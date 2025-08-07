@@ -1,0 +1,590 @@
+[
+  {
+    "ContainingType": "GestionConge.Components.Controllers.DemandeCongeController",
+    "Method": "GetAll",
+    "RelativePath": "api/DemandeConge",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.DemandeCongeController",
+    "Method": "Create",
+    "RelativePath": "api/DemandeConge",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "demande",
+        "Type": "GestionConge.Components.Models.DemandeConge",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.DemandeCongeController",
+    "Method": "GetById",
+    "RelativePath": "api/DemandeConge/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.DemandeCongeController",
+    "Method": "Update",
+    "RelativePath": "api/DemandeConge/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "demande",
+        "Type": "GestionConge.Components.Models.DemandeConge",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.DemandeCongeController",
+    "Method": "Delete",
+    "RelativePath": "api/DemandeConge/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.DemandeCongeController",
+    "Method": "GetAssignes",
+    "RelativePath": "api/DemandeConge/assignes/{validateurId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "validateurId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.DemandeCongeController",
+    "Method": "GetByUtilisateur",
+    "RelativePath": "api/DemandeConge/utilisateur/{utilisateurId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "utilisateurId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.MailTestController",
+    "Method": "SendTestEmail",
+    "RelativePath": "api/MailTest/send-test",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.PlanningCongeController",
+    "Method": "GetAll",
+    "RelativePath": "api/PlanningConge",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.PlanningCongeController",
+    "Method": "Create",
+    "RelativePath": "api/PlanningConge",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "planning",
+        "Type": "GestionConge.Components.Models.PlanningConge",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.PlanningCongeController",
+    "Method": "GetById",
+    "RelativePath": "api/PlanningConge/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.PlanningCongeController",
+    "Method": "Update",
+    "RelativePath": "api/PlanningConge/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "planning",
+        "Type": "GestionConge.Components.Models.PlanningConge",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.PlanningCongeController",
+    "Method": "Delete",
+    "RelativePath": "api/PlanningConge/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.PlanningCongeController",
+    "Method": "Planifier",
+    "RelativePath": "api/PlanningConge/planifier",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "planning",
+        "Type": "GestionConge.Components.Models.PlanningConge",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.PlanningCongeController",
+    "Method": "GetPlanningParUtilisateur",
+    "RelativePath": "api/PlanningConge/utilisateur/{utilisateurId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "utilisateurId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.RappelController",
+    "Method": "GetAll",
+    "RelativePath": "api/Rappel",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.RappelController",
+    "Method": "Create",
+    "RelativePath": "api/Rappel",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "rappel",
+        "Type": "GestionConge.Components.Models.Rappel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.RappelController",
+    "Method": "GetById",
+    "RelativePath": "api/Rappel/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.RappelController",
+    "Method": "Update",
+    "RelativePath": "api/Rappel/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "rappel",
+        "Type": "GestionConge.Components.Models.Rappel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.RappelController",
+    "Method": "Delete",
+    "RelativePath": "api/Rappel/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.StatistiquesController",
+    "Method": "GetCongesParMois",
+    "RelativePath": "api/Statistiques/conges-par-mois",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.StatistiquesController",
+    "Method": "ExportStatistiquesEnPdf",
+    "RelativePath": "api/Statistiques/export-pdf",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.StatistiquesController",
+    "Method": "GetJoursParUser",
+    "RelativePath": "api/Statistiques/jours-par-user",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.StatistiquesController",
+    "Method": "GetPicAbsences",
+    "RelativePath": "api/Statistiques/pic-absences",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.StatistiquesController",
+    "Method": "GetSolde",
+    "RelativePath": "api/Statistiques/solde/{utilisateurId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "utilisateurId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.TestController",
+    "Method": "Get",
+    "RelativePath": "api/Test",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.UtilisateurController",
+    "Method": "GetAll",
+    "RelativePath": "api/Utilisateur",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.UtilisateurController",
+    "Method": "Create",
+    "RelativePath": "api/Utilisateur",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "utilisateur",
+        "Type": "GestionConge.Components.Models.Utilisateur",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.UtilisateurController",
+    "Method": "GetById",
+    "RelativePath": "api/Utilisateur/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.UtilisateurController",
+    "Method": "Update",
+    "RelativePath": "api/Utilisateur/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "utilisateur",
+        "Type": "GestionConge.Components.Models.Utilisateur",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.UtilisateurController",
+    "Method": "Delete",
+    "RelativePath": "api/Utilisateur/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.UtilisateurController",
+    "Method": "ModifierRole",
+    "RelativePath": "api/Utilisateur/{id}/role",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "nouveauRole",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.UtilisateurController",
+    "Method": "GetSubordonnes",
+    "RelativePath": "api/Utilisateur/{id}/subordonnes",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.ValidationController",
+    "Method": "GetAll",
+    "RelativePath": "api/Validation",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.ValidationController",
+    "Method": "Create",
+    "RelativePath": "api/Validation",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "validation",
+        "Type": "GestionConge.Components.Models.Validation",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.ValidationController",
+    "Method": "GetById",
+    "RelativePath": "api/Validation/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.ValidationController",
+    "Method": "Update",
+    "RelativePath": "api/Validation/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "validation",
+        "Type": "GestionConge.Components.Models.Validation",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.ValidationController",
+    "Method": "Delete",
+    "RelativePath": "api/Validation/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.ValidationController",
+    "Method": "TraiterValidation",
+    "RelativePath": "api/Validation/traiter",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "GestionConge.Components.DTOs.RequestDto.ValidationRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

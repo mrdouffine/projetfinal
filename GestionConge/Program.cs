@@ -1,16 +1,71 @@
-using MudBlazor.Services;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using GestionConge.Client.Pages;
 using GestionConge.Components;
+using GestionConge.Components.Database;
+using GestionConge.Components.Models;
+using GestionConge.Components.Repositories;
+using GestionConge.Components.Repositories.IRepositories;
+using GestionConge.Components.Repositories.RepositoriesImpl;
+using GestionConge.Components.Services.IServices;
+using GestionConge.Components.Services.ServicesImpl;
+using MudBlazor.Services;
+using Npgsql;
+using System.Data;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Pour injecter IDbConnection (PostgreSQL)
+builder.Services.AddScoped<IDbConnection>(sp =>
+    new NpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 // Add MudBlazor services
 builder.Services.AddMudServices();
+
+
+builder.Services.AddControllers(); // <- important
+// Swagger/OpenAPI
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
+// Register the TestRepository
+builder.Services.AddScoped<TestRepository>();
+// Register the DemandeCongeRepository
+builder.Services.AddScoped<IDemandeCongeRepository, DemandeCongeRepository>();
+// Register the DemandeCongeService
+builder.Services.AddScoped<IDemandeCongeService, DemandeCongeService>();
+// Register the UtilisateurRepository and UtilisateurService
+builder.Services.AddScoped<IUtilisateurRepository, UtilisateurRepository>();
+builder.Services.AddScoped<IUtilisateurService, UtilisateurService>();
+// Register the ValidationRepository and ValidationService
+builder.Services.AddScoped<IValidationRepository, ValidationRepository>();
+builder.Services.AddScoped<IValidationService, ValidationService>();
+// Register the PlanningCongeRepository and PlanningCongeService
+builder.Services.AddScoped<IPlanningCongeRepository, PlanningCongeRepository>();
+builder.Services.AddScoped<IPlanningCongeService, PlanningCongeService>();
+// Register the RappelRepository and RappelService
+builder.Services.AddScoped<IRappelRepository, RappelRepository>();
+builder.Services.AddScoped<IRappelService, RappelService>();
+// Register the EmailService
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.AddScoped<IMailService, MailService>();
+// Register the EmailSenderService
+builder.Services.AddHostedService<ReminderEmailService>();
+// Register the PDF export service
+builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+builder.Services.AddScoped<IPdfExportService, PdfExportService>();
+
+
+
+
+// Register the DapperContext for database access
+builder.Services.AddSingleton<DapperContext>();
 
 var app = builder.Build();
 
@@ -18,6 +73,9 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+
 }
 else
 {
@@ -28,7 +86,7 @@ else
 
 app.UseHttpsRedirection();
 
-
+app.MapControllers(); // <- important pour activer les routes API
 app.UseAntiforgery();
 
 app.MapStaticAssets();

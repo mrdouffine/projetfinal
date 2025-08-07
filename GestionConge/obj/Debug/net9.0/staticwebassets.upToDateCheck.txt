@@ -1,0 +1,2 @@
+wwwroot\favicon.ico
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge\wwwroot\favicon.ico
