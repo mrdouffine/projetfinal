@@ -25,25 +25,29 @@ public class StatistiquesController : ControllerBase
     public async Task<IActionResult> GetJoursParUser()
     {
         var sql = @"
-        SELECT u.Nom, u.Prenom, SUM(c.Duree) AS TotalJours
-        FROM Utilisateurs u
-        JOIN Conges c ON u.Id = c.UtilisateurId
-        WHERE c.Statut = 'Approuvé'
-        GROUP BY u.Id, u.Nom, u.Prenom
-        ORDER BY TotalJours DESC";
+    SELECT 
+        u.Nom, 
+        u.Email, 
+        SUM(DATE_PART('day', c.Date_Fin - c.Date_Debut) + 1) AS TotalJours
+    FROM Utilisateurs u
+    JOIN Demandes_Conge c ON u.Id = c.UtilisateurId
+    WHERE c.Statut = 'Validé'
+    GROUP BY u.Id, u.Nom, u.Email
+    ORDER BY TotalJours DESC";
 
         var result = await _db.QueryAsync(sql);
         return Ok(result);
     }
 
+
     [HttpGet("pic-absences")]
     public async Task<IActionResult> GetPicAbsences()
     {
         var sql = @"
-        SELECT c.DateDebut, COUNT(*) AS NombreAbsences
-        FROM Conges c
-        WHERE c.Statut = 'Approuvé'
-        GROUP BY c.DateDebut
+        SELECT c.Date_Debut, COUNT(*) AS NombreAbsences
+        FROM Demandes_Conge c
+        WHERE c.Statut = 'Validé'
+        GROUP BY c.Date_Debut
         ORDER BY NombreAbsences DESC
         LIMIT 5";
 
@@ -58,9 +62,9 @@ public class StatistiquesController : ControllerBase
         var totalCongeParAn = 30;
 
         var sql = @"
-        SELECT COALESCE(SUM(Duree), 0) 
-        FROM Conges
-        WHERE UtilisateurId = @utilisateurId AND Statut = 'Approuvé'";
+        SELECT COALESCE(SUM(DATE_PART('day', c.Date_Fin - c.Date_Debut) + 1), 0) 
+        FROM Demandes_Conge c
+        WHERE UtilisateurId = @utilisateurId AND Statut = 'Validé'";
 
         var totalPris = await _db.ExecuteScalarAsync<int>(sql, new { utilisateurId });
         var soldeRestant = totalCongeParAn - totalPris;
@@ -72,10 +76,10 @@ public class StatistiquesController : ControllerBase
     public async Task<IActionResult> GetCongesParMois()
     {
         var sql = @"
-        SELECT DATE_TRUNC('month', DateDebut) AS Mois, COUNT(*) AS NombreConges
-        FROM Conges
-        WHERE EXTRACT(YEAR FROM DateDebut) = EXTRACT(YEAR FROM CURRENT_DATE)
-              AND Statut = 'Approuvé'
+        SELECT DATE_TRUNC('month', Date_Debut) AS Mois, COUNT(*) AS NombreConges
+        FROM Demandes_Conge
+        WHERE EXTRACT(YEAR FROM Date_Debut) = EXTRACT(YEAR FROM CURRENT_DATE)
+              AND Statut = 'Validé'
         GROUP BY Mois
         ORDER BY Mois";
 

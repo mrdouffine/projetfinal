@@ -1,6 +1,7 @@
 ﻿namespace GestionConge.Components.Controllers;
 
-using GestionConge.Components.Models;
+using GestionConge.Components.DTOs;
+using GestionConge.Components.DTOs.RequestDto;
 using GestionConge.Components.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,17 +31,17 @@ public class UtilisateurController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(Utilisateur utilisateur)
+    public async Task<IActionResult> Create(UtilisateurRequestDto utilisateurRequestDto)
     {
-        var id = await _service.CreateAsync(utilisateur);
-        return CreatedAtAction(nameof(GetById), new { id }, utilisateur);
+        var id = await _service.CreateAsync(utilisateurRequestDto);
+        return CreatedAtAction(nameof(GetById), new { id }, utilisateurRequestDto);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Utilisateur utilisateur)
+    public async Task<IActionResult> Update(int id, UtilisateurDto utilisateurDto)
     {
-        if (id != utilisateur.Id) return BadRequest();
-        var success = await _service.UpdateAsync(utilisateur);
+        if (id != utilisateurDto.Id) return BadRequest();
+        var success = await _service.UpdateAsync(utilisateurDto);
         return success ? NoContent() : NotFound();
     }
 
@@ -59,12 +60,12 @@ public class UtilisateurController : ControllerBase
         return Ok(subordonnes);
     }
 
-    // Modifier uniquement le rôle
-    [HttpPut("{id}/role")]
-    public async Task<IActionResult> ModifierRole(int id, [FromBody] string nouveauRole)
-    {
-        var success = await _service.ModifierRoleAsync(id, nouveauRole);
-        return success ? NoContent() : NotFound();
-    }
+    //// Modifier uniquement le rôle
+    //[HttpPut("{id}/role")]
+    //public async Task<IActionResult> ModifierRole(int id, [FromBody] string nouveauRole)
+    //{
+    //    var success = await _service.ModifierRoleAsync(id, nouveauRole);
+    //    return success ? NoContent() : NotFound();
+    //}
 
 }

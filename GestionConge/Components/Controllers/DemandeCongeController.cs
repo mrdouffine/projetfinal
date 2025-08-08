@@ -1,4 +1,6 @@
-﻿using GestionConge.Components.Models;
+﻿using GestionConge.Components.DTOs;
+using GestionConge.Components.DTOs.RequestDto;
+using GestionConge.Components.Models;
 using GestionConge.Components.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 namespace GestionConge.Components.Controllers;
@@ -30,14 +32,14 @@ public class DemandeCongeController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] DemandeConge demande)
+    public async Task<IActionResult> Create([FromBody] DemandeCongeRequestDto demande)
     {
         var id = await _service.CreateAsync(demande);
         return CreatedAtAction(nameof(GetById), new { id }, demande);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] DemandeConge demande)
+    public async Task<IActionResult> Update(int id, [FromBody] DemandeCongeDto demande)
     {
         if (id != demande.Id) return BadRequest();
         var success = await _service.UpdateAsync(demande);

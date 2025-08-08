@@ -1,6 +1,8 @@
 ﻿namespace GestionConge.Components.Repositories.RepositoriesImpl;
 
 using Dapper;
+using GestionConge.Components.DTOs;
+using GestionConge.Components.DTOs.RequestDto;
 using GestionConge.Components.Models;
 using GestionConge.Components.Repositories.IRepositories;
 using System.Data;
@@ -26,22 +28,22 @@ public class UtilisateurRepository : IUtilisateurRepository
         return await _db.QueryFirstOrDefaultAsync<Utilisateur>(sql, new { Id = id });
     }
 
-    public async Task<int> CreateAsync(Utilisateur utilisateur)
+    public async Task<int> CreateAsync(UtilisateurRequestDto utilisateurRequestDto)
     {
         var sql = @"
         INSERT INTO utilisateurs (nom, email, motdepasse, role, superieurid)
         VALUES (@Nom, @Email, @MotDePasse, @Role, @SuperieurId)
         RETURNING id";
-        return await _db.ExecuteScalarAsync<int>(sql, utilisateur);
+        return await _db.ExecuteScalarAsync<int>(sql, utilisateurRequestDto);
     }
 
-    public async Task<bool> UpdateAsync(Utilisateur utilisateur)
+    public async Task<bool> UpdateAsync(UtilisateurDto utilisateurDto)
     {
         var sql = @"
         UPDATE utilisateurs
         SET nom = @Nom, email = @Email, motdepasse = @MotDePasse, role = @Role, superieurid = @SuperieurId
         WHERE id = @Id";
-        var rows = await _db.ExecuteAsync(sql, utilisateur);
+        var rows = await _db.ExecuteAsync(sql, utilisateurDto);
         return rows > 0;
     }
 

@@ -53,7 +53,7 @@ public class ValidationService : IValidationService
         if (dto.Statut == "Rejeté")
         {
             demande.Statut = "Rejeté";
-            await _demandeRepo.UpdateAsync(new DemandeConge
+            await _demandeRepo.UpdateAsync(new DemandeCongeDto
             {
                 Id = demande.Id,
                 Statut = "Rejeté",
@@ -81,7 +81,7 @@ public class ValidationService : IValidationService
         if (valideur.Role == "RH" || valideur.Role == "DOT")
         {
             demande.Statut = "Validé";
-            await _demandeRepo.UpdateAsync(new DemandeConge
+            await _demandeRepo.UpdateAsync(new DemandeCongeDto
             {
                 Id = demande.Id,
                 Statut = "Validé",

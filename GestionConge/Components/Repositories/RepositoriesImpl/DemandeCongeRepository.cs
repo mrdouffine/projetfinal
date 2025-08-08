@@ -3,7 +3,7 @@ namespace GestionConge.Components.Repositories.RepositoriesImpl;
 
 using Dapper;
 using GestionConge.Components.DTOs;
-using GestionConge.Components.Models;
+using GestionConge.Components.DTOs.RequestDto;
 using System.Data;
 
 public class DemandeCongeRepository : IDemandeCongeRepository
@@ -45,7 +45,7 @@ public class DemandeCongeRepository : IDemandeCongeRepository
         return await _db.QueryFirstOrDefaultAsync<DemandeCongeDto>(sql, new { Id = id });
     }
 
-    public async Task<int> CreateAsync(DemandeConge demande)
+    public async Task<int> CreateAsync(DemandeCongeRequestDto demande)
     {
         using var transaction = _db.BeginTransaction();
 
@@ -72,14 +72,14 @@ public class DemandeCongeRepository : IDemandeCongeRepository
 
             // Étape 3 : Créer la validation initiale
             var sqlInsertValidation = @"
-            INSERT INTO validations (demandecongeid, validateurid, statut)
-            VALUES (@DemandeCongeId, @ValidateurId, 'En attente');
+            INSERT INTO validations (demandecongeid, valideurid, statut)
+            VALUES (@DemandeCongeId, @ValideurId, 'En attente');
         ";
 
             await _db.ExecuteAsync(sqlInsertValidation, new
             {
                 DemandeCongeId = demandeId,
-                ValidateurId = superieurId
+                ValideurId = superieurId
             }, transaction);
 
             transaction.Commit();
@@ -93,7 +93,7 @@ public class DemandeCongeRepository : IDemandeCongeRepository
     }
 
 
-    public async Task<bool> UpdateAsync(DemandeConge demande)
+    public async Task<bool> UpdateAsync(DemandeCongeDto demande)
     {
         var sql = @"
         UPDATE demandes_conge
@@ -126,7 +126,7 @@ public class DemandeCongeRepository : IDemandeCongeRepository
         return await _db.QueryAsync<DemandeCongeDto>(sql, new { UtilisateurId = utilisateurId });
     }
 
-    public async Task<IEnumerable<DemandeCongeDto>> GetAssignesAsync(int validateurId)
+    public async Task<IEnumerable<DemandeCongeDto>> GetAssignesAsync(int valideurId)
     {
         var sql = @"
         SELECT d.id, d.date_debut, d.date_fin, d.motif, d.statut, d.date_soumission,
@@ -135,11 +135,11 @@ public class DemandeCongeRepository : IDemandeCongeRepository
         FROM demandes_conge d
         JOIN utilisateurs u ON d.utilisateurid = u.id
         JOIN validations v ON v.demandecongeid = d.id
-        WHERE v.validateurid = @ValidateurId AND d.statut = 'En attente'
+        WHERE v.valideurid = @ValideurId AND d.statut = 'En attente'
         ORDER BY d.date_soumission DESC;
     ";
 
-        return await _db.QueryAsync<DemandeCongeDto>(sql, new { ValidateurId = validateurId });
+        return await _db.QueryAsync<DemandeCongeDto>(sql, new { ValideurId = valideurId });
     }
 
 
