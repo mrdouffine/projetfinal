@@ -4,6 +4,7 @@ namespace GestionConge.Components.Repositories.RepositoriesImpl;
 using Dapper;
 using GestionConge.Components.DTOs;
 using GestionConge.Components.DTOs.RequestDto;
+using GestionConge.Components.Models;
 using System.Data;
 
 public class DemandeCongeRepository : IDemandeCongeRepository
@@ -53,8 +54,8 @@ public class DemandeCongeRepository : IDemandeCongeRepository
         {
             // Étape 1 : Créer la demande
             var sqlInsertDemande = @"
-            INSERT INTO demandes_conge (utilisateurid, date_debut, date_fin, motif, statut, date_soumission)
-            VALUES (@UtilisateurId, @DateDebut, @DateFin, @Motif, 'En attente', @DateSoumission)
+            INSERT INTO demandes_conge (utilisateurid, date_debut, date_fin, motif, statut)
+            VALUES (@UtilisateurId, @DateDebut, @DateFin, @Motif, 'En attente')
             RETURNING id;
         ";
 
@@ -62,8 +63,11 @@ public class DemandeCongeRepository : IDemandeCongeRepository
 
             // Étape 2 : Chercher le supérieur hiérarchique
             var superieurId = await _db.ExecuteScalarAsync<int?>(
-                "SELECT superieurid FROM utilisateurs WHERE id = @Id",
-                new { Id = demande.UtilisateurId }, transaction);
+                "SELECT superieurid FROM utilisateurs WHERE id = @UtilisateurId",
+                //"SELECT s.Id, s.Nom, s.Email FROM utilisateurs u JOIN utilisateurs s ON u.SuperieurId = s.Id WHERE u.Id = @UtilisateurId",
+                new { UtilisateurId = demande.UtilisateurId }, transaction);
+
+            //            var superieur = connection.QueryFirstOrDefault<Utilisateur>(sql, new { UtilisateurId = utilisateurId }); 
 
             if (superieurId is null)
             {
@@ -106,7 +110,7 @@ public class DemandeCongeRepository : IDemandeCongeRepository
 
     public async Task<bool> UpdateStatutAsync(int demandeId, string statut)
     {
-        var sql = "UPDATE demandeconges SET statut = @Statut WHERE id = @DemandeId";
+        var sql = "UPDATE demande_conges SET statut = @Statut WHERE id = @DemandeId";
         return await _db.ExecuteAsync(sql, new { DemandeId = demandeId, Statut = statut }) > 0;
     }
 

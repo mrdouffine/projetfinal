@@ -7,9 +7,11 @@ using GestionConge.Components.Models;
 public interface IUtilisateurRepository
 {
     Task<IEnumerable<Utilisateur>> GetAllAsync();
-    Task<Utilisateur?> GetByIdAsync(int id);
+    Task<Utilisateur?> GetByIdAsync(int? id);
     Task<int> CreateAsync(UtilisateurRequestDto utilisateurRequestDto);
     Task<bool> UpdateAsync(UtilisateurDto utilisateurDto);
     Task<IEnumerable<Utilisateur>> GetSubordonnesAsync(int superieurId);
+    Task<Utilisateur?> GetByRoleAsync(string role);
+    Task<Utilisateur?> GetByEmailAsync(string email);
     Task<bool> DeleteAsync(int id);
 }

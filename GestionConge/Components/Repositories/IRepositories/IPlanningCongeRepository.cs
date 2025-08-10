@@ -10,6 +10,7 @@ public interface IPlanningCongeRepository
     Task<int> CreateAsync(PlanningConge planning);
     Task<bool> UpdateAsync(PlanningConge planning);
     Task<bool> VerifierChevauchementAsync(int utilisateurId, DateTime debut, DateTime fin);
+    Task<IEnumerable<PlanningCongeDto>> GetByUtilisateurIdAsync(int utilisateurId);
     Task<int> CalculerTotalJoursPlanifiesAsync(int utilisateurId, int annee);
 
     Task<bool> DeleteAsync(int id);

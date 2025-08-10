@@ -17,8 +17,18 @@ using System.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Pour injecter IDbConnection (PostgreSQL)
+//builder.Services.AddScoped<IDbConnection>(sp =>
+//    new NpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddScoped<IDbConnection>(sp =>
-    new NpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    var conn = new NpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection"));
+    conn.Open(); // On ouvre directement
+    return conn;
+});
+
+//// Register the DapperContext for database access
+//builder.Services.AddSingleton<DapperContext>();
 
 // Add MudBlazor services
 builder.Services.AddMudServices();
@@ -60,12 +70,6 @@ builder.Services.AddHostedService<ReminderEmailService>();
 // Register the PDF export service
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 builder.Services.AddScoped<IPdfExportService, PdfExportService>();
-
-
-
-
-// Register the DapperContext for database access
-builder.Services.AddSingleton<DapperContext>();
 
 var app = builder.Build();
 

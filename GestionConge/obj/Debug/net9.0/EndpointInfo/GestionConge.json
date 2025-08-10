@@ -367,6 +367,38 @@
         }
       }
     },
+    "/api/PlanningConge/solde/{utilisateurId}/{annee}": {
+      "get": {
+        "tags": [
+          "PlanningConge"
+        ],
+        "parameters": [
+          {
+            "name": "utilisateurId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "annee",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Rappel": {
       "get": {
         "tags": [
@@ -995,16 +1027,6 @@
           "motif": {
             "type": "string",
             "nullable": true
-          },
-          "superieurId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "backupId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -1096,7 +1118,8 @@
           },
           "superieurId": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "subordonnes": {
             "type": "array",
@@ -1120,6 +1143,10 @@
             "nullable": true
           },
           "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "motDePasse": {
             "type": "string",
             "nullable": true
           },
@@ -1191,6 +1218,10 @@
           "dateValidation": {
             "type": "string",
             "format": "date-time"
+          },
+          "ordreValidation": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

@@ -17,10 +17,37 @@ public class UtilisateurService : IUtilisateurService
 
     public Task<IEnumerable<Utilisateur>> GetAllAsync() => _repository.GetAllAsync();
     public Task<Utilisateur?> GetByIdAsync(int id) => _repository.GetByIdAsync(id);
-    public Task<int> CreateAsync(UtilisateurRequestDto utilisateurRequestDto) => _repository.CreateAsync(utilisateurRequestDto);
+    public async Task<int> CreateAsync(UtilisateurRequestDto utilisateurRequestDto)
+    {
+        // ✨ AJOUT : Validation métier
+        await ValidateUniqueEmailAsync(utilisateurRequestDto.Email);
+        await ValidateSuperieurExistsAsync(utilisateurRequestDto.SuperieurId);
+
+       return await  _repository.CreateAsync(utilisateurRequestDto);
+    }
+
     public Task<bool> UpdateAsync(UtilisateurDto utilisateurDto) => _repository.UpdateAsync(utilisateurDto);
     public Task<IEnumerable<Utilisateur>> GetSubordonnesAsync(int superieurId) =>
     _repository.GetSubordonnesAsync(superieurId);
+
+
+    private async Task ValidateUniqueEmailAsync(string email)
+    {
+        // Vérifier que l'email n'existe pas déjà
+        var existingUser = await _repository.GetByEmailAsync(email);
+        if (existingUser != null)
+            throw new InvalidOperationException("Un utilisateur avec cet email existe déjà");
+    }
+
+    private async Task ValidateSuperieurExistsAsync(int? superieurId)
+    {
+        if (superieurId.HasValue)
+        {
+            var superieur = await _repository.GetByIdAsync(superieurId.Value);
+            if (superieur == null)
+                throw new InvalidOperationException("Le supérieur spécifié n'existe pas");
+        }
+    }
 
     //public async Task<bool> ModifierRoleAsync(int id, string role)
     //{

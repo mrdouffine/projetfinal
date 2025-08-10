@@ -10,9 +10,9 @@ public class DemandeCongeRequestDto
 
     public string Motif { get; set; }
 
-    public int? SuperieurId { get; set; }
+    //public int? SuperieurId { get; set; }
 
-    public int? BackupId { get; set; }
+    //public int? BackupId { get; set; }
 
     //// Tu peux éventuellement ajouter un champ pour le type de congé si nécessaire
     //public string TypeConge { get; set; }  // ex: "Annuel", "Maladie", etc.

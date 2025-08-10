@@ -7,7 +7,7 @@ namespace GestionConge.Components.Repositories.IRepositories;
 public interface IDemandeCongeRepository
 {
     Task<IEnumerable<DemandeCongeDto>> GetAllAsync();
-    Task<DemandeCongeDto> GetByIdAsync(int id);
+    Task<DemandeCongeDto?> GetByIdAsync(int id);
     Task<int> CreateAsync(DemandeCongeRequestDto demande);
     Task<bool> UpdateAsync(DemandeCongeDto demande);
     Task<IEnumerable<DemandeCongeDto>> GetByUtilisateurIdAsync(int utilisateurId);

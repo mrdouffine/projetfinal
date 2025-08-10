@@ -41,13 +41,26 @@ public class ValidationRepository : IValidationRepository
         return await _db.QueryFirstOrDefaultAsync<ValidationDto>(sql, new { Id = id });
     }
 
+    public async Task<ValidationDto?> GetByValideurAndDemandeAsync(int valideurId, int demandeId)
+    {
+        var sql = @"
+            SELECT v.id, v.demandecongeid, v.statut, v.commentaire, v.datevalidation, v.ordre_validation,
+                   u.id as ValideurId, u.nom as NomValideur, u.email as EmailValideur
+            FROM validations v
+            JOIN utilisateurs u ON v.valideurid = u.id
+            WHERE v.valideurid = @ValideurId AND v.demandecongeid = @DemandeId
+            AND v.statut = 'En attente';
+    ";
+        return await _db.QueryFirstOrDefaultAsync<ValidationDto>(sql, new { ValideurId = valideurId, DemandeId = demandeId });
+    }
+
     public async Task<int> CreateAsync(Validation validation)
     {
         var sql = @"
-        INSERT INTO validations (demandecongeid, valideurid, statut, commentaire, datevalidation)
-        VALUES (@DemandeCongeId, @ValideurId, @Statut, @Commentaire, @DateValidation)
-        RETURNING id;
-        ";
+            INSERT INTO validations (demandecongeid, valideurid, statut, commentaire, datevalidation, ordre_validation)
+            VALUES (@DemandeCongeId, @ValideurId, @Statut, @Commentaire, @DateValidation, @OrdreValidation)
+            RETURNING id;
+            ";
 
         return await _db.ExecuteScalarAsync<int>(sql, validation);
     }

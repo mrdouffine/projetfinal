@@ -22,7 +22,7 @@ public class UtilisateurRepository : IUtilisateurRepository
         return await _db.QueryAsync<Utilisateur>(sql);
     }
 
-    public async Task<Utilisateur?> GetByIdAsync(int id)
+    public async Task<Utilisateur?> GetByIdAsync(int? id)
     {
         var sql = "SELECT * FROM utilisateurs WHERE id = @Id";
         return await _db.QueryFirstOrDefaultAsync<Utilisateur>(sql, new { Id = id });
@@ -39,10 +39,15 @@ public class UtilisateurRepository : IUtilisateurRepository
 
     public async Task<bool> UpdateAsync(UtilisateurDto utilisateurDto)
     {
-        var sql = @"
-        UPDATE utilisateurs
-        SET nom = @Nom, email = @Email, motdepasse = @MotDePasse, role = @Role, superieurid = @SuperieurId
-        WHERE id = @Id";
+        //var sql = @"
+        //UPDATE utilisateurs
+        //SET nom = @Nom, email = @Email, motdepasse = @MotDePasse, role = @Role, superieurid = @SuperieurId
+        //WHERE id = @Id";
+
+        // Si tu veux inclure le mot de passe conditionnellement :
+        var sql = string.IsNullOrEmpty(utilisateurDto.MotDePasse)
+            ? "UPDATE utilisateurs SET nom = @Nom, email = @Email, role = @Role, superieurid = @SuperieurId WHERE id = @Id"
+            : "UPDATE utilisateurs SET nom = @Nom, email = @Email, motdepasse = @MotDePasse, role = @Role, superieurid = @SuperieurId WHERE id = @Id";
         var rows = await _db.ExecuteAsync(sql, utilisateurDto);
         return rows > 0;
     }
@@ -54,7 +59,18 @@ public class UtilisateurRepository : IUtilisateurRepository
         return await _db.QueryAsync<Utilisateur>(sql, new { SuperieurId = superieurId });
     }
 
+    // ✨ AJOUT dans IUtilisateurRepository et UtilisateurRepository
+    public async Task<Utilisateur?> GetByEmailAsync(string email)
+    {
+        var sql = "SELECT * FROM utilisateurs WHERE email = @Email";
+        return await _db.QueryFirstOrDefaultAsync<Utilisateur>(sql, new { Email = email });
+    }
 
+    public async Task<Utilisateur?> GetByRoleAsync(string role)
+    {
+        var sql = "SELECT * FROM utilisateurs WHERE role = @Role AND superieurid IS NULL LIMIT 1";
+        return await _db.QueryFirstOrDefaultAsync<Utilisateur>(sql, new { Role = role });
+    }
     public async Task<bool> DeleteAsync(int id)
     {
         var sql = "DELETE FROM utilisateurs WHERE id = @Id";

@@ -47,10 +47,25 @@ public class PlanningCongeController : ControllerBase
     [HttpPost("planifier")]
     public async Task<IActionResult> Planifier([FromBody] PlanningConge planning)
     {
-        var success = await _service.AjouterPlanningAvecVerificationsAsync(planning);
-        if (!success)
-            return BadRequest("Chevauchement détecté ou dépassement du quota annuel (30 jours).");
-        return Ok();
+        try
+        {
+            var success = await _service.AjouterPlanningAvecVerificationsAsync(planning);
+            if (!success)
+                return BadRequest(new
+                {
+                    message = "Impossible de planifier ces congés",
+                    reasons = new[] {
+                    "Chevauchement avec des congés existants",
+                    "Dépassement du quota annuel (30 jours)"
+                }
+                });
+
+            return Ok(new { message = "Planning créé avec succès" });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpGet("utilisateur/{utilisateurId}")]
@@ -60,6 +75,19 @@ public class PlanningCongeController : ControllerBase
         return Ok(plannings);
     }
 
+    [HttpGet("solde/{utilisateurId}/{annee}")]
+    public async Task<IActionResult> GetSoldeRestant(int utilisateurId, int annee)
+    {
+        var totalPlanifie = await _service.CalculerTotalJoursPlanifiesAsync(utilisateurId, annee);
+        var soldeRestant = 30 - totalPlanifie;
+
+        return Ok(new
+        {
+            AnneeReference = annee,
+            TotalPlanifie = totalPlanifie,
+            SoldeRestant = Math.Max(0, soldeRestant)
+        });
+    }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)

@@ -217,6 +217,27 @@
   },
   {
     "ContainingType": "GestionConge.Components.Controllers.PlanningCongeController",
+    "Method": "GetSoldeRestant",
+    "RelativePath": "api/PlanningConge/solde/{utilisateurId}/{annee}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "utilisateurId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "annee",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.PlanningCongeController",
     "Method": "GetPlanningParUtilisateur",
     "RelativePath": "api/PlanningConge/utilisateur/{utilisateurId}",
     "HttpMethod": "GET",

@@ -16,7 +16,8 @@ public class ValidationService : IValidationService
     public ValidationService(
         IValidationRepository validationRepo,
         IDemandeCongeRepository demandeRepo,
-        IUtilisateurRepository utilisateurRepo,IMailService mailService)
+        IUtilisateurRepository utilisateurRepo,
+        IMailService mailService)
     {
         _validationRepo = validationRepo;
         _demandeRepo = demandeRepo;
@@ -28,96 +29,106 @@ public class ValidationService : IValidationService
     public Task<ValidationDto?> GetByIdAsync(int id) => _validationRepo.GetByIdAsync(id);
     public Task<int> CreateAsync(Validation validation) => _validationRepo.CreateAsync(validation);
     public Task<bool> UpdateAsync(Validation validation) => _validationRepo.UpdateAsync(validation);
-
+    public Task<bool> DeleteAsync(int id) => _validationRepo.DeleteAsync(id);
 
     public async Task<bool> TraiterValidationAsync(ValidationRequestDto dto)
     {
-        // création validation actuelle
-        var validation = new Validation
+        // 1. Récupérer la validation existante
+        var validationExistante = await _validationRepo.GetByValideurAndDemandeAsync(dto.ValideurId, dto.DemandeCongeId);
+        if (validationExistante == null)
+            return false;
+
+        // 2. Mettre à jour la validation existante
+        var validationToUpdate = new Validation
         {
-            DemandeCongeId = dto.DemandeCongeId,
-            ValideurId = dto.ValideurId,
+            Id = validationExistante.Id,
+            DemandeCongeId = validationExistante.DemandeCongeId,
+            ValideurId = validationExistante.ValideurId,
             Statut = dto.Statut,
             Commentaire = dto.Commentaire,
-            DateValidation = DateTime.UtcNow
+            DateValidation = DateTime.UtcNow,
+            OrdreValidation = validationExistante.OrdreValidation
         };
 
-        await _validationRepo.CreateAsync(validation);
+        await _validationRepo.UpdateAsync(validationToUpdate);
 
+        // 3. Récupérer la demande et le demandeur
         var demande = await _demandeRepo.GetByIdAsync(dto.DemandeCongeId);
         if (demande == null) return false;
 
         var demandeur = await _utilisateurRepo.GetByIdAsync(demande.UtilisateurId);
         if (demandeur == null) return false;
 
+        // 4. Traitement si rejeté
         if (dto.Statut == "Rejeté")
         {
-            demande.Statut = "Rejeté";
-            await _demandeRepo.UpdateAsync(new DemandeCongeDto
-            {
-                Id = demande.Id,
-                Statut = "Rejeté",
-                DateDebut = demande.DateDebut,
-                DateFin = demande.DateFin,
-                Motif = demande.Motif,
-                UtilisateurId = demande.UtilisateurId
-            });
-
-            // Envoi email au demandeur
-            MailData mailData = new MailData
-            {
-                To = demandeur.Email,
-                Subject = "Demande de congé rejetée",
-                Body = $"Bonjour {demandeur.Nom}, votre demande de congé a été rejetée. Commentaire : {dto.Commentaire}"
-            };
-            await _mailService.SendEmailAsync(mailData);
-
+            await UpdateDemandeStatutAsync(demande, "Rejeté");
+            await EnvoyerEmailAsync(demandeur, "rejetée", dto.Commentaire);
             return true;
         }
 
+        // 5. Traitement si validé - vérifier le rôle du valideur
         var valideur = await _utilisateurRepo.GetByIdAsync(dto.ValideurId);
         if (valideur == null) return false;
 
-        if (valideur.Role == "RH" || valideur.Role == "DOT")
+        if (valideur.Role == "DOT")
         {
-            demande.Statut = "Validé";
-            await _demandeRepo.UpdateAsync(new DemandeCongeDto
-            {
-                Id = demande.Id,
-                Statut = "Validé",
-                DateDebut = demande.DateDebut,
-                DateFin = demande.DateFin,
-                Motif = demande.Motif,
-                UtilisateurId = demande.UtilisateurId
-            });
-
-            // Envoi email au demandeur
-            MailData mailData = new MailData
-            {
-                To = demandeur.Email,
-                Subject = "Demande de congé validée",
-                Body = $"Bonjour {demandeur.Nom}, votre demande de congé a été validée."
-            };
-            await _mailService.SendEmailAsync(mailData);
-
-            return true;
+            // Validation finale par DOT
+            await UpdateDemandeStatutAsync(demande, "Validé");
+            await EnvoyerEmailAsync(demandeur, "validée", null);
         }
-
-        // sinon créer la validation pour le supérieur (pas de mail ici)
-
-        var superieur = await _utilisateurRepo.GetByIdAsync(valideur.SuperieurId);
-        if (superieur == null) return false;
-
-        await _validationRepo.CreateAsync(new Validation
+        else
         {
-            DemandeCongeId = dto.DemandeCongeId,
-            ValideurId = superieur.Id,
-            Statut = "En attente"
-        });
+            // Passer au DOT pour validation finale
+            var dot = await _utilisateurRepo.GetByRoleAsync("DOT");
+            if (dot == null)
+                throw new InvalidOperationException("Aucun utilisateur DOT trouvé");
+
+            await _validationRepo.CreateAsync(new Validation
+            {
+                DemandeCongeId = dto.DemandeCongeId,
+                ValideurId = dot.Id,
+                Statut = "En attente",
+                OrdreValidation = validationExistante.OrdreValidation + 1
+            });
+        }
 
         return true;
     }
 
+    // Méthodes utilitaires privées
+    private async Task UpdateDemandeStatutAsync(DemandeCongeDto demande, string statut)
+    {
+        var demandeToUpdate = new DemandeCongeDto
+        {
+            Id = demande.Id,
+            DateDebut = demande.DateDebut,
+            DateFin = demande.DateFin,
+            Motif = demande.Motif,
+            Statut = statut,
+            UtilisateurId = demande.UtilisateurId,
+            DateSoumission = demande.DateSoumission,
+            NomUtilisateur = demande.NomUtilisateur,
+            EmailUtilisateur = demande.EmailUtilisateur
+        };
 
-    public Task<bool> DeleteAsync(int id) => _validationRepo.DeleteAsync(id);
+        await _demandeRepo.UpdateAsync(demandeToUpdate);
+    }
+
+    private async Task EnvoyerEmailAsync(Utilisateur demandeur, string action, string? commentaire)
+    {
+        var sujet = action == "rejetée" ? "Demande de congé rejetée" : "Demande de congé validée";
+        var corps = action == "rejetée"
+            ? $"Bonjour {demandeur.Nom}, votre demande de congé a été rejetée. Commentaire : {commentaire}"
+            : $"Bonjour {demandeur.Nom}, votre demande de congé a été validée définitivement.";
+
+        var mailData = new MailData
+        {
+            To = demandeur.Email,
+            Subject = sujet,
+            Body = corps
+        };
+
+        await _mailService.SendEmailAsync(mailData);
+    }
 }

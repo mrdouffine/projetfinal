@@ -9,4 +9,6 @@ public class Validation
     public string Statut { get; set; } = "En attente"; // "Validé", "Rejeté"
     public string? Commentaire { get; set; }
     public DateTime DateValidation { get; set; } = DateTime.UtcNow;
+
+    public int OrdreValidation { get; set; } = 1; // Pour workflow à plusieurs niveaux
 }

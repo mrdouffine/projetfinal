@@ -12,7 +12,7 @@ public class Utilisateur
     public string Role { get; set; } = string.Empty; // Ex: Employe, RH, DOT, Admin
     public ICollection<DemandeConge> Demandes { get; set; } = new List<DemandeConge>();
 
-    public int SuperieurId { get; set; }
+    public int? SuperieurId { get; set; }
 
     public ICollection<Utilisateur>? Subordonnes { get; set; }
 }

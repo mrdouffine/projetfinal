@@ -12,4 +12,6 @@ public class ValidationDto
     public string Statut { get; set; }
     public string? Commentaire { get; set; }
     public DateTime DateValidation { get; set; }
+
+    public int OrdreValidation { get; set; } = 1;
 }

@@ -13,5 +13,10 @@ public class DapperContext
         _connectionString = _configuration.GetConnectionString("DefaultConnection");
     }
 
-    public NpgsqlConnection CreateConnection() => new NpgsqlConnection(_connectionString);
+    public NpgsqlConnection CreateConnection()
+    {
+        var connection = new NpgsqlConnection(_connectionString);
+        connection.Open(); // Ouvre directement la connexion
+        return connection;
+    }
 }

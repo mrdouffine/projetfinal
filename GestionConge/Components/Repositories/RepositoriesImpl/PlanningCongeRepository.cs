@@ -74,6 +74,18 @@
             return count > 0;
         }
 
+        public async Task<IEnumerable<PlanningCongeDto>> GetByUtilisateurIdAsync(int utilisateurId)
+        {
+            var sql = @"
+    SELECT p.id, p.date_debut, p.date_fin, p.motif, p.date_creation,
+           u.id AS UtilisateurId, u.nom AS NomUtilisateur
+    FROM plannings_conge p
+    JOIN utilisateurs u ON p.utilisateurid = u.id
+    WHERE p.utilisateurid = @UtilisateurId
+    ORDER BY p.date_debut;
+    ";
+            return await _db.QueryAsync<PlanningCongeDto>(sql, new { UtilisateurId = utilisateurId });
+        }
         public async Task<int> CalculerTotalJoursPlanifiesAsync(int utilisateurId, int annee)
         {
             var debutAnnee = new DateTime(annee, 1, 1);
