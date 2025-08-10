@@ -6,10 +6,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="..\GestionConge.Client\Components\Component.razor" Link="Component.razor" />
+    <None Include="..\GestionConge.Client\Components\Component1.razor" Link="Component1.razor" />
+    <None Include="..\GestionConge.Client\Components\Component2.razor" Link="Component2.razor" />
+  </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GestionConge.Client\GestionConge.Client.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.*" />
+    <PackageReference Include="MudBlazor" Version="6.17.0" />
   </ItemGroup>
 
 </Project>

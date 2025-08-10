@@ -1,0 +1,164 @@
+@page "/register"
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Inscription - GestionConge</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+    <MudPaper Class="pa-6" Elevation="3">
+        <MudText Typo="Typo.h4" Class="mb-4 text-center" Color="Color.Primary">
+            <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Class="mr-2" />
+            Créer un compte
+        </MudText>
+
+        <EditForm Model="@registerModel" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <MudGrid>
+                                 <MudItem xs="12" sm="6">
+                     <MudTextField @bind-Value="registerModel.FirstName" 
+                                  Label="Prénom" 
+                                  Required="true"
+                                  RequiredError="Le prénom est requis"
+                                  AdornmentIcon="@Icons.Material.Filled.Person"
+                                  Adornment="Adornment.Start"
+                                  Class="mb-3" />
+                 </MudItem>
+
+                 <MudItem xs="12" sm="6">
+                     <MudTextField @bind-Value="registerModel.LastName" 
+                                  Label="Nom" 
+                                  Required="true"
+                                  RequiredError="Le nom est requis"
+                                  AdornmentIcon="@Icons.Material.Filled.Person"
+                                  Adornment="Adornment.Start"
+                                  Class="mb-3" />
+                 </MudItem>
+
+                 <MudItem xs="12">
+                     <MudTextField @bind-Value="registerModel.Email" 
+                                  Label="Email" 
+                                  Required="true"
+                                  RequiredError="L'email est requis"
+                                  InputType="InputType.Email"
+                                  AdornmentIcon="@Icons.Material.Filled.Email"
+                                  Adornment="Adornment.Start"
+                                  Class="mb-3" />
+                 </MudItem>
+
+                 <MudItem xs="12" sm="6">
+                     <MudTextField @bind-Value="registerModel.Username" 
+                                  Label="Nom d'utilisateur" 
+                                  Required="true"
+                                  RequiredError="Le nom d'utilisateur est requis"
+                                  AdornmentIcon="@Icons.Material.Filled.AccountCircle"
+                                  Adornment="Adornment.Start"
+                                  Class="mb-3" />
+                 </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="string" Label="Département" 
+                              @bind-Value="registerModel.Department" 
+                              Required="true" RequiredError="Le département est requis">
+                        <MudSelectItem Value="@("Ressources Humaines")">Ressources Humaines</MudSelectItem>
+                        <MudSelectItem Value="@("Informatique")">Informatique</MudSelectItem>
+                        <MudSelectItem Value="@("Marketing")">Marketing</MudSelectItem>
+                        <MudSelectItem Value="@("Finance")">Finance</MudSelectItem>
+                        <MudSelectItem Value="@("Production")">Production</MudSelectItem>
+                        <MudSelectItem Value="@("Commercial")">Commercial</MudSelectItem>
+                        <MudSelectItem Value="@("Autre")">Autre</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+
+                                 <MudItem xs="12" sm="6">
+                     <MudTextField @bind-Value="registerModel.Password" 
+                                  Label="Mot de passe" 
+                                  Required="true"
+                                  RequiredError="Le mot de passe est requis"
+                                  InputType="InputType.Password"
+                                  AdornmentIcon="@Icons.Material.Filled.Lock"
+                                  Adornment="Adornment.Start"
+                                  Class="mb-3" />
+                 </MudItem>
+
+                 <MudItem xs="12" sm="6">
+                     <MudTextField @bind-Value="registerModel.ConfirmPassword" 
+                                  Label="Confirmer le mot de passe" 
+                                  Required="true"
+                                  RequiredError="La confirmation du mot de passe est requise"
+                                  InputType="InputType.Password"
+                                  AdornmentIcon="@Icons.Material.Filled.Lock"
+                                  Adornment="Adornment.Start"
+                                  Class="mb-3" />
+                 </MudItem>
+
+                 <MudItem xs="12">
+                     <MudCheckBox T="bool" @bind-Checked="registerModel.AcceptTerms" 
+                                 Color="Color.Primary" 
+                                 Label="J'accepte les conditions d'utilisation et la politique de confidentialité"
+                                 Required="true"
+                                 RequiredError="Vous devez accepter les conditions d'utilisation"
+                                 Class="mb-4" />
+                 </MudItem>
+
+                <MudItem xs="12" Class="d-flex justify-end">
+                    <MudButton Variant="Variant.Text" 
+                              Color="Color.Secondary" 
+                              Class="mr-2"
+                              Href="/login">
+                        Déjà un compte ?
+                    </MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" 
+                              Variant="Variant.Filled" 
+                              Color="Color.Primary"
+                              StartIcon="@Icons.Material.Filled.PersonAdd">
+                        Créer le compte
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private RegisterModel registerModel = new();
+
+    public class RegisterModel
+    {
+        [Required(ErrorMessage = "Le prénom est requis")]
+        [StringLength(50, ErrorMessage = "Le prénom ne peut pas dépasser 50 caractères")]
+        public string FirstName { get; set; } = "";
+
+        [Required(ErrorMessage = "Le nom est requis")]
+        [StringLength(50, ErrorMessage = "Le nom ne peut pas dépasser 50 caractères")]
+        public string LastName { get; set; } = "";
+
+        [Required(ErrorMessage = "L'email est requis")]
+        [EmailAddress(ErrorMessage = "Format d'email invalide")]
+        public string Email { get; set; } = "";
+
+        [Required(ErrorMessage = "Le nom d'utilisateur est requis")]
+        [StringLength(30, MinimumLength = 3, ErrorMessage = "Le nom d'utilisateur doit contenir entre 3 et 30 caractères")]
+        public string Username { get; set; } = "";
+
+        [Required(ErrorMessage = "Le département est requis")]
+        public string Department { get; set; } = "";
+
+        [Required(ErrorMessage = "Le mot de passe est requis")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Le mot de passe doit contenir au moins 6 caractères")]
+        public string Password { get; set; } = "";
+
+        [Required(ErrorMessage = "La confirmation du mot de passe est requise")]
+        [Compare("Password", ErrorMessage = "Les mots de passe ne correspondent pas")]
+        public string ConfirmPassword { get; set; } = "";
+
+        [Required(ErrorMessage = "Vous devez accepter les conditions d'utilisation")]
+        public bool AcceptTerms { get; set; }
+    }
+
+    private void HandleValidSubmit()
+    {
+        // TODO: Implémenter la logique d'inscription
+        Console.WriteLine($"Nouvelle inscription : {registerModel.Username} ({registerModel.Email})");
+    }
+} 

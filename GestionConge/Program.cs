@@ -1,5 +1,4 @@
 using MudBlazor.Services;
-using GestionConge.Client.Pages;
 using GestionConge.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,6 +34,6 @@ app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(GestionConge.Client._Imports).Assembly);
+   .AddAdditionalAssemblies(typeof(GestionConge.Client._Imports).Assembly);
 
 app.Run();

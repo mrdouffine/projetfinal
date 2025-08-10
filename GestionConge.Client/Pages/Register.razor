@@ -1,0 +1,23 @@
+﻿@page "/register"
+@inject AuthService Auth
+@inject NavigationManager Navigation
+
+<h3>Inscription</h3>
+
+<EditForm Model="model" OnValidSubmit="HandleRegister">
+    <DataAnnotationsValidator />
+    <InputText @bind-Value="model.Nom" placeholder="Nom" class="form-control mb-2" />
+    <InputText @bind-Value="model.Prenom" placeholder="Prénom" class="form-control mb-2" />
+    <InputText @bind-Value="model.Email" placeholder="Email" class="form-control mb-2" />
+    <InputText @bind-Value="model.Password" type="password" placeholder="Mot de passe" class="form-control mb-2" />
+    <button class="btn btn-success" type="submit">S'inscrire</button>
+</EditForm>
+
+@code {
+    private RegisterModel model = new();
+    private async Task HandleRegister()
+    {
+        var created = await Auth.RegisterAsync(model);
+        if (created) Navigation.NavigateTo("/login");
+    }
+}

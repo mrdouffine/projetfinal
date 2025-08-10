@@ -1,0 +1,136 @@
+@page "/demande-conge"
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Demande de Congé - GestionConge</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+    <MudPaper Class="pa-6" Elevation="3">
+        <MudText Typo="Typo.h4" Class="mb-4" Color="Color.Primary">
+            <MudIcon Icon="@Icons.Material.Filled.DateRange" Class="mr-2" />
+            Nouvelle Demande de Congé
+        </MudText>
+
+        <EditForm Model="@demandeModel" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="string" Label="Type de Congé" 
+                              @bind-Value="demandeModel.TypeConge" 
+                              Required="true" RequiredError="Le type de congé est requis">
+                        <MudSelectItem Value="@("Congé annuel")">Congé annuel</MudSelectItem>
+                        <MudSelectItem Value="@("Congé maladie")">Congé maladie</MudSelectItem>
+                        <MudSelectItem Value="@("Congé maternité")">Congé maternité</MudSelectItem>
+                        <MudSelectItem Value="@("Congé paternité")">Congé paternité</MudSelectItem>
+                        <MudSelectItem Value="@("Congé formation")">Congé formation</MudSelectItem>
+                        <MudSelectItem Value="@("Autre")">Autre</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal" @bind-Value="demandeModel.NombreJours" 
+                                    Label="Nombre de jours" 
+                                    Required="true" 
+                                    Min="0.5m" Max="30m"
+                                    RequiredError="Le nombre de jours est requis"
+                                    MinError="Le nombre minimum est 0.5 jour"
+                                    MaxError="Le nombre maximum est 30 jours" />
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker @bind-Date="demandeModel.DateDebut" 
+                                  Label="Date de début" 
+                                  Required="true"
+                                  RequiredError="La date de début est requise"
+                                  DateFormat="dd/MM/yyyy" />
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker @bind-Date="demandeModel.DateFin" 
+                                  Label="Date de fin" 
+                                  Required="true"
+                                  RequiredError="La date de fin est requise"
+                                  DateFormat="dd/MM/yyyy" />
+                </MudItem>
+
+                                 <MudItem xs="12">
+                     <MudTextField @bind-Value="demandeModel.Motif" 
+                                  Label="Motif de la demande" 
+                                  Lines="3" 
+                                  Required="true"
+                                  RequiredError="Le motif est requis"
+                                  MaxLength="500" />
+                 </MudItem>
+
+                 <MudItem xs="12">
+                     <MudCheckBox T="bool" @bind-Checked="demandeModel.DemandeUrgente" 
+                                 Color="Color.Warning" 
+                                 Label="Demande urgente" />
+                 </MudItem>
+
+                 <MudItem xs="12">
+                     <MudTextField @bind-Value="demandeModel.InformationsComplementaires" 
+                                  Label="Informations complémentaires (optionnel)" 
+                                  Lines="4"
+                                  MaxLength="1000" />
+                 </MudItem>
+
+                <MudItem xs="12" Class="d-flex justify-end">
+                    <MudButton Variant="Variant.Text" 
+                              Color="Color.Secondary" 
+                              Class="mr-2"
+                              OnClick="HandleCancel">
+                        Annuler
+                    </MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" 
+                              Variant="Variant.Filled" 
+                              Color="Color.Primary"
+                              StartIcon="@Icons.Material.Filled.Send">
+                        Soumettre la demande
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private DemandeCongeModel demandeModel = new();
+
+    public class DemandeCongeModel
+    {
+        [Required(ErrorMessage = "Le type de congé est requis")]
+        public string TypeConge { get; set; } = "";
+
+        [Required(ErrorMessage = "Le nombre de jours est requis")]
+        [Range(0.5, 30, ErrorMessage = "Le nombre de jours doit être entre 0.5 et 30")]
+        public decimal NombreJours { get; set; }
+
+        [Required(ErrorMessage = "La date de début est requise")]
+        public DateTime? DateDebut { get; set; }
+
+        [Required(ErrorMessage = "La date de fin est requise")]
+        public DateTime? DateFin { get; set; }
+
+        [Required(ErrorMessage = "Le motif est requis")]
+        [StringLength(500, ErrorMessage = "Le motif ne peut pas dépasser 500 caractères")]
+        public string Motif { get; set; } = "";
+
+        public bool DemandeUrgente { get; set; }
+
+        [StringLength(1000, ErrorMessage = "Les informations complémentaires ne peuvent pas dépasser 1000 caractères")]
+        public string InformationsComplementaires { get; set; } = "";
+    }
+
+    private void HandleValidSubmit()
+    {
+        // TODO: Implémenter la logique de soumission
+        Console.WriteLine("Demande soumise avec succès !");
+    }
+
+    private void HandleCancel()
+    {
+        demandeModel = new DemandeCongeModel();
+    }
+} 

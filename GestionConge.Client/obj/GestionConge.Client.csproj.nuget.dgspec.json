@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\HP\\source\\repos\\projet\\GestionConge\\GestionConge.Client\\GestionConge.Client.csproj": {}
+    "D:\\Projet_deuxième_annee\\projet\\GestionConge.Client\\GestionConge.Client.csproj": {}
   },
   "projects": {
-    "C:\\Users\\HP\\source\\repos\\projet\\GestionConge\\GestionConge.Client\\GestionConge.Client.csproj": {
+    "D:\\Projet_deuxième_annee\\projet\\GestionConge.Client\\GestionConge.Client.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\HP\\source\\repos\\projet\\GestionConge\\GestionConge.Client\\GestionConge.Client.csproj",
+        "projectUniqueName": "D:\\Projet_deuxième_annee\\projet\\GestionConge.Client\\GestionConge.Client.csproj",
         "projectName": "GestionConge.Client",
-        "projectPath": "C:\\Users\\HP\\source\\repos\\projet\\GestionConge\\GestionConge.Client\\GestionConge.Client.csproj",
-        "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\HP\\source\\repos\\projet\\GestionConge\\GestionConge.Client\\obj\\",
+        "projectPath": "D:\\Projet_deuxième_annee\\projet\\GestionConge.Client\\GestionConge.Client.csproj",
+        "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
+        "outputPath": "D:\\Projet_deuxième_annee\\projet\\GestionConge.Client\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -58,13 +58,13 @@
             "Microsoft.NET.ILLink.Tasks": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.8, )",
+              "version": "[9.0.6, )",
               "autoReferenced": true
             },
             "Microsoft.NET.Sdk.WebAssembly.Pack": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.8, )",
+              "version": "[9.0.6, )",
               "autoReferenced": true
             },
             "MudBlazor": {
@@ -83,18 +83,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.NETCore.App.Runtime.Mono.browser-wasm",
-              "version": "[9.0.8, 9.0.8]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {

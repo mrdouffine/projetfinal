@@ -1,0 +1,54 @@
+﻿@page "/validation"  
+@using GestionConge.Client.Models
+@using GestionConge.Client.Services  
+@inject CongeService CongeSvc  
+
+<h3>Validations en attente</h3>  
+
+@if (attentes == null)  
+{  
+    <p>Chargement…</p>  
+}  
+else if (!attentes.Any())  
+{  
+    <p>Aucune demande en attente.</p>  
+}  
+else  
+{  
+    @foreach (var d in attentes)  
+    {  
+        <div class="card mb-2 p-2">  
+            <div><strong>@d.Motif</strong></div>  
+            <div>@d.DateDebut.ToShortDateString() — @d.DateFin.ToShortDateString()</div>  
+            <div class="mt-2">  
+                <button class="btn btn-sm btn-success me-2" @onclick="() => Approve(d.Id)">Valider</button>  
+                <button class="btn btn-sm btn-danger" @onclick="() => Reject(d.Id)">Refuser</button>  
+            </div>  
+        </div>  
+    }  
+}  
+
+@code {  
+    private List<DemandeCongeModel>? attentes;  
+
+    protected override async Task OnInitializedAsync()  
+    {  
+        attentes = await CongeSvc.GetDemandesEnAttenteAsync();  
+    }  
+
+    private async Task Approve(int id)  
+    {  
+        if (await CongeSvc.ApproveAsync(id))  
+        {  
+            await OnInitializedAsync(); // recharge la liste  
+        }  
+    }  
+
+    private async Task Reject(int id)  
+    {  
+        if (await CongeSvc.RejectAsync(id))  
+        {  
+            await OnInitializedAsync(); // recharge la liste  
+        }  
+    }  
+}

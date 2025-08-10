@@ -1,0 +1,157 @@
+@page "/"
+
+<PageTitle>Accueil - GestionConge</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <!-- En-tête principal -->
+    <MudPaper Class="pa-6 mb-6" Elevation="3" Style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <MudText Typo="Typo.h3" Class="text-white mb-2">
+            <MudIcon Icon="@Icons.Material.Filled.Work" Class="mr-2" />
+            Système de Gestion des Congés
+        </MudText>
+        <MudText Typo="Typo.body1" Class="text-white">
+            Gérez vos demandes de congés de manière simple et efficace
+        </MudText>
+    </MudPaper>
+
+    <!-- Cartes d'action principales -->
+    <MudGrid Class="mb-6">
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Class="pa-4 text-center" Elevation="2" Style="cursor: pointer;" @onclick="() => NavigateToDemande()">
+                <MudIcon Icon="@Icons.Material.Filled.Add" Size="Size.Large" Color="Color.Primary" Class="mb-3" />
+                <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-2">
+                    Nouvelle Demande
+                </MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    Créer une nouvelle demande de congé
+                </MudText>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Class="pa-4 text-center" Elevation="2" Style="cursor: pointer;" @onclick="() => NavigateToStats()">
+                <MudIcon Icon="@Icons.Material.Filled.Analytics" Size="Size.Large" Color="Color.Info" Class="mb-3" />
+                <MudText Typo="Typo.h6" Color="Color.Info" Class="mb-2">
+                    Mes Statistiques
+                </MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    Consulter les statistiques et rapports
+                </MudText>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Class="pa-4 text-center" Elevation="2" Style="cursor: pointer;" @onclick="() => NavigateToLogin()">
+                <MudIcon Icon="@Icons.Material.Filled.Login" Size="Size.Large" Color="Color.Success" Class="mb-3" />
+                <MudText Typo="Typo.h6" Color="Color.Success" Class="mb-2">
+                    Se Connecter
+                </MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    Accéder à votre espace personnel
+                </MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    <!-- Informations et alertes -->
+    <MudGrid>
+        <MudItem xs="12" md="8">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-3">
+                    <MudIcon Icon="@Icons.Material.Filled.Info" Class="mr-2" />
+                    Informations importantes
+                </MudText>
+                <MudList T="string" Dense="true">
+                    <MudListItem T="string" Icon="@Icons.Material.Filled.CheckCircle" IconColor="Color.Success">
+                        Les demandes de congé doivent être soumises au moins 2 semaines à l'avance
+                    </MudListItem>
+                    <MudListItem T="string" Icon="@Icons.Material.Filled.CheckCircle" IconColor="Color.Success">
+                        Les congés de maladie nécessitent un certificat médical
+                    </MudListItem>
+                    <MudListItem T="string" Icon="@Icons.Material.Filled.CheckCircle" IconColor="Color.Success">
+                        Le solde de congés est mis à jour automatiquement
+                    </MudListItem>
+                    <MudListItem T="string" Icon="@Icons.Material.Filled.CheckCircle" IconColor="Color.Success">
+                        Vous recevrez une notification par email pour chaque décision
+                    </MudListItem>
+                </MudList>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" md="4">
+            <MudAlert Severity="Severity.Info" Class="mb-3">
+                <MudText Typo="Typo.body2">
+                    <strong>Nouveau :</strong> Interface modernisée pour une meilleure expérience utilisateur
+                </MudText>
+            </MudAlert>
+            
+            <MudAlert Severity="Severity.Warning">
+                <MudText Typo="Typo.body2">
+                    <strong>Rappel :</strong> Période de pointe pour les congés d'été (juin-août)
+                </MudText>
+            </MudAlert>
+        </MudItem>
+    </MudGrid>
+
+    <!-- Statistiques rapides -->
+    <MudPaper Class="pa-4 mt-6" Elevation="2">
+        <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-3">
+            <MudIcon Icon="@Icons.Material.Filled.TrendingUp" Class="mr-2" />
+            Statistiques rapides
+        </MudText>
+        <MudGrid>
+            <MudItem xs="6" sm="3">
+                <MudText Typo="Typo.h4" Color="Color.Primary">@quickStats.TotalRequests</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Demandes totales</MudText>
+            </MudItem>
+            <MudItem xs="6" sm="3">
+                <MudText Typo="Typo.h4" Color="Color.Success">@quickStats.ApprovedRequests</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Approuvées</MudText>
+            </MudItem>
+            <MudItem xs="6" sm="3">
+                <MudText Typo="Typo.h4" Color="Color.Warning">@quickStats.PendingRequests</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">En attente</MudText>
+            </MudItem>
+            <MudItem xs="6" sm="3">
+                <MudText Typo="Typo.h4" Color="Color.Info">@quickStats.AverageDays</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Jours moyens</MudText>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private QuickStats quickStats = new()
+    {
+        TotalRequests = 156,
+        ApprovedRequests = 127,
+        PendingRequests = 15,
+        AverageDays = 5.2
+    };
+
+    public class QuickStats
+    {
+        public int TotalRequests { get; set; }
+        public int ApprovedRequests { get; set; }
+        public int PendingRequests { get; set; }
+        public double AverageDays { get; set; }
+    }
+
+    private void NavigateToDemande()
+    {
+        // TODO: Implémenter la navigation
+        Console.WriteLine("Navigation vers demande de congé");
+    }
+
+    private void NavigateToStats()
+    {
+        // TODO: Implémenter la navigation
+        Console.WriteLine("Navigation vers statistiques");
+    }
+
+    private void NavigateToLogin()
+    {
+        // TODO: Implémenter la navigation
+        Console.WriteLine("Navigation vers connexion");
+    }
+} 

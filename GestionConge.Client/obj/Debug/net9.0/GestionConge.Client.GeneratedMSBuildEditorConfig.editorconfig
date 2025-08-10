@@ -16,41 +16,77 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = browser
 build_property.RootNamespace = GestionConge.Client
 build_property.RootNamespace = GestionConge.Client
-build_property.ProjectDir = C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\
+build_property.ProjectDir = D:\Projet_deuxième_annee\projet\GestionConge.Client\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = false
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client
+build_property.MSBuildProjectDirectory = D:\Projet_deuxième_annee\projet\GestionConge.Client
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Layout/MainLayout.razor]
+[D:/Projet_deuxième_annee/projet/GestionConge.Client/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Projet_deuxième_annee/projet/GestionConge.Client/Components/DemandeCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xEZW1hbmRlQ2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Projet_deuxième_annee/projet/GestionConge.Client/Components/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xOYXZNZW51LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Projet_deuxième_annee/projet/GestionConge.Client/Components/StatBox.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTdGF0Qm94LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Projet_deuxième_annee/projet/GestionConge.Client/Components/UserCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVc2VyQ2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Projet_deuxième_annee/projet/GestionConge.Client/Layout/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XE1haW5MYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Layout/NavMenu.razor]
+[D:/Projet_deuxième_annee/projet/GestionConge.Client/Layout/NavMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XE5hdk1lbnUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Counter.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
+[D:/Projet_deuxième_annee/projet/GestionConge.Client/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = TWFpbkxheW91dC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Home.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZS5yYXpvcg==
+[D:/Projet_deuxième_annee/projet/GestionConge.Client/Pages/AdminGestion.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5HZXN0aW9uLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Weather.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2VhdGhlci5yYXpvcg==
+[D:/Projet_deuxième_annee/projet/GestionConge.Client/Pages/Dashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Routes.razor]
-build_metadata.AdditionalFiles.TargetPath = Um91dGVzLnJhem9y
+[D:/Projet_deuxième_annee/projet/GestionConge.Client/Pages/DemandeConge.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVtYW5kZUNvbmdlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/_Imports.razor]
+[D:/Projet_deuxième_annee/projet/GestionConge.Client/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Projet_deuxième_annee/projet/GestionConge.Client/Pages/PlanningConge.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGxhbm5pbmdDb25nZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Projet_deuxième_annee/projet/GestionConge.Client/Pages/Register.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Projet_deuxième_annee/projet/GestionConge.Client/Pages/Validation.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVmFsaWRhdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Projet_deuxième_annee/projet/GestionConge.Client/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 

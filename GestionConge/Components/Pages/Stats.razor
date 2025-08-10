@@ -1,0 +1,206 @@
+
+
+
+
+
+
+@page "/stats"
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Statistiques - GestionConge</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <MudText Typo="Typo.h4" Class="mb-4" Color="Color.Primary">
+        <MudIcon Icon="@Icons.Material.Filled.Analytics" Class="mr-2" />
+        Tableau de Bord - Statistiques
+    </MudText>
+
+    <!-- Cartes de statistiques principales -->
+    <MudGrid Class="mb-6">
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-2">
+                    <MudIcon Icon="@Icons.Material.Filled.Pending" Class="mr-2" />
+                    Demandes en attente
+                </MudText>
+                <MudText Typo="Typo.h3" Color="Color.Warning">
+                    @pendingRequests
+                </MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    En attente de validation
+                </MudText>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-2">
+                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="mr-2" />
+                    Demandes approuvées
+                </MudText>
+                <MudText Typo="Typo.h3" Color="Color.Success">
+                    @approvedRequests
+                </MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    Cette année
+                </MudText>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-2">
+                    <MudIcon Icon="@Icons.Material.Filled.Cancel" Class="mr-2" />
+                    Demandes refusées
+                </MudText>
+                <MudText Typo="Typo.h3" Color="Color.Error">
+                    @rejectedRequests
+                </MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    Cette année
+                </MudText>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-2">
+                    <MudIcon Icon="@Icons.Material.Filled.People" Class="mr-2" />
+                    Employés actifs
+                </MudText>
+                <MudText Typo="Typo.h3" Color="Color.Info">
+                    @activeEmployees
+                </MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    Total
+                </MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    <!-- Graphiques et tableaux -->
+    <MudGrid>
+        <!-- Graphique des demandes par mois -->
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-3">
+                    <MudIcon Icon="@Icons.Material.Filled.Timeline" Class="mr-2" />
+                    Demandes par mois
+                </MudText>
+                <MudChart ChartType="ChartType.Line" ChartSeries="@monthlyData" XAxisLabels="@monthLabels" Width="100%" Height="300px" />
+            </MudPaper>
+        </MudItem>
+
+        <!-- Graphique des types de congés -->
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-3">
+                    <MudIcon Icon="@Icons.Material.Filled.PieChart" Class="mr-2" />
+                    Répartition par type de congé
+                </MudText>
+                <MudChart ChartType="ChartType.Pie" ChartSeries="@leaveTypeData" Width="100%" Height="300px" />
+            </MudPaper>
+        </MudItem>
+
+        <!-- Tableau des dernières demandes -->
+        <MudItem xs="12">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-3">
+                    <MudIcon Icon="@Icons.Material.Filled.List" Class="mr-2" />
+                    Dernières demandes
+                </MudText>
+                <MudTable Items="@recentRequests" Hover="true" Striped="true" Dense="true">
+                    <HeaderContent>
+                        <MudTh>Employé</MudTh>
+                        <MudTh>Type</MudTh>
+                        <MudTh>Date début</MudTh>
+                        <MudTh>Date fin</MudTh>
+                        <MudTh>Jours</MudTh>
+                        <MudTh>Statut</MudTh>
+                        <MudTh>Actions</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@context.EmployeeName</MudTd>
+                        <MudTd>@context.LeaveType</MudTd>
+                        <MudTd>@context.StartDate.ToShortDateString()</MudTd>
+                        <MudTd>@context.EndDate.ToShortDateString()</MudTd>
+                        <MudTd>@context.Days</MudTd>
+                                                 <MudTd>
+                             <MudChip T="string" Color="@GetStatusColor(context.Status)" Size="Size.Small">
+                                 @context.Status
+                             </MudChip>
+                         </MudTd>
+                        <MudTd>
+                            <MudIconButton Icon="@Icons.Material.Filled.Visibility" 
+                                         Color="Color.Primary" 
+                                         Size="Size.Small"
+                                         OnClick="@(() => ViewRequest(context))" />
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    // Données de test pour les statistiques
+    private int pendingRequests = 15;
+    private int approvedRequests = 127;
+    private int rejectedRequests = 8;
+    private int activeEmployees = 45;
+
+    // Données pour le graphique mensuel
+    private List<ChartSeries> monthlyData = new()
+    {
+        new ChartSeries { Name = "Demandes", Data = new double[] { 12, 15, 18, 22, 19, 25, 28, 30, 26, 23, 20, 17 } }
+    };
+
+    private string[] monthLabels = { "Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc" };
+
+    // Données pour le graphique des types de congés
+    private List<ChartSeries> leaveTypeData = new()
+    {
+        new ChartSeries { Name = "Congé annuel", Data = new double[] { 45 } },
+        new ChartSeries { Name = "Congé maladie", Data = new double[] { 25 } },
+        new ChartSeries { Name = "Congé formation", Data = new double[] { 15 } },
+        new ChartSeries { Name = "Autre", Data = new double[] { 15 } }
+    };
+
+    // Données pour le tableau des dernières demandes
+    private List<RequestData> recentRequests = new()
+    {
+        new RequestData { EmployeeName = "Jean Dupont", LeaveType = "Congé annuel", StartDate = DateTime.Now.AddDays(5), EndDate = DateTime.Now.AddDays(12), Days = 7, Status = "En attente" },
+        new RequestData { EmployeeName = "Marie Martin", LeaveType = "Congé maladie", StartDate = DateTime.Now.AddDays(-2), EndDate = DateTime.Now.AddDays(2), Days = 4, Status = "Approuvé" },
+        new RequestData { EmployeeName = "Pierre Durand", LeaveType = "Congé formation", StartDate = DateTime.Now.AddDays(15), EndDate = DateTime.Now.AddDays(17), Days = 2, Status = "En attente" },
+        new RequestData { EmployeeName = "Sophie Bernard", LeaveType = "Congé annuel", StartDate = DateTime.Now.AddDays(-10), EndDate = DateTime.Now.AddDays(-3), Days = 7, Status = "Approuvé" },
+        new RequestData { EmployeeName = "Lucas Petit", LeaveType = "Congé maladie", StartDate = DateTime.Now.AddDays(-5), EndDate = DateTime.Now.AddDays(-1), Days = 4, Status = "Refusé" }
+    };
+
+    public class RequestData
+    {
+        public string EmployeeName { get; set; } = "";
+        public string LeaveType { get; set; } = "";
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public int Days { get; set; }
+        public string Status { get; set; } = "";
+    }
+
+    private Color GetStatusColor(string status)
+    {
+        return status switch
+        {
+            "En attente" => Color.Warning,
+            "Approuvé" => Color.Success,
+            "Refusé" => Color.Error,
+            _ => Color.Default
+        };
+    }
+
+    private void ViewRequest(RequestData request)
+    {
+        // TODO: Implémenter la vue détaillée d'une demande
+        Console.WriteLine($"Voir la demande de {request.EmployeeName}");
+    }
+} 

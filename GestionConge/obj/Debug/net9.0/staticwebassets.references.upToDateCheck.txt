@@ -1,0 +1,1 @@
+D:\Projet_deuxième_annee\projet\GestionConge.Client\obj\Debug\net9.0\staticwebassets.build.json

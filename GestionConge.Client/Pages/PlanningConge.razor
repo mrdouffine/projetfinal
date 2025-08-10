@@ -1,0 +1,29 @@
+﻿@page "/planning"
+@using GestionConge.Client.Services
+@inject CongeService CongeSvc
+
+<h3>Planning annuel</h3>
+
+<p>Planifie tes congés pour l'année (solde: <strong>@solde</strong> jours)</p>
+
+<!-- minimal: une liste de congés planifiés -->
+@if (planning == null)
+{
+    <p>Chargement…</p>
+}
+else
+{
+    <ul>
+        @foreach(var p in planning)
+        {
+            <li>@p.DateDebut.ToShortDateString() — @p.DateFin.ToShortDateString() (@p.Motif)</li>
+        }
+    </ul>
+}
+
+@code {
+    private int solde = 30;
+    private List<DemandeCongeModel>? planning;
+
+    protected override async Task OnInitializedAsync() => planning = await CongeSvc.GetPlanningAnnuelAsync(DateTime.Now.Year);// solde could be computed from API but left static for demo
+}

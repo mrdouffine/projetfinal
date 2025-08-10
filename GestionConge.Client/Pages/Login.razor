@@ -1,0 +1,31 @@
+﻿@page "/login"
+@inject AuthService Auth
+@inject NavigationManager Navigation
+
+<h3>Connexion</h3>
+
+<EditForm Model="model" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText @bind-Value="model.Email" placeholder="Email" class="form-control mb-2" />
+    <InputText @bind-Value="model.Password" type="password" placeholder="Mot de passe" class="form-control mb-2" />
+    <button class="btn btn-primary" type="submit">Se connecter</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(error)) 
+{
+    <div class="text-danger mt-2">@error</div>
+}
+
+@code {
+    private LoginModel model = new();
+    private string error = "";
+
+    private async Task HandleLogin()
+    {
+        var ok = await Auth.LoginAsync(model);
+        if (ok) Navigation.NavigateTo("/dashboard");
+        else error = "Identifiants invalides.";
+    }
+}

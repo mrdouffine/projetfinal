@@ -1,0 +1,39 @@
+﻿@page "/demande"
+@using GestionConge.Client.Services
+@inject CongeService CongeSvc
+
+<h3>Nouvelle demande de congé</h3>
+
+<EditForm Model="demande" OnValidSubmit="Submit">
+    <DataAnnotationsValidator />
+    <div class="mb-2">
+        <label>Date début</label>
+        <InputDate @bind-Value="demande.DateDebut" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Date fin</label>
+        <InputDate @bind-Value="demande.DateFin" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Motif</label>
+        <InputTextArea @bind-Value="demande.Motif" class="form-control" />
+    </div>
+    <button class="btn btn-primary" type="submit">Soumettre</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(msg)) 
+{
+    <div class="mt-2 text-success">@msg</div>
+}
+
+@code {
+    private DemandeCongeModel demande = new();
+    private string msg = "";
+
+    private async Task Submit()
+    {
+        var ok = await CongeSvc.CreateDemandeAsync(demande);
+        if (ok) msg = "Demande soumise.";
+        else msg = "Erreur lors de l'envoi.";
+    }
+}

@@ -1,0 +1,14 @@
+﻿@code {  
+    [Parameter] public string Title { get; set; }  
+    [Parameter] public string Value { get; set; }  
+}  
+
+<div class="card p-3 mb-2">  
+    <div class="text-muted small">@Title</div>  
+    @* Ensure the component is properly referenced or replace with valid Razor syntax *@
+    @if (!string.IsNullOrEmpty(Value))  
+    {  
+        <div>@Value</div>  
+    }  
+</div>
+quoi l

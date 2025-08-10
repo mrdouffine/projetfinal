@@ -1,0 +1,13 @@
+﻿@code {  
+    [Parameter]  
+    public DemandeCongeModel Demande { get; set; }  
+}  
+
+@parameter DemandeCongeModel Demande  
+<div class="card mb-2">  
+  <div class="card-body">  
+    <div><strong>@Demande.Motif</strong></div>  
+    <div>@Demande.DateDebut.ToShortDateString() — @Demande.DateFin.ToShortDateString()</div>  
+    <div class="small text-muted">Statut: @Demande.Statut</div>  
+  </div>  
+</div>

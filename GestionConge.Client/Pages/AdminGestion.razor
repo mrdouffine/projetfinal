@@ -1,0 +1,25 @@
+﻿@page "/admin/users"
+@inject UserService UserSvc
+
+<h3>Gestion des utilisateurs</h3>
+
+@if (users == null) 
+{
+    <p>Chargement…</p>
+}
+else
+{
+    foreach(var u in users)
+    {
+        <UserCard User="u" />
+    }
+}
+
+@code {
+    private List<UserModel>? users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await UserSvc.GetAllAsync();
+    }
+}

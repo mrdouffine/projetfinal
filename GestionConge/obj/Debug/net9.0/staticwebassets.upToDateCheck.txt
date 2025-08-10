@@ -1,0 +1,2 @@
+wwwroot\favicon.ico
+D:\Projet_deuxième_annee\projet\GestionConge\wwwroot\favicon.ico
