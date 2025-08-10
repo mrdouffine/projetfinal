@@ -1,0 +1,30 @@
+﻿@* @page "/demande"
+@* @inject DemandeService DemandeService *@
+
+@* <MudPaper Class="pa-4">
+    <MudText Typo="Typo.h5">Mes demandes de congé</MudText>
+    <MudTable Items="_demandes" Hover="true" Bordered="true">
+        <HeaderContent>
+            <MudTh>Date début</MudTh>
+            <MudTh>Date fin</MudTh>
+            <MudTh>Motif</MudTh>
+            <MudTh>Statut</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.DateDebut.ToShortDateString()</MudTd>
+            <MudTd>@context.DateFin.ToShortDateString()</MudTd>
+            <MudTd>@context.Motif</MudTd>
+            <MudTd><ValidationBadge Statut="@context.Statut" /></MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper> *@
+
+@* @code {
+    private List<DemandeCongeDto> _demandes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _demandes = await DemandeService.GetMesDemandes() ?? new();
+    }
+} *@
+

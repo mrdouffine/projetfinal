@@ -27,6 +27,30 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Components/ChartComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xDaGFydENvbXBvbmVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Components/DemandeCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xEZW1hbmRlQ2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Components/Header.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIZWFkZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Components/ValidationBadge.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xWYWxpZGF0aW9uQmFkZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Layout/Footer.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XEZvb3Rlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Layout/LoginLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XExvZ2luTGF5b3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Layout/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XE1haW5MYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -35,16 +59,40 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XE5hdk1lbnUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Counter.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/DemandeForm.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVtYW5kZUZvcm0ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Home.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZS5yYXpvcg==
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Demandes.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVtYW5kZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Weather.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2VhdGhlci5yYXpvcg==
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Notifications.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTm90aWZpY2F0aW9ucy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Register.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Statistiques.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3RhdGlzdGlxdWVzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Utilisateurs.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXRpbGlzYXRldXJzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Validations.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVmFsaWRhdGlvbnMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Routes.razor]

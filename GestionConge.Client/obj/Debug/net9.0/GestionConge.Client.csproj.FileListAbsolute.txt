@@ -1,0 +1,8 @@
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\obj\Debug\net9.0\GestionConge.Client.csproj.AssemblyReference.cache
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\obj\Debug\net9.0\rpswa.dswa.cache.json
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\obj\Debug\net9.0\GestionConge.Client.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\obj\Debug\net9.0\GestionConge.Client.AssemblyInfoInputs.cache
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\obj\Debug\net9.0\GestionConge.Client.AssemblyInfo.cs
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\obj\Debug\net9.0\GestionConge.Client.csproj.CoreCompileInputs.cache
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\obj\Debug\net9.0\GestionConge.Client.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\obj\Debug\net9.0\GestionConge.Client.sourcelink.json
