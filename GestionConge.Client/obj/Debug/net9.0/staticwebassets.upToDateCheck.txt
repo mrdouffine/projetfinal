@@ -1,8 +1,12 @@
 wwwroot\css\site.css
-wwwroot\appsettings.Development.json
+wwwroot\js\chart.js
 wwwroot\appsettings.json
+wwwroot\appsettings.Development.json
 Components\Header.razor.js
+Layout\LoginLayout.razor.js
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\wwwroot\css\site.css
-C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\wwwroot\appsettings.Development.json
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\wwwroot\js\chart.js
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\wwwroot\appsettings.json
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\wwwroot\appsettings.Development.json
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\Components\Header.razor.js
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\Layout\LoginLayout.razor.js

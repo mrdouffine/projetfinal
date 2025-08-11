@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GestionConge.Client")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fbb8b6dc70b8e6806458035a565f72de66315582")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+116d5d8b178431b2dd9cf905eff45dc371c15c8f")]
 [assembly: System.Reflection.AssemblyProductAttribute("GestionConge.Client")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GestionConge.Client")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,5 +1,35 @@
-﻿<h3>Notifications</h3>
+﻿@page "/notifications"
+@inject GestionConge.Client.Services.ApiService ApiService
+
+<h3>Notifications</h3>
+
+@if (notifications == null)
+{
+    <p>Chargement des notifications...</p>
+}
+else if (!notifications.Any())
+{
+    <p>Aucune notification disponible.</p>
+}
+else
+{
+    <ul>
+        @foreach (var notif in notifications)
+        {
+            <li>
+                <strong>@notif.NomUtilisateur</strong> : @notif.Message
+                <br />
+                <span class="text-muted">@notif.DateRappel.ToString("dd/MM/yyyy HH:mm")</span>
+            </li>
+        }
+    </ul>
+}
 
 @code {
+    private List<GestionConge.Client.Models.RappelDto>? notifications;
 
+    protected override async Task OnInitializedAsync()
+    {
+        notifications = await ApiService.GetNotificationsAsync();
+    }
 }

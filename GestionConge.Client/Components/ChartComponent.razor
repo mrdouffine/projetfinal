@@ -1,10 +1,237 @@
-﻿@* @using MudBlazor
+﻿@inject IJSRuntime JSRuntime
 
-<MudPaper Class="pa-4">
-    <MudChart ChartType="ChartType.Bar" Labels="@Labels" Datasets="@Data" />
-</MudPaper>
+<div class="chart-container">
+    @if (ShowHeader)
+    {
+        <div class="chart-header">
+            <div class="chart-title-section">
+                @if (!string.IsNullOrEmpty(Icon))
+                {
+                    <MudIcon Icon="@Icon" Size="Size.Medium" Color="Color.Primary" Class="mr-2" />
+                }
+                <div>
+                    <MudText Typo="Typo.h6" Class="chart-title">@Title</MudText>
+                    @if (!string.IsNullOrEmpty(Subtitle))
+                    {
+                        <MudText Typo="Typo.body2" Class="chart-subtitle">@Subtitle</MudText>
+                    }
+                </div>
+            </div>
+            @if (ShowRefresh)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                               Size="Size.Small"
+                               OnClick="@OnRefresh"
+                               Class="chart-refresh-btn" />
+            }
+        </div>
+    }
+
+    <div class="chart-content" style="height: @($"{Height}px")">
+        @if (IsLoading)
+        {
+            <div class="chart-loading">
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                <MudText Typo="Typo.body2" Class="mt-2">Chargement des données...</MudText>
+            </div>
+        }
+        else if (Data?.Any() != true)
+        {
+            <div class="chart-empty">
+                <MudIcon Icon="@Icons.Material.Filled.BarChart" Size="Size.Large" Class="empty-icon" />
+                <MudText Typo="Typo.h6" Class="empty-title">Aucune donnée</MudText>
+                <MudText Typo="Typo.body2" Class="empty-subtitle">
+                    Aucune donnée disponible pour ce graphique
+                </MudText>
+                @if (ShowRefresh)
+                {
+                    <MudButton Variant="Variant.Outlined"
+                               StartIcon="@Icons.Material.Filled.Refresh"
+                               OnClick="@OnRefresh"
+                               Class="mt-3">
+                        Actualiser
+                    </MudButton>
+                }
+            </div>
+        }
+        else
+        {
+            <canvas id="chart-@ComponentId"
+                    width="@Width"
+                    height="@Height">
+            </canvas>
+        }
+    </div>
+
+    @if (ShowFooter && !string.IsNullOrEmpty(FooterText))
+    {
+        <div class="chart-footer">
+            <MudText Typo="Typo.caption" Class="mud-text-secondary">@FooterText</MudText>
+        </div>
+    }
+</div>
 
 @code {
-    [Parameter] public string[] Labels { get; set; }
-    [Parameter] public MudChartDataset[] Data { get; set; }
-} *@
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Subtitle { get; set; } = "";
+    [Parameter] public string Icon { get; set; } = Icons.Material.Filled.BarChart;
+    [Parameter] public bool ShowHeader { get; set; } = true;
+    [Parameter] public bool ShowFooter { get; set; } = false;
+    [Parameter] public bool ShowRefresh { get; set; } = false;
+    [Parameter] public bool IsLoading { get; set; } = false;
+    [Parameter] public string FooterText { get; set; } = "";
+
+    [Parameter] public ChartTypes ChartType { get; set; } = ChartTypes.Bar;
+    [Parameter] public IEnumerable<ChartDataItem>? Data { get; set; }
+    [Parameter] public List<ChartSeries> Series { get; set; } = new();
+    [Parameter] public List<string>? CustomColors { get; set; }
+
+    [Parameter] public int Width { get; set; } = 800;
+    [Parameter] public int Height { get; set; } = 400;
+
+    [Parameter] public EventCallback OnRefresh { get; set; }
+
+    private string ComponentId = Guid.NewGuid().ToString("N")[..8];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && Data?.Any() == true)
+        {
+            await RenderChart();
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Data?.Any() == true)
+        {
+            await RenderChart();
+        }
+    }
+
+    private async Task RenderChart()
+    {
+        try
+        {
+            var chartConfig = new
+            {
+                type = ChartType.ToString().ToLower(),
+                data = PrepareChartData(),
+                options = GetChartOptions()
+            };
+
+            await JSRuntime.InvokeVoidAsync("renderChart", $"chart-{ComponentId}", chartConfig);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erreur lors du rendu du graphique: {ex.Message}");
+        }
+    }
+
+    private object PrepareChartData()
+    {
+        if (Data == null) return new { };
+
+        var labels = Data.Select(d => d.Label).ToArray();
+        var datasets = new List<object>();
+
+        if (ChartType == ChartTypes.Pie || ChartType == ChartTypes.Donut)
+        {
+            var values = Data.Select(d => d.Value).ToArray();
+            var colors = CustomColors?.Take(Data.Count()).ToArray() ??
+                        GenerateColors(Data.Count());
+
+            datasets.Add(new
+            {
+                data = values,
+                backgroundColor = colors,
+                borderWidth = 2,
+                borderColor = "#ffffff"
+            });
+        }
+        else
+        {
+            foreach (var series in Series)
+            {
+                var values = Data.Select(d => d.GetValue(series.DataKey)).ToArray();
+                datasets.Add(new
+                {
+                    label = series.Name,
+                    data = values,
+                    backgroundColor = series.Color + "80",
+                    borderColor = series.Color,
+                    borderWidth = series.StrokeWidth,
+                    tension = 0.4
+                });
+            }
+        }
+
+        return new { labels, datasets };
+    }
+
+    private object GetChartOptions()
+    {
+        var baseOptions = new
+        {
+            responsive = true,
+            maintainAspectRatio = false,
+            plugins = new { legend = new { display = true } }
+        };
+
+        if (ChartType == ChartTypes.Pie || ChartType == ChartTypes.Donut)
+        {
+            return new
+            {
+                responsive = true,
+                maintainAspectRatio = false,
+                cutout = ChartType == ChartTypes.Donut ? "60%" : "0%",
+                plugins = baseOptions.plugins
+            };
+        }
+
+        return baseOptions;
+    }
+
+    private string[] GenerateColors(int count)
+    {
+        var colors = new[]
+        {
+            "#0082bb", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6",
+            "#06b6d4", "#84cc16", "#f97316", "#ec4899", "#6366f1"
+        };
+
+        return Enumerable.Range(0, count)
+            .Select(i => colors[i % colors.Length])
+            .ToArray();
+    }
+
+    public enum ChartTypes
+    {
+        Line,
+        Bar,
+        Area,
+        Pie,
+        Donut
+    }
+
+    public class ChartDataItem
+    {
+        public string Label { get; set; } = "";
+        public double Value { get; set; }
+        public Dictionary<string, double> AdditionalValues { get; set; } = new();
+
+        public double GetValue(string key)
+        {
+            if (key == "value") return Value;
+            return AdditionalValues.GetValueOrDefault(key, 0);
+        }
+    }
+
+    public class ChartSeries
+    {
+        public string DataKey { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Color { get; set; } = "#0082bb";
+        public int StrokeWidth { get; set; } = 2;
+    }
+}

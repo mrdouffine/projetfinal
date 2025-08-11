@@ -1,0 +1,304 @@
+/* LoginLayout.css - Styles pour le layout de connexion */
+
+body[b-1pkywkc00u] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-container[b-1pkywkc00u] {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.login-card[b-1pkywkc00u] {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    max-width: 400px;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+    .login-card.loaded[b-1pkywkc00u] {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+.login-header[b-1pkywkc00u] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.login-body[b-1pkywkc00u] {
+    padding: 2rem;
+}
+
+.brand-logo[b-1pkywkc00u] {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.brand-subtitle[b-1pkywkc00u] {
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.form-floating[b-1pkywkc00u] {
+    margin-bottom: 1rem;
+}
+
+/* Styles pour les boutons de connexion */
+.btn-login[b-1pkywkc00u] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 0.75rem;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    color: white;
+    width: 100%;
+}
+
+    .btn-login:hover[b-1pkywkc00u] {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+
+    .btn-login:focus[b-1pkywkc00u] {
+        box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+    }
+
+/* Diviseur pour les options de connexion */
+.divider[b-1pkywkc00u] {
+    position: relative;
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+    .divider[b-1pkywkc00u]::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #dee2e6;
+    }
+
+    .divider span[b-1pkywkc00u] {
+        background: white;
+        padding: 0 1rem;
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+
+/* Boutons de connexion sociale */
+.social-login[b-1pkywkc00u] {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.btn-social[b-1pkywkc00u] {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+    background: white;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    color: #6c757d;
+    text-decoration: none;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .btn-social:hover[b-1pkywkc00u] {
+        background: #f8f9fa;
+        transform: translateY(-1px);
+        color: #495057;
+        text-decoration: none;
+    }
+
+/* Pied de page de connexion */
+.login-footer[b-1pkywkc00u] {
+    text-align: center;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+    margin-top: 1rem;
+}
+
+/* Bouton de retour */
+.back-to-home[b-1pkywkc00u] {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    color: white;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+    .back-to-home:hover[b-1pkywkc00u] {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        text-decoration: none;
+        transform: translateX(-2px);
+    }
+
+.mobile-back-button[b-1pkywkc00u] {
+    text-align: center;
+    position: absolute;
+    top: 1rem;
+}
+
+/* Conteneur de particules */
+#particles-container[b-1pkywkc00u] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.particle[b-1pkywkc00u] {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: float-b-1pkywkc00u linear infinite;
+}
+
+/* Animation des particules */
+@keyframes float-b-1pkywkc00u {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Styles pour les champs de formulaire */
+.form-control:focus[b-1pkywkc00u] {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+}
+
+.form-floating > label[b-1pkywkc00u] {
+    color: #6c757d;
+}
+
+.form-floating > .form-control:focus ~ label[b-1pkywkc00u],
+.form-floating > .form-control:not(:placeholder-shown) ~ label[b-1pkywkc00u] {
+    color: #667eea;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .login-container[b-1pkywkc00u] {
+        padding: 1rem;
+    }
+
+    .login-card[b-1pkywkc00u] {
+        margin: 1rem;
+        max-width: none;
+    }
+
+    .login-header[b-1pkywkc00u] {
+        padding: 1.5rem 1rem;
+    }
+
+    .login-body[b-1pkywkc00u] {
+        padding: 1.5rem;
+    }
+
+    .back-to-home[b-1pkywkc00u] {
+        position: relative;
+        top: auto;
+        left: auto;
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: white;
+    }
+
+    .brand-logo[b-1pkywkc00u] {
+        font-size: 1.75rem;
+    }
+
+    .social-login[b-1pkywkc00u] {
+        flex-direction: column;
+    }
+
+    .btn-social[b-1pkywkc00u] {
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-card[b-1pkywkc00u] {
+        border-radius: 15px;
+        margin: 0.5rem;
+    }
+
+    .login-header[b-1pkywkc00u] {
+        padding: 1.25rem 1rem;
+    }
+
+    .login-body[b-1pkywkc00u] {
+        padding: 1.25rem;
+    }
+
+    .brand-logo[b-1pkywkc00u] {
+        font-size: 1.5rem;
+    }
+}
+
+/* Animation d'entrée pour les éléments */
+.fade-in-up[b-1pkywkc00u] {
+    animation: fadeInUp-b-1pkywkc00u 0.6s ease-out;
+}
+
+@keyframes fadeInUp-b-1pkywkc00u {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 40px, 0);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}

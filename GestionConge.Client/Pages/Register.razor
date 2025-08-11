@@ -1,5 +1,47 @@
-﻿<h3>Register</h3>
+﻿@page "/register"
+@inject GestionConge.Client.Services.UserService UserService
+@inject NavigationManager Navigation
+
+<h3>Inscription</h3>
+
+<EditForm Model="@registerModel" OnValidSubmit="HandleRegister">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Nom :</label>
+        <InputText @bind-Value="registerModel.Nom" />
+    </div>
+    <div>
+        <label>Email :</label>
+        <InputText @bind-Value="registerModel.Email" />
+    </div>
+    <div>
+        <label>Mot de passe :</label>
+        <InputText @bind-Value="registerModel.MotDePasse" type="password" />
+    </div>
+    <button type="submit">S'inscrire</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="text-danger">@errorMessage</div>
+}
 
 @code {
+    private GestionConge.Client.Models.UtilisateurDto registerModel = new();
+    private string? errorMessage;
 
+    private async Task HandleRegister()
+    {
+        var result = await UserService.RegisterAsync(registerModel);
+        if (result)
+        {
+            Navigation.NavigateTo("/login");
+        }
+        else
+        {
+            errorMessage = "Erreur lors de l'inscription. Veuillez réessayer.";
+        }
+    }
 }

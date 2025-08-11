@@ -1,5 +1,38 @@
-﻿<h3>Validations</h3>
+﻿@page "/validations"
+@using GestionConge.Client.Models
+@inject GestionConge.Client.Services.ApiService ApiService
+@inject GestionConge.Client.Components.ValidationBadge ValidationBadge
+<h3>Validations</h3>
+
+@if (validations == null)
+{
+    <p>Chargement des validations...</p>
+}
+else if (!validations.Any())
+{
+    <p>Aucune validation en attente.</p>
+}
+else
+{
+    <ul>
+        @foreach (var validation in validations)
+        {
+            <li>
+                <strong>@validation.DemandeCongeId</strong> - @validation.Statut
+                <br />
+                <span class="text-muted">@validation.DateValidation.ToString("dd/MM/yyyy HH:mm")</span>
+                <br />
+                <ValidationBadge Statut="@validation.Statut" />
+            </li>
+        }
+    </ul>
+}
 
 @code {
+    private List<GestionConge.Client.Models.ValidationDto>? validations;
 
+    protected override async Task OnInitializedAsync()
+    {
+        validations = await ApiService.GetValidationsAsync();
+    }
 }

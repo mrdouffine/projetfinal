@@ -1,5 +1,33 @@
-﻿<h3>DemandeForm</h3>
+﻿@page "/demande-form"
+@inject GestionConge.Client.Services.DemandeService DemandeService
+
+<h3>Nouvelle demande de congé</h3>
+
+<EditForm Model="@demande" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Date de début :</label>
+        <InputDate @bind-Value="demande.DateDebut" />
+    </div>
+    <div>
+        <label>Date de fin :</label>
+        <InputDate @bind-Value="demande.DateFin" />
+    </div>
+    <div>
+        <label>Motif :</label>
+        <InputText @bind-Value="demande.Motif" />
+    </div>
+    <button type="submit">Envoyer</button>
+</EditForm>
 
 @code {
+    private GestionConge.Client.Models.DemandeCongeDto demande = new();
 
+    private async Task HandleValidSubmit()
+    {
+        // À compléter : appel à l'API pour soumettre la demande
+        // await DemandeService.CreateDemandeAsync(demande);
+    }
 }

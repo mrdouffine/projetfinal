@@ -1,12 +1,20 @@
-﻿//using GestionConge.Client.Models;
+﻿using GestionConge.Client.Models;
+using System.Net.Http.Json;
 
-//namespace GestionConge.Client.Services;
+namespace GestionConge.Client.Services
+{
+    public class DemandeService
+    {
+        private readonly HttpClient _api;
 
-//public class DemandeService
-//{
-//    private readonly ApiService _api;
-//    public DemandeService(ApiService api) => _api = api;
+        public DemandeService(HttpClient api)
+        {
+            _api = api;
+        }
 
-//    public Task<List<DemandeCongeDto>?> GetMesDemandes() =>
-//        _api.GetAsync<List<DemandeCongeDto>>("api/demandes/mes");
-//}
+        public async Task<IEnumerable<DemandeCongeDto>> GetDemandesAsync()
+        {
+            return await _api.GetFromJsonAsync<IEnumerable<DemandeCongeDto>>("api/demandes");
+        }
+    }
+}

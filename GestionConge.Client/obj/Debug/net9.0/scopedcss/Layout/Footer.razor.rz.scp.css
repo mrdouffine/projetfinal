@@ -1,0 +1,80 @@
+/* Footer.razor.css - Styles isolés pour le composant Footer */
+
+.eshop-footer[b-wimq1ljgen] {
+    background-color: #212529;
+    color: #f8f9fa;
+    padding: 2rem 0 1rem;
+    margin-top: auto;
+}
+
+    .eshop-footer h5[b-wimq1ljgen],
+    .eshop-footer h6[b-wimq1ljgen] {
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+.footer-link[b-wimq1ljgen] {
+    color: #f8f9fa;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    display: inline-block;
+    padding: 0.25rem 0;
+}
+
+    .footer-link:hover[b-wimq1ljgen] {
+        color: #0d6efd;
+        text-decoration: none;
+    }
+
+.social-links[b-wimq1ljgen] {
+    display: inline-flex;
+    gap: 1rem;
+}
+
+.social-link[b-wimq1ljgen] {
+    color: #f8f9fa;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+}
+
+    .social-link:hover[b-wimq1ljgen] {
+        color: #0d6efd;
+        background-color: rgba(13, 110, 253, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .social-link i[b-wimq1ljgen] {
+        transition: transform 0.3s ease;
+    }
+
+    .social-link:hover i[b-wimq1ljgen] {
+        transform: scale(1.1);
+    }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .eshop-footer[b-wimq1ljgen] {
+        text-align: center;
+    }
+
+        .eshop-footer .social-links[b-wimq1ljgen] {
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .eshop-footer .row.align-items-center[b-wimq1ljgen] {
+            text-align: center;
+        }
+
+        .eshop-footer .col-md-6:last-child[b-wimq1ljgen] {
+            margin-top: 1rem;
+        }
+}

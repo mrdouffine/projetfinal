@@ -1,5 +1,28 @@
-﻿<h3>Statistiques</h3>
+﻿@* @page "/statistiques"
+@inject GestionConge.Client.Services.StatistiqueService StatistiqueService
+
+<h3>Statistiques</h3>
+
+@if (statistiques == null)
+{
+    <p>Chargement des statistiques...</p>
+}
+else
+{
+    <ul>
+        <li>Total des demandes : @statistiques.TotalDemandes</li>
+        <li>Demandes validées : @statistiques.DemandesValidees</li>
+        <li>Demandes refusées : @statistiques.DemandesRefusees</li>
+        <li>Utilisateurs inscrits : @statistiques.TotalUtilisateurs</li>
+    </ul>
+    <ChartComponent Data="@statistiques.ChartData" />
+}
 
 @code {
+    private GestionConge.Client.Models.StatistiquesDto? statistiques;
 
-}
+    protected override async Task OnInitializedAsync()
+    {
+        statistiques = await StatistiqueService.GetStatistiquesAsync();
+    }
+} *@

@@ -1,5 +1,65 @@
-﻿<h3>LoginLayout</h3>
+﻿@* LoginLayout.razor - Layout spécialisé pour les pages de connexion *@
+@inherits LayoutComponentBase
 
-@code {
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestion de congés</title>
+    <base href="~/" />
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS personnalisé -->
+    <link href="css/site.css" rel="stylesheet" />
+</head>
 
-}
+<body>
+    <div class="login-container">
+        <!-- Bouton retour à l'accueil -->
+        <a href="/" class="back-to-home d-none d-md-block">
+            <i class="fas fa-arrow-left me-2"></i>
+            Retour à l'accueil
+        </a>
+        
+        <!-- Bouton mobile -->
+        <div class="d-md-none w-100 mobile-back-button">
+            <a href="/" class="back-to-home">
+                <i class="fas fa-arrow-left me-2"></i>
+                Accueil
+            </a>
+        </div>
+
+        <!-- Carte de connexion -->
+        <div class="login-card">
+            <!-- En-tête -->
+            <div class="login-header">
+                <div class="brand-logo">
+                    <i class="fas fa-store me-2"></i>
+                    GCO
+                </div>
+                <div class="brand-subtitle">
+                    Votre app de gestion de congés
+                </div>
+            </div>
+
+            <!-- Corps principal -->
+            <div class="login-body">
+                @Body
+            </div>
+        </div>
+        
+        <!-- Conteneur pour les particules -->
+        <div id="particles-container"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="_framework/blazor.server.js"></script>
+    <script src="js/login-animations.js"></script>
+</body>
+</html>
