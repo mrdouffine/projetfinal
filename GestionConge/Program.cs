@@ -2,7 +2,6 @@ using DinkToPdf;
 using DinkToPdf.Contracts;
 using GestionConge.Client.Pages;
 using GestionConge.Components;
-using GestionConge.Components.Database;
 using GestionConge.Components.Models;
 using GestionConge.Components.Repositories;
 using GestionConge.Components.Repositories.IRepositories;
@@ -98,5 +97,6 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(GestionConge.Client._Imports).Assembly);
+
 
 app.Run();
