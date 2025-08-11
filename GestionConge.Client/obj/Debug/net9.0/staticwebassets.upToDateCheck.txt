@@ -1,0 +1,8 @@
+wwwroot\css\site.css
+wwwroot\appsettings.Development.json
+wwwroot\appsettings.json
+Components\Header.razor.js
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\wwwroot\css\site.css
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\wwwroot\appsettings.Development.json
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\wwwroot\appsettings.json
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\Components\Header.razor.js

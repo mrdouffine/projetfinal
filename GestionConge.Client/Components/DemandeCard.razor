@@ -1,5 +1,177 @@
-﻿<h3>DemandeCard</h3>
+﻿@using GestionConge.Client.Models
+
+<MudCard Class="mb-4" Elevation="2">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <div class="d-flex align-center justify-space-between">
+                <div class="d-flex align-center">
+                    <MudAvatar Color="@GetAvatarColor()" Size="Size.Medium" Class="mr-3">
+                        <MudIcon Icon="@GetStatusIcon()" />
+                    </MudAvatar>
+                    <div>
+                        <MudText Typo="Typo.h6">@Demande.TypeConge</MudText>
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                            Du @Demande.DateDebut.ToString("dd/MM/yyyy") au @Demande.DateFin.ToString("dd/MM/yyyy")
+                        </MudText>
+                    </div>
+                </div>
+                <ValidationBadge Status="@Demande.Statut" />
+            </div>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small">
+                <MudMenuItem Icon="@Icons.Material.Filled.Visibility"
+                             OnClick="@(() => OnView?.Invoke(Demande.Id))">
+                    Voir détails
+                </MudMenuItem>
+                @if (Demande.Statut == "En attente" && ShowEditActions)
+                {
+                    <MudMenuItem Icon="@Icons.Material.Filled.Edit"
+                                 OnClick="@(() => OnEdit?.Invoke(Demande.Id))">
+                        Modifier
+                    </MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Filled.Delete"
+                                 OnClick="@(() => OnDelete?.Invoke(Demande.Id))">
+                        Supprimer
+                    </MudMenuItem>
+                }
+            </MudMenu>
+        </CardHeaderActions>
+    </MudCardHeader>
+
+    <MudCardContent>
+        <div class="d-flex flex-column gap-3">
+            <div class="d-flex align-center gap-6">
+                <div class="d-flex align-center">
+                    <MudIcon Icon="@Icons.Material.Filled.CalendarToday"
+                             Size="Size.Small"
+                             Class="mr-2 mud-text-secondary" />
+                    <MudText Typo="Typo.body2">
+                        <strong>@GetDureeEnJours() jours</strong>
+                    </MudText>
+                </div>
+
+                @* <div class="d-flex align-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Person"
+                             Size="Size.Small"
+                             Class="mr-2 mud-text-secondary" />
+                    <MudText Typo="Typo.body2">@Demande.NomUtilisateur</MudText>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Demande.DateSoumission?.ToString()))
+                {
+                    <div class="d-flex align-center">
+                        <MudIcon Icon="@Icons.Material.Filled.AccessTime"
+                                 Size="Size.Small"
+                                 Class="mr-2 mud-text-secondary" />
+                        <MudText Typo="Typo.body2">
+                            Soumis le @Demande.DateSoumission?.ToString("dd/MM/yyyy")
+                        </MudText>
+                    </div>
+                } *@
+            </div>
+
+            @if (!string.IsNullOrEmpty(Demande.Motif))
+            {
+                <MudExpansionPanels Elevation="0" Class="mud-expansion-panels-custom">
+                    <MudExpansionPanel>
+                        <TitleContent>
+                            <div class="d-flex align-center">
+                                <MudIcon Icon="@Icons.Material.Filled.Notes" Class="mr-2" />
+                                <MudText Typo="Typo.subtitle2">Motif</MudText>
+                            </div>
+                        </TitleContent>
+                        <ChildContent>
+                            <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                                @Demande.Motif
+                            </MudText>
+                        </ChildContent>
+                    </MudExpansionPanel>
+                </MudExpansionPanels>
+            }
+
+            @if (!string.IsNullOrEmpty(Demande.Commentaire) && Demande.Statut != "En attente")
+            {
+                <MudAlert Severity="@GetAlertSeverity()" Variant="Variant.Outlined" Dense="true">
+                    <div>
+                        <MudText Typo="Typo.subtitle2" Class="mb-1">
+                            Commentaire du valideur :
+                        </MudText>
+                        <MudText Typo="Typo.body2">@Demande.Commentaire</MudText>
+                    </div>
+                </MudAlert>
+            }
+        </div>
+    </MudCardContent>
+
+    @if (ShowActions && Demande.Statut == "En attente")
+    {
+        <MudCardActions>
+            <div class="d-flex justify-end gap-2 w-100">
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Error"
+                           StartIcon="@Icons.Material.Filled.Close"
+                           Size="Size.Small"
+                           OnClick="@(() => OnReject?.Invoke(Demande.Id))">
+                    Rejeter
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Success"
+                           StartIcon="@Icons.Material.Filled.Check"
+                           Size="Size.Small"
+                           OnClick="@(() => OnApprove?.Invoke(Demande.Id))">
+                    Approuver
+                </MudButton>
+            </div>
+        </MudCardActions>
+    }
+</MudCard>
 
 @code {
+    [Parameter] public DemandeCongeDto Demande { get; set; } = new();
+    [Parameter] public bool ShowActions { get; set; } = false;
+    [Parameter] public bool ShowEditActions { get; set; } = true;
 
+    [Parameter] public Action<int>? OnView { get; set; }
+    [Parameter] public Action<int>? OnEdit { get; set; }
+    [Parameter] public Action<int>? OnDelete { get; set; }
+    [Parameter] public Action<int>? OnApprove { get; set; }
+    [Parameter] public Action<int>? OnReject { get; set; }
+
+    private Color GetAvatarColor()
+    {
+        return Demande.Statut switch
+        {
+            "Approuvée" => Color.Success,
+            "Rejetée" => Color.Error,
+            "En attente" => Color.Warning,
+            _ => Color.Default
+        };
+    }
+
+    private string GetStatusIcon()
+    {
+        return Demande.Statut switch
+        {
+            "Approuvée" => Icons.Material.Filled.CheckCircle,
+            "Rejetée" => Icons.Material.Filled.Cancel,
+            "En attente" => Icons.Material.Filled.Schedule,
+            _ => Icons.Material.Filled.Help
+        };
+    }
+
+    private Severity GetAlertSeverity()
+    {
+        return Demande.Statut switch
+        {
+            "Approuvée" => Severity.Success,
+            "Rejetée" => Severity.Error,
+            _ => Severity.Info
+        };
+    }
+
+    private int GetDureeEnJours()
+    {
+        return (Demande.DateFin - Demande.DateDebut).Days + 1;
+    }
 }

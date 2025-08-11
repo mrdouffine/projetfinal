@@ -1,13 +1,111 @@
-﻿
-<MudNavMenu>
-    <MudNavLink Href="index" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Accueil</MudNavLink>
-    <MudNavLink Href="demande" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Demandes</MudNavLink>
-    <MudNavLink Href="validations" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CheckCircle">Validations</MudNavLink>
-    <MudNavLink Href="Notifications" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Notifications</MudNavLink>
-    <MudNavLink Href="Statistiques" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.BubbleChart">Statistiques</MudNavLink>
-    <MudNavLink Href="Settings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">Notifications</MudNavLink>
+﻿<div class="d-flex flex-column" style="height: 100%;">
+    <!-- Header du menu -->
+    <div class="pa-4 text-center">
+        <MudAvatar Size="Size.Large" Color="Color.Primary">
+            <MudIcon Icon="@Icons.Material.Filled.Person" />
+        </MudAvatar>
+        <MudText Typo="Typo.subtitle1" Class="mt-2">John Doe</MudText>
+        <MudText Typo="Typo.body2" Class="mud-text-secondary">Manager</MudText>
+    </div>
 
+    <MudDivider />
 
-</MudNavMenu>
+    <!-- Menu de navigation -->
+    <MudNavMenu Class="flex-grow-1 pa-2">
+        <MudNavLink Href="/"
+                    Match="NavLinkMatch.All"
+                    Icon="@Icons.Material.Filled.Dashboard"
+                    IconColor="Color.Primary">
+            Dashboard
+        </MudNavLink>
 
+        <MudNavGroup Text="Demandes de congés"
+                     Icon="@Icons.Material.Filled.EventNote"
+                     Expanded="true">
+            <MudNavLink Href="/demandes"
+                        Icon="@Icons.Material.Filled.Add"
+                        IconColor="Color.Info">
+                Nouvelle demande
+            </MudNavLink>
+            <MudNavLink Href="/mes-demandes"
+                        Icon="@Icons.Material.Filled.List"
+                        IconColor="Color.Success">
+                Mes demandes
+            </MudNavLink>
+        </MudNavGroup>
 
+        <MudNavLink Href="/validations"
+                    Match="NavLinkMatch.Prefix"
+                    Icon="@Icons.Material.Filled.TaskAlt"
+                    IconColor="Color.Warning">
+            Validations
+            <MudBadge Content="@_pendingValidations"
+                      Color="Color.Error"
+                      Class="ml-auto"
+                      Visible="@(_pendingValidations > 0)" />
+        </MudNavLink>
+
+        <MudNavLink Href="/notifications"
+                    Match="NavLinkMatch.Prefix"
+                    Icon="@Icons.Material.Filled.Notifications"
+                    IconColor="Color.Secondary">
+            Notifications
+        </MudNavLink>
+
+        <MudNavLink Href="/statistiques"
+                    Match="NavLinkMatch.Prefix"
+                    Icon="@Icons.Material.Filled.Analytics"
+                    IconColor="Color.Tertiary">
+            Statistiques
+        </MudNavLink>
+
+        <MudDivider Class="my-2" />
+
+        <!-- Section Administration (visible seulement pour les admins) -->
+        @if (_isAdmin)
+        {
+            <MudNavGroup Text="Administration"
+                         Icon="@Icons.Material.Filled.AdminPanelSettings"
+                         IconColor="Color.Error">
+                <MudNavLink Href="/utilisateurs"
+                            Icon="@Icons.Material.Filled.People"
+                            IconColor="Color.Info">
+                    Utilisateurs
+                </MudNavLink>
+                <MudNavLink Href="/parametres"
+                            Icon="@Icons.Material.Filled.Settings"
+                            IconColor="Color.Default">
+                    Paramètres système
+                </MudNavLink>
+            </MudNavGroup>
+        }
+    </MudNavMenu>
+
+    <!-- Footer du menu -->
+    <div class="pa-4 mt-auto">
+        <MudDivider Class="mb-3" />
+        <MudButton Variant="Variant.Text"
+                   StartIcon="@Icons.Material.Filled.Help"
+                   FullWidth="true"
+                   Size="Size.Small"
+                   Class="justify-start">
+            Aide & Support
+        </MudButton>
+        <MudText Typo="Typo.caption"
+                 Class="text-center mt-2 mud-text-secondary">
+            Version 1.0.0
+        </MudText>
+    </div>
+</div>
+
+@code {
+    private bool _isAdmin = true; // À remplacer par la logique d'authentification
+    private int _pendingValidations = 5; // À récupérer depuis un service
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     Charger les données utilisateur et les notifications
+    //     _isAdmin = await AuthService.IsUserInRoleAsync("Admin");
+    //     _pendingValidations = await DemandeService.GetPendingValidationsCountAsync();
+    // }
+}

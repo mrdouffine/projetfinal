@@ -1,46 +1,95 @@
 ﻿@inherits LayoutComponentBase
-
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
+
 <MudLayout>
-    <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudText Typo="Typo.h5" Class="ml-3">GCO</MudText>
+    <MudAppBar Elevation="2" Fixed="true" Dense="true">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       Color="Color.Inherit"
+                       Edge="Edge.Start"
+                       OnClick="@DrawerToggle" />
+        <MudText Typo="Typo.h5" Class="ml-3">
+            <MudIcon Icon="@Icons.Material.Filled.BusinessCenter" Class="mr-2" />
+            GCO
+        </MudText>
         <MudSpacer />
-        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+
+        <!-- Notifications -->
+        <MudIconButton Icon="@Icons.Material.Filled.Notifications"
+                       Color="Color.Inherit"
+                       OnClick="@ShowNotifications">
+            <MudBadge Content="@_notificationCount"
+                      Color="Color.Error"
+                      Overlap="true"
+                      Visible="@(_notificationCount > 0)">
+            </MudBadge>
+        </MudIconButton>
+
+        <!-- Dark/Light Mode Toggle -->
+        <MudIconButton Icon="@DarkLightModeButtonIcon"
+                       Color="Color.Inherit"
+                       OnClick="@DarkModeToggle"
+                       Title="@(_isDarkMode ? "Mode clair" : "Mode sombre")" />
+
+        <!-- User Menu -->
+        <MudMenu Icon="@Icons.Material.Filled.AccountCircle"
+                 Color="Color.Inherit"
+                 Direction="Direction.Bottom"
+                 OffsetX="true">
+            <MudMenuItem Icon="@Icons.Material.Filled.Person">Profil</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.Settings">Paramètres</MudMenuItem>
+            <MudDivider />
+            <MudMenuItem Icon="@Icons.Material.Filled.Logout"
+                         OnClick="@Logout">Déconnexion</MudMenuItem>
+        </MudMenu>
     </MudAppBar>
-    <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+
+    <MudDrawer @bind-Open="_drawerOpen"
+               ClipMode="DrawerClipMode.Always"
+               Elevation="2"
+               Class="mud-width-xs">
         <NavMenu />
     </MudDrawer>
+
     <MudMainContent Class="pt-16 pa-4">
-        @Body
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pa-0">
+            @Body
+        </MudContainer>
     </MudMainContent>
 </MudLayout>
 
-
+<!-- Error UI -->
 <div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
+    <div class="background"></div>
+    <div class="content">
+        <div class="icon">⚠️</div>
+        <div class="message">Une erreur inattendue s'est produite.</div>
+        <div class="actions">
+            <a href="." class="reload">Recharger</a>
+            <button class="dismiss" onclick="document.getElementById('blazor-error-ui').style.display='none'">✕</button>
+        </div>
+    </div>
 </div>
 
 @code {
     private bool _drawerOpen = true;
     private bool _isDarkMode = true;
+    private int _notificationCount = 3; // Exemple
     private MudTheme? _theme = null;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-
         _theme = new()
         {
             PaletteLight = _lightPalette,
             PaletteDark = _darkPalette,
             LayoutProperties = new LayoutProperties()
+            {
+                DefaultBorderRadius = "8px"
+            }
         };
     }
 
@@ -52,52 +101,80 @@
     private void DarkModeToggle()
     {
         _isDarkMode = !_isDarkMode;
+        // Optionnel : sauvegarder la préférence en localStorage
+        // await JSRuntime.InvokeVoidAsync("localStorage.setItem", "darkMode", _isDarkMode.ToString());
+    }
+
+    private void ShowNotifications()
+    {
+        // Logique pour afficher les notifications
+        // NavigationManager.NavigateTo("/notifications");
+    }
+
+    private void Logout()
+    {
+        // Logique de déconnexion
+        // AuthService.Logout();
+        // NavigationManager.NavigateTo("/login");
     }
 
     private readonly PaletteLight _lightPalette = new()
     {
         Black = "#110e2d",
+        Primary = "#0082bb", // Votre couleur principale
+        PrimaryContrastText = "#ffffff",
+        Secondary = "#f0f4f8",
         AppbarText = "#424242",
-        AppbarBackground = "rgba(255,255,255,0.8)",
+        AppbarBackground = "rgba(255,255,255,0.95)",
         DrawerBackground = "#ffffff",
-        GrayLight = "#e8e8e8",
-        GrayLighter = "#f9f9f9",
+        Surface = "#ffffff",
+        Background = "#f8fafc",
+        BackgroundGray = "#f1f5f9",
+        TextPrimary = "#334155",
+        TextSecondary = "#64748b",
+        GrayLight = "#e2e8f0",
+        GrayLighter = "#f8fafc",
+        Info = "#0ea5e9",
+        Success = "#10b981",
+        Warning = "#f59e0b",
+        Error = "#ef4444",
+        Divider = "#e2e8f0"
     };
 
     private readonly PaletteDark _darkPalette = new()
     {
-        Primary = "#7e6fff",
-        Surface = "#1e1e2d",
-        Background = "#1a1a27",
-        BackgroundGray = "#151521",
-        AppbarText = "#92929f",
-        AppbarBackground = "rgba(26,26,39,0.8)",
-        DrawerBackground = "#1a1a27",
-        ActionDefault = "#74718e",
-        ActionDisabled = "#9999994d",
-        ActionDisabledBackground = "#605f6d4d",
-        TextPrimary = "#b2b0bf",
-        TextSecondary = "#92929f",
-        TextDisabled = "#ffffff33",
-        DrawerIcon = "#92929f",
-        DrawerText = "#92929f",
-        GrayLight = "#2a2833",
-        GrayLighter = "#1e1e2d",
-        Info = "#4a86ff",
-        Success = "#3dcb6c",
-        Warning = "#ffb545",
-        Error = "#ff3f5f",
-        LinesDefault = "#33323e",
-        TableLines = "#33323e",
-        Divider = "#292838",
-        OverlayLight = "#1e1e2d80",
+        Primary = "#0082bb", // Votre couleur principale
+        PrimaryContrastText = "#ffffff",
+        Secondary = "#1e293b",
+        Surface = "#1e293b",
+        Background = "#0f172a",
+        BackgroundGray = "#1e293b",
+        AppbarText = "#cbd5e1",
+        AppbarBackground = "rgba(15,23,42,0.95)",
+        DrawerBackground = "#1e293b",
+        DrawerIcon = "#cbd5e1",
+        DrawerText = "#cbd5e1",
+        ActionDefault = "#64748b",
+        ActionDisabled = "#475569",
+        ActionDisabledBackground = "#334155",
+        TextPrimary = "#f1f5f9",
+        TextSecondary = "#cbd5e1",
+        TextDisabled = "#64748b",
+        GrayLight = "#374151",
+        GrayLighter = "#1f2937",
+        Info = "#0ea5e9",
+        Success = "#10b981",
+        Warning = "#f59e0b",
+        Error = "#ef4444",
+        LinesDefault = "#374151",
+        TableLines = "#374151",
+        Divider = "#374151",
+        OverlayLight = "rgba(15,23,42,0.8)",
     };
 
     public string DarkLightModeButtonIcon => _isDarkMode switch
     {
-        true => Icons.Material.Rounded.AutoMode,
+        true => Icons.Material.Rounded.LightMode,
         false => Icons.Material.Outlined.DarkMode,
     };
 }
-
-

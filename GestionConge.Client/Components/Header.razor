@@ -1,5 +1,142 @@
-﻿<h3>Header</h3>
+﻿@inject IJSRuntime JSRuntime
+
+<div class="page-header @(Compact ? "compact" : "")">
+    <div class="header-content">
+        <div class="header-main">
+            <div class="header-text">
+                @if (!string.IsNullOrEmpty(Icon))
+                {
+                    <div class="header-icon">
+                        <MudIcon Icon="@Icon" Size="Size.Large" Color="Color.Primary" />
+                    </div>
+                }
+                <div>
+                    <h1 class="header-title">@Title</h1>
+                    @if (!string.IsNullOrEmpty(Subtitle))
+                    {
+                        <p class="header-subtitle">@Subtitle</p>
+                    }
+                </div>
+            </div>
+
+            @if (Breadcrumbs != null && Breadcrumbs.Any())
+            {
+                <div class="header-breadcrumbs">
+                    <nav class="breadcrumb-nav">
+                        @for (int i = 0; i < Breadcrumbs.Count; i++)
+                        {
+                            var item = Breadcrumbs[i];
+                            var isLast = i == Breadcrumbs.Count - 1;
+
+                            @if (!isLast && !string.IsNullOrEmpty(item.Href))
+                            {
+                                <MudLink Href="@item.Href" Class="breadcrumb-link">
+                                    @if (!string.IsNullOrEmpty(item.Icon))
+                                    {
+                                        <MudIcon Icon="@item.Icon" Size="Size.Small" Class="mr-1" />
+                                    }
+                                    @item.Text
+                                </MudLink>
+                                <span class="breadcrumb-separator">/</span>
+                            }
+                            else
+                            {
+                                <span class="breadcrumb-current">
+                                    @if (!string.IsNullOrEmpty(item.Icon))
+                                    {
+                                        <MudIcon Icon="@item.Icon" Size="Size.Small" Class="mr-1" />
+                                    }
+                                    @item.Text
+                                </span>
+                            }
+                        }
+                    </nav>
+                </div>
+            }
+        </div>
+
+        @if (Actions != null)
+        {
+            <div class="header-actions">
+                @Actions
+            </div>
+        }
+    </div>
+
+    @if (ShowStats && Stats != null && Stats.Any())
+    {
+        <div class="header-stats">
+            @foreach (var stat in Stats)
+            {
+                <div class="stat-card @stat.ColorClass">
+                    <div class="stat-icon">
+                        <MudIcon Icon="@stat.Icon" Size="Size.Medium" />
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">@stat.Value</div>
+                        <div class="stat-label">@stat.Label</div>
+                        @if (stat.Change != null)
+                        {
+                            <div class="stat-change @(stat.ChangeIsPositive ? "positive" : "negative")">
+                                <MudIcon Icon="@(stat.ChangeIsPositive? Icons.Material.Filled.TrendingUp : Icons.Material.Filled.TrendingDown)"
+                                         Size="Size.Small" />
+                                @stat.Change
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (Filters != null)
+    {
+        <div class="header-filters">
+            @Filters
+        </div>
+    }
+</div>
 
 @code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Subtitle { get; set; } = "";
+    [Parameter] public string Icon { get; set; } = "";
+    [Parameter] public bool Compact { get; set; } = false;
+    [Parameter] public bool ShowStats { get; set; } = false;
+    [Parameter] public RenderFragment? Actions { get; set; }
+    [Parameter] public RenderFragment? Filters { get; set; }
+    [Parameter] public List<BreadcrumbItem>? Breadcrumbs { get; set; }
+    [Parameter] public List<StatItem>? Stats { get; set; }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("scrollToTop");
+            }
+            catch
+            {
+                // Ignore JS errors
+            }
+        }
+    }
+
+    public class BreadcrumbItem
+    {
+        public string Text { get; set; } = "";
+        public string? Href { get; set; }
+        public string Icon { get; set; } = "";
+    }
+
+    public class StatItem
+    {
+        public string Label { get; set; } = "";
+        public string Value { get; set; } = "";
+        public string Icon { get; set; } = "";
+        public string ColorClass { get; set; } = "default";
+        public string? Change { get; set; }
+        public bool ChangeIsPositive { get; set; } = true;
+    }
 }

@@ -1,0 +1,20 @@
+/* DemandeCard.razor.css */
+
+[b-95ejxo11u1] .mud-expansion-panels-custom .mud-expand-panel {
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 8px;
+}
+
+[b-95ejxo11u1] .mud-card {
+    transition: all 0.2s ease;
+    border: 1px solid var(--mud-palette-lines-default);
+}
+
+    [b-95ejxo11u1] .mud-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+[data-mud-dark-theme][b-95ejxo11u1]  .mud-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}

@@ -1,15 +1,68 @@
-﻿
+﻿@using GestionConge.Client.Models
 
-
-<MudChip Color="@GetColor()" Variant="Variant.Filled">@Statut</MudChip>
+<MudChip T="string"
+         Color="@GetBadgeColor()"
+         Size="@Size"
+         Variant="@Variant"
+         Icon="@GetBadgeIcon()"
+         Class="@GetBadgeClass()">
+    @GetBadgeText()
+</MudChip>
 
 @code {
-    [Parameter] public string Statut { get; set; } = "En attente";
+    [Parameter] public string Status { get; set; } = "";
+    [Parameter] public MudBlazor.Size Size { get; set; } = MudBlazor.Size.Medium;
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public bool ShowIcon { get; set; } = true;
+    [Parameter] public bool Animated { get; set; } = false;
 
-    private Color GetColor() => Statut switch
+    private Color GetBadgeColor()
     {
-        "Validé" => Color.Success,
-        "Rejeté" => Color.Error,
-        _ => Color.Warning
-    };
+        return Status?.ToLower() switch
+        {
+            "approuvée" or "approved" or "validée" => Color.Success,
+            "rejetée" or "rejected" or "refusée" => Color.Error,
+            "en attente" or "pending" or "en cours" => Color.Warning,
+            "brouillon" or "draft" => Color.Default,
+            "annulée" or "cancelled" => Color.Dark,
+            "en révision" or "under review" => Color.Info,
+            _ => Color.Default
+        };
+    }
+
+    private string GetBadgeIcon()
+    {
+        if (!ShowIcon) return "";
+
+        return Status?.ToLower() switch
+        {
+            "approuvée" or "approved" or "validée" => Icons.Material.Filled.CheckCircle,
+            "rejetée" or "rejected" or "refusée" => Icons.Material.Filled.Cancel,
+            "en attente" or "pending" or "en cours" => Icons.Material.Filled.Schedule,
+            _ => Icons.Material.Filled.Help
+        };
+    }
+
+    private string GetBadgeText()
+    {
+        return Status?.ToLower() switch
+        {
+            "approved" => "Validée",
+            "rejected" => "Rejetée",
+            "pending" => "En attente",
+            _ => Status ?? "Inconnu"
+        };
+    }
+
+    private string GetBadgeClass()
+    {
+        var baseClass = "validation-badge";
+
+        if (Animated && Status?.ToLower() is "en attente" or "pending" or "en cours")
+        {
+            baseClass += " validation-badge-animated";
+        }
+
+        return baseClass;
+    }
 }

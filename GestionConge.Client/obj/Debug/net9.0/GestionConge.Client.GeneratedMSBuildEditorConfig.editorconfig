@@ -31,18 +31,6 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xDaGFydENvbXBvbmVudC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Components/DemandeCard.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xEZW1hbmRlQ2FyZC5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Components/Header.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIZWFkZXIucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Components/ValidationBadge.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xWYWxpZGF0aW9uQmFkZ2UucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Layout/Footer.razor]
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XEZvb3Rlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
@@ -102,3 +90,15 @@ build_metadata.AdditionalFiles.CssScope =
 [C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Components/DemandeCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xEZW1hbmRlQ2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-95ejxo11u1
+
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Components/Header.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIZWFkZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-3v5gf8oqpv
+
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Components/ValidationBadge.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xWYWxpZGF0aW9uQmFkZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-o8xs77eo6j

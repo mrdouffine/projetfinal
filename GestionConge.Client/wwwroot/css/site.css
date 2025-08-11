@@ -1,0 +1,202 @@
+﻿/* Styles pour l'interface d'erreur Blazor */
+#blazor-error-ui {
+    background: rgba(15, 23, 42, 0.9);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: none;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+    #blazor-error-ui .background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(255, 99, 71, 0.1), rgba(255, 165, 0, 0.1));
+    }
+
+    #blazor-error-ui .content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+    }
+
+[data-mud-dark-theme] #blazor-error-ui .content {
+    background: #1e293b;
+    color: #f1f5f9;
+    border: 1px solid #374151;
+}
+
+#blazor-error-ui .icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    animation: pulse 2s infinite;
+}
+
+#blazor-error-ui .message {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #374151;
+}
+
+[data-mud-dark-theme] #blazor-error-ui .message {
+    color: #f1f5f9;
+}
+
+#blazor-error-ui .actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+}
+
+#blazor-error-ui .reload {
+    background: #0082bb;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+    #blazor-error-ui .reload:hover {
+        background: #006a9b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 130, 187, 0.4);
+    }
+
+#blazor-error-ui .dismiss {
+    background: #6b7280;
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+    #blazor-error-ui .dismiss:hover {
+        background: #4b5563;
+        transform: translateY(-2px);
+    }
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Styles pour améliorer l'apparence générale */
+.mud-nav-link {
+    border-radius: 8px !important;
+    margin: 2px 0 !important;
+    transition: all 0.2s ease !important;
+}
+
+    .mud-nav-link:hover {
+        transform: translateX(4px) !important;
+    }
+
+    .mud-nav-link.active {
+        background: rgba(0, 130, 187, 0.1) !important;
+        color: #0082bb !important;
+        font-weight: 600 !important;
+    }
+
+        .mud-nav-link.active .mud-icon {
+            color: #0082bb !important;
+        }
+
+/* Animations pour le drawer */
+.mud-drawer {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Styles pour les badges */
+.mud-badge {
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-3px);
+    }
+
+    60% {
+        transform: translateY(-1px);
+    }
+}
+
+/* Amélioration des groupes de navigation */
+.mud-nav-group .mud-expand-panel-header {
+    padding: 8px 16px !important;
+    border-radius: 8px !important;
+}
+
+.mud-nav-group .mud-nav-link {
+    margin-left: 1rem !important;
+    padding-left: 2rem !important;
+    position: relative;
+}
+
+    .mud-nav-group .mud-nav-link:before {
+        content: '';
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        width: 4px;
+        height: 4px;
+        background: currentColor;
+        border-radius: 50%;
+        transform: translateY(-50%);
+        opacity: 0.5;
+    }
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .mud-drawer {
+        width: 280px !important;
+    }
+
+    #blazor-error-ui .content {
+        width: 95%;
+        padding: 1.5rem;
+    }
+
+    #blazor-error-ui .actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    #blazor-error-ui .reload,
+    #blazor-error-ui .dismiss {
+        width: 100%;
+    }
+}

@@ -1,0 +1,69 @@
+﻿/* ValidationBadge.razor.css */
+
+::deep .validation-badge {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+}
+
+    ::deep .validation-badge:hover {
+        transform: scale(1.05);
+    }
+
+::deep .validation-badge-animated {
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+    0% {
+        box-shadow: 0 0 5px rgba(255, 193, 7, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 15px rgba(255, 193, 7, 0.8);
+        transform: scale(1.02);
+    }
+
+    100% {
+        box-shadow: 0 0 5px rgba(255, 193, 7, 0.4);
+    }
+}
+
+/* Styles spécifiques par statut */
+::deep .mud-chip-color-success.validation-badge {
+    background: linear-gradient(45deg, #10b981, #059669) !important;
+}
+
+::deep .mud-chip-color-error.validation-badge {
+    background: linear-gradient(45deg, #ef4444, #dc2626) !important;
+}
+
+::deep .mud-chip-color-warning.validation-badge {
+    background: linear-gradient(45deg, #f59e0b, #d97706) !important;
+}
+
+::deep .mud-chip-color-info.validation-badge {
+    background: linear-gradient(45deg, #3b82f6, #2563eb) !important;
+}
+
+/* Variant outlined */
+::deep .mud-chip-variant-outlined.validation-badge {
+    background: transparent !important;
+    border-width: 2px;
+}
+
+/* Variant text */
+::deep .mud-chip-variant-text.validation-badge {
+    background: transparent !important;
+    font-weight: 700;
+}
+
+/* Dark theme adjustments */
+[data-mud-dark-theme] ::deep .validation-badge {
+    color: white !important;
+}
+
+[data-mud-dark-theme] ::deep .mud-chip-variant-outlined.validation-badge {
+    color: var(--mud-palette-text-primary) !important;
+}

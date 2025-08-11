@@ -1,5 +1,10 @@
-﻿<h3>ChartComponent</h3>
+﻿@* @using MudBlazor
+
+<MudPaper Class="pa-4">
+    <MudChart ChartType="ChartType.Bar" Labels="@Labels" Datasets="@Data" />
+</MudPaper>
 
 @code {
-
-}
+    [Parameter] public string[] Labels { get; set; }
+    [Parameter] public MudChartDataset[] Data { get; set; }
+} *@
