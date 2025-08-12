@@ -3,17 +3,20 @@
     public class DemandeCongeDto
     {
         public int Id { get; set; }
-        public string TypeConge { get; set; } = string.Empty;
         public DateTime DateDebut { get; set; }
         public DateTime DateFin { get; set; }
-
-        //Motif
         public string Motif { get; set; } = string.Empty;
         public string Statut { get; set; } = string.Empty;
-        public string Commentaire { get; set; } = string.Empty;
+        public DateTime DateSoumission { get; set; }
+
+        // Infos de l'utilisateur
         public int UtilisateurId { get; set; }
-        public UtilisateurDto? Utilisateur { get; set; }
-        public ValidationDto? Validation { get; set; }
-        public RappelDto? Rappel { get; set; }
+        public string NomUtilisateur { get; set; } = string.Empty;
+        public string EmailUtilisateur { get; set; } = string.Empty;
+
+        // Infos de validation
+        public string? StatutValidation { get; set; }
+        public string? CommentaireValidation { get; set; }
+        public DateTime? DateValidation { get; set; }
     }
 }

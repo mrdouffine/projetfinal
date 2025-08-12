@@ -1,43 +1,209 @@
 ﻿@page "/login"
-@inject GestionConge.Client.Services.AuthService AuthService
+@using System.ComponentModel.DataAnnotations
+@layout GestionConge.Client.Layout.LoginLayout
 @inject NavigationManager Navigation
+@* Login.razor - Page de connexion *@
 
-<h3>Connexion</h3>
+<PageTitle>Connexion - GCO</PageTitle>
 
-<EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<div class="login-form">
+    <h4 class="text-center mb-4">Connexion</h4>
 
-    <div>
-        <label>Email d'utilisateur :</label>
-        <InputText @bind-Value="loginModel.Email" />
+    <!-- Affichage des erreurs -->
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            @errorMessage
+        </div>
+    }
+
+    <!-- Formulaire de connexion -->
+    <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+        <DataAnnotationsValidator />
+
+        <div class="form-floating mb-3">
+            <InputText id="email" class="form-control" @bind-Value="loginModel.Email" placeholder="votre.email@entreprise.com" />
+            <label for="email">
+                <i class="fas fa-envelope me-2"></i>Adresse email
+            </label>
+            <ValidationMessage For="@(() => loginModel.Email)" class="text-danger small" />
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputText id="password" type="password" class="form-control" @bind-Value="loginModel.Password" placeholder="Mot de passe" />
+            <label for="password">
+                <i class="fas fa-lock me-2"></i>Mot de passe
+            </label>
+            <ValidationMessage For="@(() => loginModel.Password)" class="text-danger small" />
+        </div>
+
+        <div class="form-check mb-3">
+            <InputCheckbox id="rememberMe" class="form-check-input" @bind-Value="loginModel.RememberMe" />
+            <label class="form-check-label" for="rememberMe">
+                Se souvenir de moi
+            </label>
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-login" disabled="@isLoading">
+                @if (isLoading)
+                {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span>Connexion en cours...</span>
+                }
+                else
+                {
+                    <i class="fas fa-sign-in-alt me-2"></i>
+                    <span>Se connecter</span>
+                }
+            </button>
+        </div>
+    </EditForm>
+
+    <!-- Liens utiles -->
+    <div class="login-footer">
+        <p class="mb-2">
+            <a href="/forgot-password" class="text-decoration-none">
+                <i class="fas fa-key me-1"></i>
+                Mot de passe oublié ?
+            </a>
+        </p>
+        <p class="mb-0">
+            Pas encore de compte ?
+            <a href="/register" class="text-decoration-none">
+                <i class="fas fa-user-plus me-1"></i>
+                S'inscrire
+            </a>
+        </p>
     </div>
-    <div>
-        <label>Mot de passe :</label>
-        <InputText @bind-Value="loginModel.MotDePasse" type="password" />
-    </div>
-    <button type="submit">Se connecter</button>
-</EditForm>
 
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <div class="text-danger">@errorMessage</div>
-}
+    <!-- Divider -->
+    <div class="divider">
+        <span>ou</span>
+    </div>
+
+    <!-- Connexion rapide (pour les tests) -->
+    <div class="demo-accounts">
+        <h6 class="text-center mb-3">Comptes de démonstration</h6>
+        <div class="row g-2">
+            <div class="col-6">
+                <button class="btn btn-outline-primary btn-sm w-100" @onclick="() => LoginAsDemo(DemoUser.Employee)">
+                    <i class="fas fa-user me-1"></i>
+                    Employé
+                </button>
+            </div>
+            <div class="col-6">
+                <button class="btn btn-outline-success btn-sm w-100" @onclick="() => LoginAsDemo(DemoUser.DOT)">
+                    <i class="fas fa-user-tie me-1"></i>
+                    Manager
+                </button>
+            </div>
+            <div class="col-6">
+                <button class="btn btn-outline-info btn-sm w-100" @onclick="() => LoginAsDemo(DemoUser.HR)">
+                    <i class="fas fa-users me-1"></i>
+                    RH
+                </button>
+            </div>
+            <div class="col-6">
+                <button class="btn btn-outline-secondary btn-sm w-100" @onclick="() => LoginAsDemo(DemoUser.Admin)">
+                    <i class="fas fa-crown me-1"></i>
+                    Admin
+                </button>
+            </div>
+        </div>
+        <small class="text-muted d-block text-center mt-2">
+            Cliquez pour vous connecter directement
+        </small>
+    </div>
+</div>
 
 @code {
-    private GestionConge.Client.Models.AuthDtos.LoginDto loginModel = new();
-    private string? errorMessage;
+    private LoginModel loginModel = new();
+    private string errorMessage = string.Empty;
+    private bool isLoading = false;
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "L'adresse email est requise")]
+        [EmailAddress(ErrorMessage = "Format d'email invalide")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Le mot de passe est requis")]
+        [MinLength(6, ErrorMessage = "Le mot de passe doit contenir au moins 6 caractères")]
+        public string Password { get; set; } = string.Empty;
+
+        public bool RememberMe { get; set; }
+    }
+
+    public enum DemoUser
+    {
+        Employee,
+        DOT,
+        HR,
+        Admin
+    }
 
     private async Task HandleLogin()
     {
-        var result = await AuthService.LoginAsync(loginModel);
-        if (result)
+        errorMessage = string.Empty;
+        isLoading = true;
+
+        try
         {
-            Navigation.NavigateTo("/");
+            // Simulation d'un appel API
+            await Task.Delay(1500);
+
+            // Vérification des identifiants fictifs
+            if (loginModel.Email == "marie.dubois@entreprise.com" && loginModel.Password == "password123")
+            {
+                // Succès - redirection vers le dashboard
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                errorMessage = "Identifiants incorrects. Utilisez marie.dubois@entreprise.com / password123";
+            }
         }
-        else
+        catch (Exception ex)
         {
-            errorMessage = "Identifiants invalides.";
+            errorMessage = "Une erreur s'est produite lors de la connexion. Veuillez réessayer.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoginAsDemo(DemoUser userType)
+    {
+        isLoading = true;
+        errorMessage = string.Empty;
+
+        // Simulation de connexion
+        await Task.Delay(1000);
+
+        var userData = userType switch
+        {
+            DemoUser.Employee => ("marie.dubois@entreprise.com", "Employé"),
+            DemoUser.DOT => ("jean.martin@entreprise.com", "DOT"),
+            DemoUser.HR => ("sophie.laurent@entreprise.com", "RH"),
+            DemoUser.Admin => ("admin@entreprise.com", "Administrateur"),
+            _ => ("", "")
+        };
+
+        // Ici vous stockeriez les informations utilisateur (session, local storage, etc.)
+        // Pour la démonstration, on redirige simplement
+        Navigation.NavigateTo("/");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Déclencher les animations JavaScript
+            await Task.Delay(100);
+            // Ici vous pourriez appeler du JavaScript pour les animations
         }
     }
 }

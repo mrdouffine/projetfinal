@@ -9,7 +9,7 @@
                         <MudIcon Icon="@GetStatusIcon()" />
                     </MudAvatar>
                     <div>
-                        <MudText Typo="Typo.h6">@Demande.TypeConge</MudText>
+                        <MudText Typo="Typo.h6">@Demande.Motif</MudText>
                         <MudText Typo="Typo.body2" Class="mud-text-secondary">
                             Du @Demande.DateDebut.ToString("dd/MM/yyyy") au @Demande.DateFin.ToString("dd/MM/yyyy")
                         </MudText>
@@ -51,24 +51,24 @@
                     </MudText>
                 </div>
 
-                @* <div class="d-flex align-center">
+                 <div class="d-flex align-center">
                     <MudIcon Icon="@Icons.Material.Filled.Person"
                              Size="Size.Small"
                              Class="mr-2 mud-text-secondary" />
                     <MudText Typo="Typo.body2">@Demande.NomUtilisateur</MudText>
                 </div>
 
-                @if (!string.IsNullOrEmpty(Demande.DateSoumission?.ToString()))
+                @if (!string.IsNullOrEmpty(Demande.DateSoumission.ToString()))
                 {
                     <div class="d-flex align-center">
                         <MudIcon Icon="@Icons.Material.Filled.AccessTime"
                                  Size="Size.Small"
                                  Class="mr-2 mud-text-secondary" />
                         <MudText Typo="Typo.body2">
-                            Soumis le @Demande.DateSoumission?.ToString("dd/MM/yyyy")
+                            Soumis le @Demande.DateSoumission.ToString("dd/MM/yyyy")
                         </MudText>
                     </div>
-                } *@
+                } 
             </div>
 
             @if (!string.IsNullOrEmpty(Demande.Motif))
@@ -90,14 +90,14 @@
                 </MudExpansionPanels>
             }
 
-            @if (!string.IsNullOrEmpty(Demande.Commentaire) && Demande.Statut != "En attente")
+            @if (!string.IsNullOrEmpty(Demande.CommentaireValidation) && Demande.Statut != "En attente")
             {
                 <MudAlert Severity="@GetAlertSeverity()" Variant="Variant.Outlined" Dense="true">
                     <div>
                         <MudText Typo="Typo.subtitle2" Class="mb-1">
                             Commentaire du valideur :
                         </MudText>
-                        <MudText Typo="Typo.body2">@Demande.Commentaire</MudText>
+                        <MudText Typo="Typo.body2">@Demande.CommentaireValidation</MudText>
                     </div>
                 </MudAlert>
             }

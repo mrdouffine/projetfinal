@@ -1,33 +1,541 @@
 ﻿@page "/demande-form"
-@inject GestionConge.Client.Services.DemandeService DemandeService
+@page "/demande-form/{id:int?}"
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager NavigationManager
 
-<h3>Nouvelle demande de congé</h3>
+@* DemandeForm.razor - Formulaire de création/modification de demande de congés *@
 
-<EditForm Model="@demande" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<PageTitle>@(IsEditMode ? "Modifier la demande" : "Nouvelle demande") - GCO</PageTitle>
 
-    <div>
-        <label>Date de début :</label>
-        <InputDate @bind-Value="demande.DateDebut" />
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="page-title">
+                <i class="fas fa-@(IsEditMode ? "edit" : "plus-circle") me-3"></i>
+                @(IsEditMode ? "Modifier la demande" : "Nouvelle demande de congés")
+            </h1>
+            <p class="page-subtitle">
+                @(IsEditMode ? "Modifiez les informations de votre demande" : "Créez une nouvelle demande de congés")
+            </p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="/demandes" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Retour à la liste
+            </a>
+        </div>
     </div>
-    <div>
-        <label>Date de fin :</label>
-        <InputDate @bind-Value="demande.DateFin" />
+</div>
+
+<!-- Informations du solde -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card info-card">
+            <div class="card-body text-center">
+                <div class="info-icon text-primary">
+                    <i class="fas fa-calendar-check fa-2x"></i>
+                </div>
+                <h4 class="mt-2">23 jours</h4>
+                <small class="text-muted">Congés payés disponibles</small>
+            </div>
+        </div>
     </div>
-    <div>
-        <label>Motif :</label>
-        <InputText @bind-Value="demande.Motif" />
+    <div class="col-md-4">
+        <div class="card info-card">
+            <div class="card-body text-center">
+                <div class="info-icon text-info">
+                    <i class="fas fa-clock fa-2x"></i>
+                </div>
+                <h4 class="mt-2">8 jours</h4>
+                <small class="text-muted">RTT disponibles</small>
+            </div>
+        </div>
     </div>
-    <button type="submit">Envoyer</button>
-</EditForm>
+    <div class="col-md-4">
+        <div class="card info-card">
+            <div class="card-body text-center">
+                <div class="info-icon text-success">
+                    <i class="fas fa-chart-line fa-2x"></i>
+                </div>
+                <h4 class="mt-2">2 jours</h4>
+                <small class="text-muted">Utilisés ce mois</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Formulaire -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-form me-2"></i>
+                    Informations de la demande
+                </h5>
+            </div>
+            <div class="card-body">
+                <EditForm Model="demandeModel" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            @errorMessage
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(successMessage))
+                    {
+                        <div class="alert alert-success" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @successMessage
+                        </div>
+                    }
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="typeConge">
+                                <i class="fas fa-tags me-1"></i>
+                                Type de congé <span class="text-danger">*</span>
+                            </label>
+                            <InputSelect id="typeConge" class="form-select" @bind-Value="demandeModel.TypeConge">
+                                <option value="">-- Sélectionnez un type --</option>
+                                <option value="Congés payés">Congés payés</option>
+                                <option value="RTT">RTT</option>
+                                <option value="Congé maladie">Congé maladie</option>
+                                <option value="Congé sans solde">Congé sans solde</option>
+                                <option value="Congé formation">Congé formation</option>
+                                <option value="Congé maternité">Congé maternité</option>
+                                <option value="Congé paternité">Congé paternité</option>
+                            </InputSelect>
+                            <ValidationMessage For="@(() => demandeModel.TypeConge)" class="text-danger small" />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Statut
+                            </label>
+                            <input type="text" class="form-control" value="@(IsEditMode? CurrentDemande?.Statut : "En attente")" disabled />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="dateDebut">
+                                <i class="fas fa-calendar-plus me-1"></i>
+                                Date de début <span class="text-danger">*</span>
+                            </label>
+                            <InputDate id="dateDebut" class="form-control" @bind-Value="demandeModel.DateDebut" @onchange="CalculateNombreJours" />
+                            <ValidationMessage For="@(() => demandeModel.DateDebut)" class="text-danger small" />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="dateFin">
+                                <i class="fas fa-calendar-minus me-1"></i>
+                                Date de fin <span class="text-danger">*</span>
+                            </label>
+                            <InputDate id="dateFin" class="form-control" @bind-Value="demandeModel.DateFin" @onchange="CalculateNombreJours" />
+                            <ValidationMessage For="@(() => demandeModel.DateFin)" class="text-danger small" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-calculator me-1"></i>
+                                Nombre de jours
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" value="@calculatedDays" disabled />
+                                <span class="input-group-text">jour@(calculatedDays > 1 ? "s" : "")</span>
+                            </div>
+                            <small class="form-text text-muted">Calculé automatiquement (jours ouvrés uniquement)</small>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="demiJournee">
+                                <i class="fas fa-clock me-1"></i>
+                                Options
+                            </label>
+                            <div class="form-check">
+                                <InputCheckbox id="demiJournee" class="form-check-input" @bind-Value="demandeModel.DemiJournee" />
+                                <label class="form-check-label" for="demiJournee">
+                                    Demi-journée (premier/dernier jour uniquement)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="motif">
+                            <i class="fas fa-comment me-1"></i>
+                            Motif de la demande
+                        </label>
+                        <InputTextArea id="motif" class="form-control" rows="4" @bind-Value="demandeModel.Motif"
+                                       placeholder="Décrivez brièvement le motif de votre demande (optionnel)..." />
+                        <ValidationMessage For="@(() => demandeModel.Motif)" class="text-danger small" />
+                        <div class="form-text">@(demandeModel.Motif?.Length ?? 0)/500 caractères</div>
+                    </div>
+
+                    @if (IsEditMode && CurrentDemande?.Statut == "Rejeté")
+                    {
+                        <div class="alert alert-warning">
+                            <h6><i class="fas fa-exclamation-triangle me-2"></i>Commentaire du validateur</h6>
+                            <p class="mb-0">@CurrentDemande.CommentaireValidation</p>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="form-label" for="validateur">
+                            <i class="fas fa-user-check me-1"></i>
+                            Validateur
+                        </label>
+                        <InputSelect id="validateur" class="form-select" @bind-Value="demandeModel.ValidateurEmail">
+                            <option value="">-- Sélectionnez un validateur --</option>
+                            <option value="jean.martin@entreprise.com">Jean Martin - Manager</option>
+                            <option value="sophie.laurent@entreprise.com">Sophie Laurent - RH</option>
+                            <option value="pierre.durand@entreprise.com">Pierre Durand - Directeur</option>
+                        </InputSelect>
+                        <ValidationMessage For="@(() => demandeModel.ValidateurEmail)" class="text-danger small" />
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <InputCheckbox id="confirmation" class="form-check-input" @bind-Value="demandeModel.Confirmation" />
+                        <label class="form-check-label" for="confirmation">
+                            <span class="text-danger">*</span> Je confirme que les informations saisies sont exactes et que j'ai vérifié mon solde de congés
+                        </label>
+                        <ValidationMessage For="@(() => demandeModel.Confirmation)" class="text-danger small" />
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <button type="submit" class="btn btn-primary" disabled="@isLoading">
+                                @if (isLoading)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    <span>@(IsEditMode ? "Modification..." : "Soumission...")</span>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-@(IsEditMode ? "save" : "paper-plane") me-2"></i>
+                                    <span>@(IsEditMode ? "Modifier la demande" : "Soumettre la demande")</span>
+                                }
+                            </button>
+
+                            @if (IsEditMode)
+                            {
+                                <button type="button" class="btn btn-outline-secondary ms-2" @onclick="ResetForm">
+                                    <i class="fas fa-undo me-2"></i>
+                                    Annuler les modifications
+                                </button>
+                            }
+                        </div>
+
+                        <button type="button" class="btn btn-outline-danger" @onclick="SaveAsDraft">
+                            <i class="fas fa-file-alt me-2"></i>
+                            Enregistrer comme brouillon
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panneau d'aide -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Informations utiles
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="help-item">
+                    <h6><i class="fas fa-calendar-day me-2 text-primary"></i>Délais</h6>
+                    <p class="small text-muted">
+                        Les demandes doivent être soumises au moins 2 semaines avant la date de début souhaitée.
+                    </p>
+                </div>
+
+                <div class="help-item">
+                    <h6><i class="fas fa-clock me-2 text-info"></i>Validation</h6>
+                    <p class="small text-muted">
+                        Votre manager dispose de 5 jours ouvrés pour valider ou rejeter votre demande.
+                    </p>
+                </div>
+
+                <div class="help-item">
+                    <h6><i class="fas fa-edit me-2 text-warning"></i>Modifications</h6>
+                    <p class="small text-muted">
+                        Vous ne pouvez modifier une demande que si elle n'a pas encore été validée.
+                    </p>
+                </div>
+
+                <div class="help-item">
+                    <h6><i class="fas fa-ban me-2 text-danger"></i>Annulation</h6>
+                    <p class="small text-muted">
+                        Une demande approuvée ne peut être annulée que 48h avant la date de début.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendrier des congés équipe -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-users me-2"></i>
+                    Congés prévus de l'équipe
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="calendar-preview">
+                    <div class="calendar-item">
+                        <div class="calendar-date">15-19 Mar</div>
+                        <div class="calendar-info">
+                            <strong>Jean Martin</strong>
+                            <small class="d-block text-muted">Congés payés</small>
+                        </div>
+                    </div>
+
+                    <div class="calendar-item">
+                        <div class="calendar-date">25 Mar</div>
+                        <div class="calendar-info">
+                            <strong>Sophie Laurent</strong>
+                            <small class="d-block text-muted">RTT</small>
+                        </div>
+                    </div>
+
+                    <div class="calendar-item">
+                        <div class="calendar-date">2-5 Avr</div>
+                        <div class="calendar-info">
+                            <strong>Pierre Durand</strong>
+                            <small class="d-block text-muted">Congés payés</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @code {
-    private GestionConge.Client.Models.DemandeCongeDto demande = new();
+    [Parameter] public int? Id { get; set; }
 
-    private async Task HandleValidSubmit()
+    private DemandeModel demandeModel = new();
+    private DemandeConge? CurrentDemande;
+    private string errorMessage = "";
+    private string successMessage = "";
+    private bool isLoading = false;
+    private int calculatedDays = 0;
+
+    private bool IsEditMode => Id.HasValue;
+
+    public class DemandeModel
     {
-        // À compléter : appel à l'API pour soumettre la demande
-        // await DemandeService.CreateDemandeAsync(demande);
+        [Required(ErrorMessage = "Le type de congé est requis")]
+        public string TypeConge { get; set; } = "";
+
+        [Required(ErrorMessage = "La date de début est requise")]
+        public DateTime DateDebut { get; set; } = DateTime.Today.AddDays(1);
+
+        [Required(ErrorMessage = "La date de fin est requise")]
+        public DateTime DateFin { get; set; } = DateTime.Today.AddDays(1);
+
+        [StringLength(500, ErrorMessage = "Le motif ne peut pas dépasser 500 caractères")]
+        public string Motif { get; set; } = "";
+
+        [Required(ErrorMessage = "Vous devez sélectionner un validateur")]
+        public string ValidateurEmail { get; set; } = "";
+
+        [CustomValidation(typeof(DemandeModel), nameof(ValidateConfirmation))]
+        public bool Confirmation { get; set; }
+
+        public bool DemiJournee { get; set; }
+
+        public static ValidationResult? ValidateConfirmation(bool confirmation, ValidationContext context)
+        {
+            return confirmation ? ValidationResult.Success : new ValidationResult("Vous devez confirmer les informations");
+        }
+    }
+
+    public class DemandeConge
+    {
+        public int Id { get; set; }
+        public DateTime DateSoumission { get; set; }
+        public DateTime DateDebut { get; set; }
+        public DateTime DateFin { get; set; }
+        public string TypeConge { get; set; } = "";
+        public int NombreJours { get; set; }
+        public string Statut { get; set; } = "";
+        public string Motif { get; set; } = "";
+        public string ValidateurNom { get; set; } = "";
+        public string ValidateurEmail { get; set; } = "";
+        public DateTime? DateValidation { get; set; }
+        public string CommentaireValidation { get; set; } = "";
+        public bool DemiJournee { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (IsEditMode)
+        {
+            await LoadExistingDemande();
+        }
+        else
+        {
+            demandeModel.DateDebut = DateTime.Today.AddDays(14);
+            demandeModel.DateFin = DateTime.Today.AddDays(14);
+        }
+
+        CalculateNombreJours();
+    }
+
+    private async Task LoadExistingDemande()
+    {
+        await Task.Delay(500);
+
+        if (Id.HasValue)
+        {
+            CurrentDemande = new DemandeConge
+            {
+                Id = Id.Value,
+                DateSoumission = DateTime.Now.AddDays(-5),
+                DateDebut = DateTime.Today.AddDays(10),
+                DateFin = DateTime.Today.AddDays(14),
+                TypeConge = "Congés payés",
+                NombreJours = 5,
+                Statut = "En attente",
+                Motif = "Vacances en famille",
+                ValidateurEmail = "jean.martin@entreprise.com",
+                ValidateurNom = "Jean Martin",
+                DemiJournee = false
+            };
+
+            demandeModel.TypeConge = CurrentDemande.TypeConge;
+            demandeModel.DateDebut = CurrentDemande.DateDebut;
+            demandeModel.DateFin = CurrentDemande.DateFin;
+            demandeModel.Motif = CurrentDemande.Motif;
+            demandeModel.ValidateurEmail = CurrentDemande.ValidateurEmail;
+            demandeModel.DemiJournee = CurrentDemande.DemiJournee;
+        }
+    }
+
+    private void CalculateNombreJours()
+    {
+        if (demandeModel.DateDebut != default && demandeModel.DateFin != default && demandeModel.DateFin >= demandeModel.DateDebut)
+        {
+            var days = 0;
+            var current = demandeModel.DateDebut;
+
+            while (current <= demandeModel.DateFin)
+            {
+                if (current.DayOfWeek != DayOfWeek.Saturday && current.DayOfWeek != DayOfWeek.Sunday)
+                {
+                    days++;
+                }
+                current = current.AddDays(1);
+            }
+
+            calculatedDays = demandeModel.DemiJournee ? Math.Max(1, days - 1) : days;
+        }
+        else
+        {
+            calculatedDays = 0;
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task HandleSubmit()
+    {
+        errorMessage = "";
+        successMessage = "";
+        isLoading = true;
+
+        try
+        {
+            if (demandeModel.DateDebut < DateTime.Today.AddDays(1))
+            {
+                errorMessage = "La date de début ne peut pas être dans le passé.";
+                return;
+            }
+
+            if (demandeModel.DateFin < demandeModel.DateDebut)
+            {
+                errorMessage = "La date de fin ne peut pas être antérieure à la date de début.";
+                return;
+            }
+
+            if (calculatedDays == 0)
+            {
+                errorMessage = "La période sélectionnée ne contient aucun jour ouvré.";
+                return;
+            }
+
+            await Task.Delay(2000);
+
+            if (IsEditMode)
+            {
+                successMessage = "Demande modifiée avec succès !";
+                await Task.Delay(2000);
+                NavigationManager.NavigateTo("/demandes");
+            }
+            else
+            {
+                successMessage = "Demande soumise avec succès ! Vous recevrez une notification lorsqu'elle sera traitée.";
+                await Task.Delay(2000);
+                NavigationManager.NavigateTo("/demandes");
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Une erreur s'est produite : {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ResetForm()
+    {
+        if (CurrentDemande != null)
+        {
+            demandeModel.TypeConge = CurrentDemande.TypeConge;
+            demandeModel.DateDebut = CurrentDemande.DateDebut;
+            demandeModel.DateFin = CurrentDemande.DateFin;
+            demandeModel.Motif = CurrentDemande.Motif;
+            demandeModel.ValidateurEmail = CurrentDemande.ValidateurEmail;
+            demandeModel.DemiJournee = CurrentDemande.DemiJournee;
+            CalculateNombreJours();
+        }
+
+        errorMessage = "";
+        successMessage = "";
+    }
+
+    private async Task SaveAsDraft()
+    {
+        isLoading = true;
+
+        try
+        {
+            await Task.Delay(1000);
+            successMessage = "Brouillon enregistré avec succès !";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Erreur lors de l'enregistrement : {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 }
