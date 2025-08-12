@@ -1,5 +1,4 @@
 ﻿@page "/notifications"
-@inject GestionConge.Client.Services.ApiService ApiService
 
 <h3>Notifications</h3>
 
@@ -13,23 +12,54 @@ else if (!notifications.Any())
 }
 else
 {
-    <ul>
-        @foreach (var notif in notifications)
+    <div class="list-group">
+        @foreach (var notif in notifications.OrderByDescending(n => n.DateRappel))
         {
-            <li>
-                <strong>@notif.NomUtilisateur</strong> : @notif.Message
-                <br />
-                <span class="text-muted">@notif.DateRappel.ToString("dd/MM/yyyy HH:mm")</span>
-            </li>
+            <div class="list-group-item list-group-item-action flex-column align-items-start">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">@notif.NomUtilisateur</h5>
+                    <small class="text-muted">@notif.DateRappel.ToString("dd/MM/yyyy HH:mm")</small>
+                </div>
+                <p class="mb-1">@notif.Message</p>
+            </div>
         }
-    </ul>
+    </div>
 }
 
 @code {
-    private List<GestionConge.Client.Models.RappelDto>? notifications;
-
-    protected override async Task OnInitializedAsync()
+    // Modèle local simplifié pour la démo
+    public class RappelDto
     {
-        notifications = await ApiService.GetNotificationsAsync();
+        public string NomUtilisateur { get; set; } = "";
+        public string Message { get; set; } = "";
+        public DateTime DateRappel { get; set; }
+    }
+
+    private List<RappelDto>? notifications;
+
+    protected override void OnInitialized()
+    {
+        // Données fictives pour la démo
+        notifications = new List<RappelDto>
+        {
+            new RappelDto
+            {
+                NomUtilisateur = "Alice Dupont",
+                Message = "Votre demande de congé a été approuvée.",
+                DateRappel = DateTime.Now.AddMinutes(-30)
+            },
+            new RappelDto
+            {
+                NomUtilisateur = "Bob Martin",
+                Message = "Nouvelle demande de congé en attente de validation.",
+                DateRappel = DateTime.Now.AddHours(-1)
+            },
+            new RappelDto
+            {
+                NomUtilisateur = "Claire Bernard",
+                Message = "Rappel : vous avez une réunion prévue demain à 10h.",
+                DateRappel = DateTime.Now.AddDays(-1)
+            }
+        };
     }
 }

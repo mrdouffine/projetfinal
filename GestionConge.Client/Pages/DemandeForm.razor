@@ -1,5 +1,4 @@
 ﻿@page "/demande-form"
-@page "/demande-form/{id:int?}"
 @using System.ComponentModel.DataAnnotations
 @inject NavigationManager NavigationManager
 
@@ -7,25 +6,19 @@
 
 <PageTitle>@(IsEditMode ? "Modifier la demande" : "Nouvelle demande") - GCO</PageTitle>
 
-<div class="page-header">
-    <div class="row align-items-center">
-        <div class="col-md-8">
-            <h1 class="page-title">
-                <i class="fas fa-@(IsEditMode ? "edit" : "plus-circle") me-3"></i>
-                @(IsEditMode ? "Modifier la demande" : "Nouvelle demande de congés")
-            </h1>
-            <p class="page-subtitle">
-                @(IsEditMode ? "Modifiez les informations de votre demande" : "Créez une nouvelle demande de congés")
-            </p>
-        </div>
-        <div class="col-md-4 text-md-end">
-            <a href="/demandes" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>
-                Retour à la liste
-            </a>
-        </div>
-    </div>
-</div>
+<MudPaper Height="auto" Width="100%" Class="pa-4">
+    <MudContainer MaxWidth="MaxWidth.Small">
+        <MudText Typo="Typo.h4" Class="text-center mb-4">
+            @(IsEditMode ? "Modifier votre demande de congés" : "Créer une nouvelle demande de congés")
+        </MudText>
+        <MudText Typo="Typo.subtitle1" Class="text-center mb-3">
+            Veuillez remplir le formulaire ci-dessous pour soumettre votre demande.
+        </MudText>
+    </MudContainer>
+</MudPaper>
+
+
+
 
 <!-- Informations du solde -->
 <div class="row mb-4">

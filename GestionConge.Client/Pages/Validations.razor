@@ -1,8 +1,6 @@
 ﻿@page "/validations"
-@using GestionConge.Client.Models
-@inject GestionConge.Client.Services.ApiService ApiService
-@inject GestionConge.Client.Components.ValidationBadge ValidationBadge
-<h3>Validations</h3>
+
+<h3>Validations en attente</h3>
 
 @if (validations == null)
 {
@@ -14,25 +12,92 @@ else if (!validations.Any())
 }
 else
 {
-    <ul>
-        @foreach (var validation in validations)
+    <div class="row">
+        @foreach (var validation in validations.OrderByDescending(v => v.DateValidation))
         {
-            <li>
-                <strong>@validation.DemandeCongeId</strong> - @validation.Statut
-                <br />
-                <span class="text-muted">@validation.DateValidation.ToString("dd/MM/yyyy HH:mm")</span>
-                <br />
-                <ValidationBadge Statut="@validation.Statut" />
-            </li>
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <strong>Demande #@validation.DemandeCongeId</strong>
+                        <span class="@GetStatusBadgeClass(validation.Statut) px-2 py-1 rounded text-white">
+                            @validation.Statut
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            <strong>Date de validation :</strong><br />
+                            @validation.DateValidation.ToString("dd/MM/yyyy HH:mm")
+                        </p>
+                        <p><strong>Commentaire :</strong> @validation.Commentaire</p>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => VoirDetails(validation.DemandeCongeId)">
+                            <i class="fas fa-eye"></i> Voir détails
+                        </button>
+                    </div>
+                </div>
+            </div>
         }
-    </ul>
+    </div>
 }
 
 @code {
-    private List<GestionConge.Client.Models.ValidationDto>? validations;
-
-    protected override async Task OnInitializedAsync()
+    // Modèle local simplifié pour la démo
+    public class ValidationDto
     {
-        validations = await ApiService.GetValidationsAsync();
+        public int DemandeCongeId { get; set; }
+        public string Statut { get; set; } = "";
+        public DateTime DateValidation { get; set; }
+        public string Commentaire { get; set; } = "";
+    }
+
+    private List<ValidationDto>? validations;
+
+    protected override void OnInitialized()
+    {
+        // Données fictives
+        validations = new List<ValidationDto>
+        {
+            new ValidationDto
+            {
+                DemandeCongeId = 1,
+                Statut = "Approuvé",
+                DateValidation = DateTime.Now.AddDays(-1).AddHours(-2),
+                Commentaire = "Validé rapidement, tout est en ordre."
+            },
+            new ValidationDto
+            {
+                DemandeCongeId = 2,
+                Statut = "En attente",
+                DateValidation = DateTime.Now.AddHours(-3),
+                Commentaire = "En attente de confirmation du manager."
+            },
+            new ValidationDto
+            {
+                DemandeCongeId = 3,
+                Statut = "Rejeté",
+                DateValidation = DateTime.Now.AddDays(-5),
+                Commentaire = "Non conforme aux règles internes."
+            }
+        };
+    }
+
+    private string GetStatusBadgeClass(string statut)
+    {
+        return statut switch
+        {
+            "En attente" => "bg-warning",
+            "Approuvé" => "bg-success",
+            "Rejeté" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+
+    private void VoirDetails(int demandeId)
+    {
+        // Pour la démo, affiche juste en console
+        Console.WriteLine($"Voir détails pour demande #{demandeId}");
+        // Tu peux rediriger vers une page détails si tu en as une, par ex :
+        // NavigationManager.NavigateTo($"/demande-details/{demandeId}");
     }
 }

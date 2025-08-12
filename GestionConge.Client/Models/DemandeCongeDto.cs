@@ -14,6 +14,7 @@
         public string NomUtilisateur { get; set; } = string.Empty;
         public string EmailUtilisateur { get; set; } = string.Empty;
 
+        public string? TypeConge { get; set; }
         // Infos de validation
         public string? StatutValidation { get; set; }
         public string? CommentaireValidation { get; set; }

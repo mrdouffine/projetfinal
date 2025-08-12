@@ -1,125 +1,9 @@
 ﻿@page "/demandes"
 @* Demandes.razor - Liste des demandes de congés *@
 @using System.Globalization
-@using GestionConge.Client.Models
 @inject NavigationManager NavigationManager
-@inject GestionConge.Client.Services.DemandeService DemandeService
 
 <PageTitle>Mes demandes - GCO</PageTitle>
-
-@code {
-    private List<DemandeCongeDto> demandes = new();
-    private List<DemandeCongeDto> filteredDemandes = new();
-    private string selectedStatus = "";
-    private string selectedType = "";
-    private string selectedPeriod = "";
-    private string viewMode = "table";
-
-    protected override async Task OnInitializedAsync()
-    {
-        var result = await DemandeService.GetDemandesAsync();
-        demandes = result?.ToList() ?? new();
-        filteredDemandes = demandes;
-    }
-
-    private void OnStatusFilterChange(ChangeEventArgs e)
-    {
-        selectedStatus = e.Value?.ToString() ?? "";
-        ApplyFilters();
-    }
-
-    private void OnTypeFilterChange(ChangeEventArgs e)
-    {
-        selectedType = e.Value?.ToString() ?? "";
-        ApplyFilters();
-    }
-
-    private void OnPeriodFilterChange(ChangeEventArgs e)
-    {
-        selectedPeriod = e.Value?.ToString() ?? "";
-        ApplyFilters();
-    }
-
-    private void ClearFilters()
-    {
-        selectedStatus = "";
-        selectedType = "";
-        selectedPeriod = "";
-        filteredDemandes = demandes;
-    }
-
-    private void ApplyFilters()
-    {
-        filteredDemandes = demandes.Where(d =>
-            (string.IsNullOrEmpty(selectedStatus) || d.Statut == selectedStatus) &&
-            (string.IsNullOrEmpty(selectedType) || d.Motif == selectedType) &&
-            (string.IsNullOrEmpty(selectedPeriod) || IsInSelectedPeriod(d.DateSoumission))
-        ).ToList();
-    }
-
-    private bool IsInSelectedPeriod(DateTime date)
-    {
-        if (selectedPeriod == "thisMonth")
-            return date.Month == DateTime.Now.Month && date.Year == DateTime.Now.Year;
-        if (selectedPeriod == "lastMonth")
-        {
-            var lastMonth = DateTime.Now.AddMonths(-1);
-            return date.Month == lastMonth.Month && date.Year == lastMonth.Year;
-        }
-        if (selectedPeriod == "thisYear")
-            return date.Year == DateTime.Now.Year;
-        return true;
-    }
-
-    private void SetViewMode(string mode)
-    {
-        viewMode = mode;
-    }
-
-    private string GetDateRange(DateTime debut, DateTime fin)
-    {
-        return $"{(fin - debut).Days + 1} jour{((fin - debut).Days > 0 ? "s" : "")}";
-    }
-
-    private string GetTypeBadgeClass(string type)
-    {
-        return type switch
-        {
-            "Congés payés" => "bg-success",
-            "RTT" => "bg-info",
-            "Congé maladie" => "bg-warning",
-            "Congé sans solde" => "bg-secondary",
-            _ => "bg-light text-dark"
-        };
-    }
-
-    private string GetStatusBadgeClass(string statut)
-    {
-        return statut switch
-        {
-            "En attente" => "bg-warning",
-            "Approuvé" => "bg-success",
-            "Rejeté" => "bg-danger",
-            "Annulé" => "bg-secondary",
-            _ => "bg-light text-dark"
-        };
-    }
-
-    private void ViewDemande(int id)
-    {
-        NavigationManager.NavigateTo($"/demande-details/{id}");
-    }
-
-    private void EditDemande(int id)
-    {
-        NavigationManager.NavigateTo($"/demande-edit/{id}");
-    }
-
-    private void CancelDemande(int id)
-    {
-        // Annulation logique ici
-    }
-}
 
 <div class="page-header">
     <div class="row align-items-center">
@@ -145,7 +29,9 @@
         <div class="row g-3">
             <div class="col-md-3">
                 <label class="form-label">Statut</label>
-                <select class="form-select" @onchange="OnStatusFilterChange">
+                <select class="form-select"
+                        @bind="selectedStatus"
+                        >
                     <option value="">Tous les statuts</option>
                     <option value="En attente">En attente</option>
                     <option value="Approuvé">Approuvé</option>
@@ -155,7 +41,7 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label">Type de congé</label>
-                <select class="form-select" @onchange="OnTypeFilterChange">
+                <select class="form-select" @bind="selectedType">
                     <option value="">Tous les types</option>
                     <option value="Congés payés">Congés payés</option>
                     <option value="RTT">RTT</option>
@@ -165,7 +51,7 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label">Période</label>
-                <select class="form-select" @onchange="OnPeriodFilterChange">
+                <select class="form-select" @bind="selectedPeriod">
                     <option value="">Toute période</option>
                     <option value="thisMonth">Ce mois</option>
                     <option value="lastMonth">Mois dernier</option>
@@ -281,11 +167,11 @@
                                             <br /><small class="text-muted">@GetDateRange(demande.DateDebut, demande.DateFin)</small>
                                         </div>
                                     </td>
-                                    @* <td>
+                                    <td>
                                         <span class="badge @GetTypeBadgeClass(demande.TypeConge)">
                                             @demande.TypeConge
                                         </span>
-                                    </td> *@
+                                    </td>
                                     <td>
                                         <strong>@GetDateRange(demande.DateDebut, demande.DateFin)</strong>
                                     </td>
@@ -392,3 +278,172 @@
         }
     </div>
 </div>
+@code {
+    // Modèle simplifié de demande de congé (fictif)
+    public class DemandeCongeDto
+    {
+        public int Id { get; set; }
+        public DateTime DateSoumission { get; set; }
+        public DateTime DateDebut { get; set; }
+        public DateTime DateFin { get; set; }
+        public string TypeConge { get; set; } = "";
+        public string Statut { get; set; } = "";
+        public string Motif { get; set; } = "";
+    }
+
+    private List<DemandeCongeDto> demandes = new();
+    private List<DemandeCongeDto> filteredDemandes = new();
+
+    private string selectedStatus = "";
+    private string selectedType = "";
+    private string selectedPeriod = "";
+    private string viewMode = "table";
+
+    protected override void OnInitialized()
+    {
+        // Données fictives pour tester la page
+        demandes = new List<DemandeCongeDto>
+        {
+            new DemandeCongeDto
+            {
+                Id = 1,
+                DateSoumission = DateTime.Now.AddDays(-5),
+                DateDebut = DateTime.Now.AddDays(10),
+                DateFin = DateTime.Now.AddDays(15),
+                TypeConge = "Congés payés",
+                Statut = "En attente",
+                Motif = "Vacances d'été"
+            },
+            new DemandeCongeDto
+            {
+                Id = 2,
+                DateSoumission = DateTime.Now.AddDays(-20),
+                DateDebut = DateTime.Now.AddDays(-15),
+                DateFin = DateTime.Now.AddDays(-10),
+                TypeConge = "RTT",
+                Statut = "Approuvé",
+                Motif = "Repos mérité"
+            },
+            new DemandeCongeDto
+            {
+                Id = 3,
+                DateSoumission = DateTime.Now.AddDays(-2),
+                DateDebut = DateTime.Now.AddDays(3),
+                DateFin = DateTime.Now.AddDays(4),
+                TypeConge = "Congé maladie",
+                Statut = "Rejeté",
+                Motif = "Maladie"
+            }
+        };
+
+        filteredDemandes = demandes.ToList();
+        ApplyFilters();
+    }
+
+    private void OnStatusFilterChange(ChangeEventArgs e)
+    {
+        selectedStatus = e.Value?.ToString() ?? "";
+        ApplyFilters();
+    }
+
+    private void OnTypeFilterChange(ChangeEventArgs e)
+    {
+        selectedType = e.Value?.ToString() ?? "";
+        ApplyFilters();
+    }
+
+    private void OnPeriodFilterChange(ChangeEventArgs e)
+    {
+        selectedPeriod = e.Value?.ToString() ?? "";
+        ApplyFilters();
+    }
+
+    private void ClearFilters()
+    {
+        selectedStatus = "";
+        selectedType = "";
+        selectedPeriod = "";
+        filteredDemandes = demandes;
+        StateHasChanged();
+    }
+
+    private void ApplyFilters()
+    {
+        filteredDemandes = demandes.Where(d =>
+            (string.IsNullOrEmpty(selectedStatus) || d.Statut == selectedStatus) &&
+            (string.IsNullOrEmpty(selectedType) || d.TypeConge == selectedType) &&
+            (string.IsNullOrEmpty(selectedPeriod) || IsInSelectedPeriod(d.DateSoumission))
+        ).ToList();
+    }
+
+    private bool IsInSelectedPeriod(DateTime date)
+    {
+        if (selectedPeriod == "thisMonth")
+            return date.Month == DateTime.Now.Month && date.Year == DateTime.Now.Year;
+        if (selectedPeriod == "lastMonth")
+        {
+            var lastMonth = DateTime.Now.AddMonths(-1);
+            return date.Month == lastMonth.Month && date.Year == lastMonth.Year;
+        }
+        if (selectedPeriod == "thisYear")
+            return date.Year == DateTime.Now.Year;
+        return true;
+    }
+
+    private void SetViewMode(string mode)
+    {
+        viewMode = mode;
+    }
+
+    private string GetDateRange(DateTime debut, DateTime fin)
+    {
+        return $"{(fin - debut).Days + 1} jour{((fin - debut).Days > 0 ? "s" : "")}";
+    }
+
+    private string GetTypeBadgeClass(string type)
+    {
+        return type switch
+        {
+            "Congés payés" => "bg-success",
+            "RTT" => "bg-info",
+            "Congé maladie" => "bg-warning",
+            "Congé sans solde" => "bg-secondary",
+            _ => "bg-light text-dark"
+        };
+    }
+
+    private string GetStatusBadgeClass(string statut)
+    {
+        return statut switch
+        {
+            "En attente" => "bg-warning",
+            "Approuvé" => "bg-success",
+            "Rejeté" => "bg-danger",
+            "Annulé" => "bg-secondary",
+            _ => "bg-light text-dark"
+        };
+    }
+
+    private void ViewDemande(int id)
+    {
+        // Navigation fictive pour la démo
+        Console.WriteLine($"Voir demande {id}");
+    }
+
+    private void EditDemande(int id)
+    {
+        // Navigation fictive pour la démo
+        Console.WriteLine($"Modifier demande {id}");
+    }
+
+    private void CancelDemande(int id)
+    {
+        // Pour la démo, on supprime juste la demande
+        var demande = demandes.FirstOrDefault(d => d.Id == id);
+        if (demande != null)
+        {
+            demandes.Remove(demande);
+            ApplyFilters();
+        }
+    }
+}
