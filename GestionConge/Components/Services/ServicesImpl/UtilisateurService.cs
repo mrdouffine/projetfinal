@@ -26,6 +26,9 @@ public class UtilisateurService : IUtilisateurService
        return await  _repository.CreateAsync(utilisateurRequestDto);
     }
 
+    public Task<Utilisateur?> GetByEmailAndPasswordAsync(string email, string password) =>
+        _repository.GetByEmailAndPasswordAsync(email, password);
+
     public Task<bool> UpdateAsync(UtilisateurDto utilisateurDto) => _repository.UpdateAsync(utilisateurDto);
     public Task<IEnumerable<Utilisateur>> GetSubordonnesAsync(int superieurId) =>
     _repository.GetSubordonnesAsync(superieurId);

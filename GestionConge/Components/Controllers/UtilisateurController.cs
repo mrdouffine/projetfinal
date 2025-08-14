@@ -30,6 +30,13 @@ public class UtilisateurController : ControllerBase
         return utilisateur is not null ? Ok(utilisateur) : NotFound();
     }
 
+    //[HttpPost("/login")]
+    //public async Task<IActionResult> GetByEmailAndPassword([FromBody] UtilisateurRequestDto loginRequest)
+    //{
+    //    var utilisateur = await _service.GetByEmailAndPasswordAsync(loginRequest.Email, loginRequest.MotDePasse);
+    //    return utilisateur is not null ? Ok(utilisateur) : Unauthorized();
+    //}
+
     [HttpPost]
     public async Task<IActionResult> Create(UtilisateurRequestDto utilisateurRequestDto)
     {

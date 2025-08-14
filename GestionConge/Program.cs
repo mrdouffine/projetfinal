@@ -1,6 +1,5 @@
 using DinkToPdf;
 using DinkToPdf.Contracts;
-using GestionConge.Client.Pages;
 using GestionConge.Components;
 using GestionConge.Components.Models;
 using GestionConge.Components.Repositories;
@@ -8,9 +7,12 @@ using GestionConge.Components.Repositories.IRepositories;
 using GestionConge.Components.Repositories.RepositoriesImpl;
 using GestionConge.Components.Services.IServices;
 using GestionConge.Components.Services.ServicesImpl;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using MudBlazor.Services;
 using Npgsql;
 using System.Data;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -61,6 +63,8 @@ builder.Services.AddScoped<IPlanningCongeService, PlanningCongeService>();
 // Register the RappelRepository and RappelService
 builder.Services.AddScoped<IRappelRepository, RappelRepository>();
 builder.Services.AddScoped<IRappelService, RappelService>();
+// Register the AuthService
+builder.Services.AddScoped<IAuthService, AuthService>();
 // Register the EmailService
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.AddScoped<IMailService, MailService>();
@@ -69,6 +73,38 @@ builder.Services.AddHostedService<ReminderEmailService>();
 // Register the PDF export service
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 builder.Services.AddScoped<IPdfExportService, PdfExportService>();
+//AuthService
+
+
+var jwt = builder.Configuration.GetSection("JwtSettings");
+var secret = jwt["SecretKey"]!;
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(opt =>
+    {
+        opt.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidIssuer = jwt["Issuer"],
+            ValidAudience = jwt["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+builder.Services.AddAuthorization();
+
+
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("client",
+        p => p.WithOrigins("https://localhost:7064", "http://localhost:7064", "https://localhost:5001", "http://localhost:5000")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials());
+});
 
 var app = builder.Build();
 
@@ -91,7 +127,9 @@ app.UseHttpsRedirection();
 
 app.MapControllers(); // <- important pour activer les routes API
 app.UseAntiforgery();
-
+app.UseCors("client");
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()

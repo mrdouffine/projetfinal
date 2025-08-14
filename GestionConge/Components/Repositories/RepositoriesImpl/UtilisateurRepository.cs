@@ -1,6 +1,7 @@
 ﻿namespace GestionConge.Components.Repositories.RepositoriesImpl;
 
 using Dapper;
+using GestionConge.Components.Auth;
 using GestionConge.Components.DTOs;
 using GestionConge.Components.DTOs.RequestDto;
 using GestionConge.Components.Models;
@@ -28,15 +29,24 @@ public class UtilisateurRepository : IUtilisateurRepository
         return await _db.QueryFirstOrDefaultAsync<Utilisateur>(sql, new { Id = id });
     }
 
-    public async Task<int> CreateAsync(UtilisateurRequestDto utilisateurRequestDto)
+    public async Task<int> CreateAsync(UtilisateurAuth utilisateurAuth)
     {
         var sql = @"
-        INSERT INTO utilisateurs (nom, email, motdepasse, role, superieurid)
-        VALUES (@Nom, @Email, @MotDePasse, @Role, @SuperieurId)
+        INSERT INTO utilisateurs (nom, email, motdepasse, role)
+        VALUES (@Nom, @Email, @MotDePasse, @Role)
         RETURNING id";
-        return await _db.ExecuteScalarAsync<int>(sql, utilisateurRequestDto);
+        return await _db.ExecuteScalarAsync<int>(sql, utilisateurAuth);
+    }
+    public async Task<UtilisateurAuth?> GetByEmailAndPasswordAsync(string email, string password)
+    {
+        var sql = "SELECT * FROM utilisateurs WHERE email = @Email AND motdepasse = @MotDePasse";
+        return await _db.QueryFirstOrDefaultAsync<UtilisateurAuth>(sql, new { Email = email, MotDePasse = password });
     }
 
+    public Task<UtilisateurAuth?> GetByUserNameAsync(string nom) =>
+        _db.QueryFirstOrDefaultAsync<UtilisateurAuth>(
+            "SELECT id, nom, email, motdepasse, role FROM utilisateurs WHERE nom = @nom",
+            new { nom });
     public async Task<bool> UpdateAsync(UtilisateurDto utilisateurDto)
     {
         //var sql = @"
@@ -59,11 +69,10 @@ public class UtilisateurRepository : IUtilisateurRepository
         return await _db.QueryAsync<Utilisateur>(sql, new { SuperieurId = superieurId });
     }
 
-    // ✨ AJOUT dans IUtilisateurRepository et UtilisateurRepository
-    public async Task<Utilisateur?> GetByEmailAsync(string email)
+    public async Task<UtilisateurAuth?> GetByEmailAsync(string email)
     {
         var sql = "SELECT * FROM utilisateurs WHERE email = @Email";
-        return await _db.QueryFirstOrDefaultAsync<Utilisateur>(sql, new { Email = email });
+        return await _db.QueryFirstOrDefaultAsync<UtilisateurAuth>(sql, new { Email = email });
     }
 
     public async Task<Utilisateur?> GetByRoleAsync(string role)

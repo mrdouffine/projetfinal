@@ -409,22 +409,6 @@
   },
   {
     "ContainingType": "GestionConge.Components.Controllers.UtilisateurController",
-    "Method": "Create",
-    "RelativePath": "api/Utilisateur",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "utilisateurRequestDto",
-        "Type": "GestionConge.Components.DTOs.RequestDto.UtilisateurRequestDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "GestionConge.Components.Controllers.UtilisateurController",
     "Method": "GetById",
     "RelativePath": "api/Utilisateur/{id}",
     "HttpMethod": "GET",
@@ -582,6 +566,38 @@
       {
         "Name": "request",
         "Type": "GestionConge.Components.DTOs.RequestDto.ValidationRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.UtilisateurController",
+    "Method": "GetByEmailAndPassword",
+    "RelativePath": "login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginRequest",
+        "Type": "GestionConge.Components.DTOs.RequestDto.UtilisateurRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.UtilisateurController",
+    "Method": "Create",
+    "RelativePath": "register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "utilisateurRequestDto",
+        "Type": "GestionConge.Components.DTOs.RequestDto.UtilisateurRequestDto",
         "IsRequired": true
       }
     ],
