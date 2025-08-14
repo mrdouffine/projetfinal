@@ -2,14 +2,14 @@
 @using System.ComponentModel.DataAnnotations
 @layout GestionConge.Client.Layout.LoginLayout
 @inject NavigationManager Navigation
-@* Login.razor - Page de connexion *@
+@using GestionConge.Client.Services
+@inject AuthService AuthService
 
 <PageTitle>Connexion - GCO</PageTitle>
 
 <div class="login-form">
     <h4 class="text-center mb-4">Connexion</h4>
 
-    <!-- Affichage des erreurs -->
     @if (!string.IsNullOrEmpty(errorMessage))
     {
         <div class="alert alert-danger" role="alert">
@@ -18,7 +18,6 @@
         </div>
     }
 
-    <!-- Formulaire de connexion -->
     <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
         <DataAnnotationsValidator />
 
@@ -61,7 +60,6 @@
         </div>
     </EditForm>
 
-    <!-- Liens utiles -->
     <div class="login-footer">
         <p class="mb-2">
             <a href="/forgot-password" class="text-decoration-none">
@@ -78,12 +76,10 @@
         </p>
     </div>
 
-    <!-- Divider -->
     <div class="divider">
         <span>ou</span>
     </div>
 
-    <!-- Connexion rapide (pour les tests) -->
     <div class="demo-accounts">
         <h6 class="text-center mb-3">Comptes de démonstration</h6>
         <div class="row g-2">
@@ -151,27 +147,25 @@
 
         try
         {
-            // Simulation d'un appel API
-            await Task.Delay(1500);
-
-            // Vérification des identifiants fictifs
-            if (loginModel.Email == "marie.dubois@entreprise.com" && loginModel.Password == "password123")
+            var success = await AuthService.LoginAsync(loginModel.Email, loginModel.Password);
+            if (success)
             {
-                // Succès - redirection vers le dashboard
+                // Redirection après connexion réussie
                 Navigation.NavigateTo("/");
             }
             else
             {
-                errorMessage = "Identifiants incorrects. Utilisez marie.dubois@entreprise.com / password123";
+                errorMessage = "Identifiants incorrects. Veuillez réessayer.";
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             errorMessage = "Une erreur s'est produite lors de la connexion. Veuillez réessayer.";
         }
         finally
         {
             isLoading = false;
+            StateHasChanged();
         }
     }
 
@@ -180,30 +174,35 @@
         isLoading = true;
         errorMessage = string.Empty;
 
-        // Simulation de connexion
-        await Task.Delay(1000);
-
-        var userData = userType switch
+        var demoCredentials = userType switch
         {
-            DemoUser.Employee => ("marie.dubois@entreprise.com", "Employé"),
-            DemoUser.DOT => ("jean.martin@entreprise.com", "DOT"),
-            DemoUser.HR => ("sophie.laurent@entreprise.com", "RH"),
-            DemoUser.Admin => ("admin@entreprise.com", "Administrateur"),
+            DemoUser.Employee => ("marie.dubois@entreprise.com", "password123"),
+            DemoUser.DOT => ("jean.martin@entreprise.com", "password123"),
+            DemoUser.HR => ("sophie.laurent@entreprise.com", "password123"),
+            DemoUser.Admin => ("admin@entreprise.com", "password123"),
             _ => ("", "")
         };
 
-        // Ici vous stockeriez les informations utilisateur (session, local storage, etc.)
-        // Pour la démonstration, on redirige simplement
-        Navigation.NavigateTo("/");
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
+        try
         {
-            // Déclencher les animations JavaScript
-            await Task.Delay(100);
-            // Ici vous pourriez appeler du JavaScript pour les animations
+            var success = await AuthService.LoginAsync(demoCredentials.Item1, demoCredentials.Item2);
+            if (success)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                errorMessage = "Erreur lors de la connexion de démonstration.";
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "Une erreur s'est produite lors de la connexion. Veuillez réessayer.";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
         }
     }
 }
