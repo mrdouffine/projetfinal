@@ -1,5 +1,6 @@
 ﻿namespace GestionConge.Components.Services.ServicesImpl;
 
+using GestionConge.Components.Auth;
 using GestionConge.Components.DTOs;
 using GestionConge.Components.DTOs.RequestDto;
 using GestionConge.Components.Models;
@@ -17,16 +18,16 @@ public class UtilisateurService : IUtilisateurService
 
     public Task<IEnumerable<Utilisateur>> GetAllAsync() => _repository.GetAllAsync();
     public Task<Utilisateur?> GetByIdAsync(int id) => _repository.GetByIdAsync(id);
-    public async Task<int> CreateAsync(UtilisateurRequestDto utilisateurRequestDto)
+    public async Task<int> CreateAsync(UtilisateurAuth utilisateurAuth)
     {
         // ✨ AJOUT : Validation métier
-        await ValidateUniqueEmailAsync(utilisateurRequestDto.Email);
-        await ValidateSuperieurExistsAsync(utilisateurRequestDto.SuperieurId);
+        await ValidateUniqueEmailAsync(utilisateurAuth.Email);
+        //await ValidateSuperieurExistsAsync(utilisateurAuth.SuperieurId);
 
-       return await  _repository.CreateAsync(utilisateurRequestDto);
+       return await  _repository.CreateAsync(utilisateurAuth);
     }
 
-    public Task<Utilisateur?> GetByEmailAndPasswordAsync(string email, string password) =>
+    public Task<UtilisateurAuth?> GetByEmailAndPasswordAsync(string email, string password) =>
         _repository.GetByEmailAndPasswordAsync(email, password);
 
     public Task<bool> UpdateAsync(UtilisateurDto utilisateurDto) => _repository.UpdateAsync(utilisateurDto);

@@ -1,0 +1,26 @@
+### GET request to example server
+POST https://localhost:7064/api/auth/register
+content-type: application/json
+
+{
+  "nom": "Trash manga",
+  "email": "trash@gmail.com",
+  "motdepasse": "123488889"
+}
+
+> {% client.global.set("auth-token", response.body.accessToken);  %}
+
+
+
+### POST Login
+POST https://localhost:7064/api/auth/login
+content-type: application/json
+
+{
+  "userNameOrEmail": "trash@gmail.com",
+  "password": "123488889"
+}
+
+> {% client.global.set("auth-token", response.body.accessToken);  %}
+
+###

@@ -18,4 +18,9 @@ public interface IUtilisateurRepository
     Task<Utilisateur?> GetByRoleAsync(string role);
     Task<UtilisateurAuth?> GetByEmailAsync(string email);
     Task<bool> DeleteAsync(int id);
+
+
+    // Méthodes pour la gestion des tokens
+    Task UpdateRefreshTokenAsync(int userId, string? token, DateTime? expiresUtc);
+    Task<UtilisateurAuth?> GetByRefreshTokenAsync(string refreshToken);
 }

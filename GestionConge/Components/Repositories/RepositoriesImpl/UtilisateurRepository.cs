@@ -3,10 +3,11 @@
 using Dapper;
 using GestionConge.Components.Auth;
 using GestionConge.Components.DTOs;
-using GestionConge.Components.DTOs.RequestDto;
 using GestionConge.Components.Models;
 using GestionConge.Components.Repositories.IRepositories;
 using System.Data;
+using System.Security.Cryptography;
+using System.Text;
 
 public class UtilisateurRepository : IUtilisateurRepository
 {
@@ -47,6 +48,71 @@ public class UtilisateurRepository : IUtilisateurRepository
         _db.QueryFirstOrDefaultAsync<UtilisateurAuth>(
             "SELECT id, nom, email, motdepasse, role FROM utilisateurs WHERE nom = @nom",
             new { nom });
+
+
+    public async Task UpdateRefreshTokenAsync(int userId, string? token, DateTime? expiresUtc)
+    {
+        // Si token null -> on supprime les colonnes (NULL)
+        if (string.IsNullOrEmpty(token))
+        {
+            var sqlNull = @"
+                    UPDATE utilisateurs
+                    SET refreshtoken = NULL,
+                        refreshtokenexpirydate = NULL
+                    WHERE id = @UserId;";
+            await _db.ExecuteAsync(sqlNull, new { UserId = userId });
+            return;
+        }
+
+        // Hacher le refresh token avant stockage (SHA256 hex)
+        var hashed = HashToken(token);
+
+        var sql = @"
+                UPDATE utilisateurs
+                SET refreshtoken = @HashedToken,
+                    refreshtokenexpirydate = @ExpiresUtc
+                WHERE id = @UserId;";
+        await _db.ExecuteAsync(sql, new { HashedToken = hashed, ExpiresUtc = expiresUtc, UserId = userId });
+    }
+
+    // -------------------------
+    // Méthode demandée: GetByRefreshTokenAsync
+    // -------------------------
+    /// <summary>
+    /// Retourne l'utilisateur qui a le refresh token (après hachage) qui n'est pas expiré.
+    /// </summary>
+    public async Task<UtilisateurAuth?> GetByRefreshTokenAsync(string refreshToken)
+    {
+        if (string.IsNullOrEmpty(refreshToken)) return null;
+
+        var hashed = HashToken(refreshToken);
+
+        var sql = @"
+                SELECT id, nom, email, motdepasse, role, superieurid
+                FROM utilisateurs
+                WHERE refreshtoken = @HashedToken
+                  AND refreshtokenexpirydate IS NOT NULL
+                  AND refreshtokenexpirydate > NOW()
+                LIMIT 1;
+            ";
+
+        return await _db.QueryFirstOrDefaultAsync<UtilisateurAuth>(sql, new { HashedToken = hashed });
+    }
+
+    // -------------------------
+    // Helper: hash token (SHA256 -> hex)
+    // -------------------------
+    private static string HashToken(string token)
+    {
+        // Convert to bytes and compute SHA256 then hex-string (lowercase)
+        using var sha = SHA256.Create();
+        var bytes = Encoding.UTF8.GetBytes(token);
+        var hash = sha.ComputeHash(bytes);
+        var sb = new StringBuilder(hash.Length * 2);
+        foreach (var b in hash)
+            sb.Append(b.ToString("x2"));
+        return sb.ToString();
+    }
     public async Task<bool> UpdateAsync(UtilisateurDto utilisateurDto)
     {
         //var sql = @"

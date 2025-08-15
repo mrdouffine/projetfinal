@@ -1,5 +1,6 @@
 ﻿namespace GestionConge.Components.Controllers;
 
+using GestionConge.Components.Auth;
 using GestionConge.Components.DTOs;
 using GestionConge.Components.DTOs.RequestDto;
 using GestionConge.Components.Services.IServices;
@@ -38,10 +39,10 @@ public class UtilisateurController : ControllerBase
     //}
 
     [HttpPost]
-    public async Task<IActionResult> Create(UtilisateurRequestDto utilisateurRequestDto)
+    public async Task<IActionResult> Create(UtilisateurAuth utilisateurAuth)
     {
-        var id = await _service.CreateAsync(utilisateurRequestDto);
-        return CreatedAtAction(nameof(GetById), new { id }, utilisateurRequestDto);
+        var id = await _service.CreateAsync(utilisateurAuth);
+        return CreatedAtAction(nameof(GetById), new { id }, utilisateurAuth);
     }
 
     [HttpPut("{id}")]

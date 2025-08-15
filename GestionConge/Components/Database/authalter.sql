@@ -1,3 +1,3 @@
 ALTER TABLE utilisateurs
-ADD RefreshToken NVARCHAR(200) NULL,
-RefreshTokenExpiryDate DATETIME NULL;
+ADD COLUMN refreshtoken VARCHAR(200),
+ADD COLUMN refreshtokenexpirydate TIMESTAMP;
