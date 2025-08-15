@@ -3,6 +3,7 @@
 using GestionConge.Components.DTOs.RequestDto;
 using GestionConge.Components.Models;
 using GestionConge.Components.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -16,6 +17,7 @@ public class ValidationController : ControllerBase
         _service = service;
     }
 
+    [Authorize(Roles ="Admin")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -23,6 +25,7 @@ public class ValidationController : ControllerBase
         return Ok(result);
     }
 
+    [Authorize(Roles ="DOT")]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -30,6 +33,7 @@ public class ValidationController : ControllerBase
         return validation is not null ? Ok(validation) : NotFound();
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] Validation validation)
     {
@@ -37,6 +41,7 @@ public class ValidationController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id }, validation);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] Validation validation)
     {
@@ -45,6 +50,7 @@ public class ValidationController : ControllerBase
         return success ? NoContent() : NotFound();
     }
 
+    [Authorize]
     [HttpPost("traiter")]
     public async Task<IActionResult> TraiterValidation([FromBody] ValidationRequestDto request)
     {
@@ -52,7 +58,7 @@ public class ValidationController : ControllerBase
         return success ? Ok(new { message = "Validation traitée." }) : BadRequest("Erreur lors du traitement.");
     }
 
-
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using GestionConge.Components.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System.Data;
@@ -20,6 +21,7 @@ public class StatistiquesController : ControllerBase
     }
 
     // On ajoutera les endpoints ici
+    [Authorize(Roles = "Admin")]
 
     [HttpGet("jours-par-user")]
     public async Task<IActionResult> GetJoursParUser()
@@ -39,6 +41,7 @@ public class StatistiquesController : ControllerBase
         return Ok(result);
     }
 
+    [Authorize(Roles = "Admin")]
 
     [HttpGet("pic-absences")]
     public async Task<IActionResult> GetPicAbsences()
@@ -54,6 +57,7 @@ public class StatistiquesController : ControllerBase
         var result = await _db.QueryAsync(sql);
         return Ok(result);
     }
+    [Authorize(Roles = "Admin")]
 
     [HttpGet("solde/{utilisateurId}")]
     public async Task<IActionResult> GetSolde(int utilisateurId)
@@ -72,6 +76,8 @@ public class StatistiquesController : ControllerBase
         return Ok(new { SoldeRestant = soldeRestant });
     }
 
+    [Authorize(Roles = "Admin")]
+
     [HttpGet("conges-par-mois")]
     public async Task<IActionResult> GetCongesParMois()
     {
@@ -86,6 +92,8 @@ public class StatistiquesController : ControllerBase
         var result = await _db.QueryAsync(sql);
         return Ok(result);
     }
+
+    [Authorize(Roles = "Admin")]
 
     [HttpGet("export-pdf")]
     public IActionResult ExportStatistiquesEnPdf()

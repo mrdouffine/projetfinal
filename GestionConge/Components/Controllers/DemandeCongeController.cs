@@ -2,6 +2,7 @@
 using GestionConge.Components.DTOs.RequestDto;
 using GestionConge.Components.Models;
 using GestionConge.Components.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace GestionConge.Components.Controllers;
 
@@ -17,6 +18,7 @@ public class DemandeCongeController : ControllerBase
         _service = service;
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -24,6 +26,7 @@ public class DemandeCongeController : ControllerBase
         return Ok(result);
     }
 
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -31,6 +34,7 @@ public class DemandeCongeController : ControllerBase
         return demande is not null ? Ok(demande) : NotFound();
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] DemandeCongeRequestDto demande)
     {
@@ -38,6 +42,7 @@ public class DemandeCongeController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id }, demande);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] DemandeCongeDto demande)
     {
@@ -46,6 +51,7 @@ public class DemandeCongeController : ControllerBase
         return success ? NoContent() : NotFound();
     }
 
+    [Authorize]
     [HttpGet("utilisateur/{utilisateurId}")]
     public async Task<IActionResult> GetByUtilisateur(int utilisateurId)
     {
@@ -53,6 +59,7 @@ public class DemandeCongeController : ControllerBase
         return Ok(demandes);
     }
 
+    [Authorize(Roles = "DOT,Admin")]
     [HttpGet("assignes/{validateurId}")]
     public async Task<IActionResult> GetAssignes(int validateurId)
     {
@@ -60,6 +67,7 @@ public class DemandeCongeController : ControllerBase
         return Ok(demandes);
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

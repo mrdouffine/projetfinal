@@ -2,8 +2,8 @@
 
 using GestionConge.Components.Auth;
 using GestionConge.Components.DTOs;
-using GestionConge.Components.DTOs.RequestDto;
 using GestionConge.Components.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -17,6 +17,7 @@ public class UtilisateurController : ControllerBase
         _service = service;
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -24,6 +25,7 @@ public class UtilisateurController : ControllerBase
         return Ok(utilisateurs);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -37,7 +39,7 @@ public class UtilisateurController : ControllerBase
     //    var utilisateur = await _service.GetByEmailAndPasswordAsync(loginRequest.Email, loginRequest.MotDePasse);
     //    return utilisateur is not null ? Ok(utilisateur) : Unauthorized();
     //}
-
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> Create(UtilisateurAuth utilisateurAuth)
     {
@@ -45,6 +47,7 @@ public class UtilisateurController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id }, utilisateurAuth);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, UtilisateurDto utilisateurDto)
     {
@@ -53,6 +56,7 @@ public class UtilisateurController : ControllerBase
         return success ? NoContent() : NotFound();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -60,6 +64,7 @@ public class UtilisateurController : ControllerBase
         return success ? NoContent() : NotFound();
     }
 
+    [Authorize]
     // Récupérer les subordonnés
     [HttpGet("{id}/subordonnes")]
     public async Task<IActionResult> GetSubordonnes(int id)

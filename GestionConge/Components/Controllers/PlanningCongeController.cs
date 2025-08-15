@@ -2,6 +2,7 @@
 
 using GestionConge.Components.Models;
 using GestionConge.Components.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -15,6 +16,7 @@ public class PlanningCongeController : ControllerBase
         _service = service;
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -22,6 +24,7 @@ public class PlanningCongeController : ControllerBase
         return Ok(result);
     }
 
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -29,6 +32,7 @@ public class PlanningCongeController : ControllerBase
         return item is not null ? Ok(item) : NotFound();
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] PlanningConge planning)
     {
@@ -36,6 +40,7 @@ public class PlanningCongeController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id }, planning);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] PlanningConge planning)
     {
@@ -44,6 +49,7 @@ public class PlanningCongeController : ControllerBase
         return success ? NoContent() : NotFound();
     }
 
+    [Authorize]
     [HttpPost("planifier")]
     public async Task<IActionResult> Planifier([FromBody] PlanningConge planning)
     {
@@ -68,6 +74,8 @@ public class PlanningCongeController : ControllerBase
         }
     }
 
+    [Authorize]
+
     [HttpGet("utilisateur/{utilisateurId}")]
     public async Task<IActionResult> GetPlanningParUtilisateur(int utilisateurId)
     {
@@ -75,6 +83,7 @@ public class PlanningCongeController : ControllerBase
         return Ok(plannings);
     }
 
+    [Authorize]
     [HttpGet("solde/{utilisateurId}/{annee}")]
     public async Task<IActionResult> GetSoldeRestant(int utilisateurId, int annee)
     {
@@ -89,6 +98,7 @@ public class PlanningCongeController : ControllerBase
         });
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
