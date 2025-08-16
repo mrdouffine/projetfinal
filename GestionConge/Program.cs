@@ -1,5 +1,6 @@
 using DinkToPdf;
 using DinkToPdf.Contracts;
+using GestionConge.Client.Services;
 using GestionConge.Components;
 using GestionConge.Components.Models;
 using GestionConge.Components.Repositories;
@@ -64,7 +65,7 @@ builder.Services.AddScoped<IPlanningCongeService, PlanningCongeService>();
 builder.Services.AddScoped<IRappelRepository, RappelRepository>();
 builder.Services.AddScoped<IRappelService, RappelService>();
 // Register the AuthService
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthService, AuthServices>();
 // Register the EmailService
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.AddScoped<IMailService, MailService>();
@@ -73,7 +74,8 @@ builder.Services.AddHostedService<ReminderEmailService>();
 // Register the PDF export service
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 builder.Services.AddScoped<IPdfExportService, PdfExportService>();
-//AuthService
+//Register AuthService from GestionConge.Client
+builder.Services.AddScoped<AuthService>();
 
 
 var jwt = builder.Configuration.GetSection("JwtSettings");

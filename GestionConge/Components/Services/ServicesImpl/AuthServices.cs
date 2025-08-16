@@ -10,12 +10,12 @@ using System.Text;
 
 namespace GestionConge.Components.Services.ServicesImpl;
 
-public class AuthService : IAuthService
+public class AuthServices : IAuthService
 {
     private readonly IUtilisateurRepository _users;
     private readonly IConfiguration _cfg;
 
-    public AuthService(IUtilisateurRepository users, IConfiguration cfg)
+    public AuthServices(IUtilisateurRepository users, IConfiguration cfg)
     {
         _users = users;
         _cfg = cfg;
