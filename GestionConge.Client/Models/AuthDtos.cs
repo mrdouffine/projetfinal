@@ -13,7 +13,7 @@
             public string Email { get; set; } = string.Empty;
             public string MotDePasse { get; set; } = string.Empty;
             public string Role { get; set; } = string.Empty;  // Exemple : "Employé", "Admin", etc.
-            public int? SuperieurId { get; set; }  // ID du supérieur hiérarchique, s’il y en a
+            //public int? SuperieurId { get; set; }  // ID du supérieur hiérarchique, s’il y en a
         }
         public class ResetPasswordDto
         {

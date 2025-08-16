@@ -15,11 +15,6 @@ namespace GestionConge.Client.Services
             _http = http;
         }
 
-        public async Task<bool> RegisterAsync(UtilisateurDto utilisateur)
-        {
-            var response = await _http.PostAsJsonAsync("api/utilisateurs/register", utilisateur);
-            return response.IsSuccessStatusCode;
-        }
 
         public async Task<List<UtilisateurDto>?> GetAllAsync()
         {
