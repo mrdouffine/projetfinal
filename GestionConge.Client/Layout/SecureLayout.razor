@@ -1,0 +1,44 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager Nav
+@inject GestionConge.Client.Services.AuthService AuthService
+
+<div class="secure-shell">
+    @if (_checking)
+    {
+        <!-- Écran court de chargement -->
+        <div class="d-flex justify-content-center align-items-center" style="min-height:40vh">
+            <div class="spinner-border" role="status"></div>
+            <span class="ms-2">Vérification de la session...</span>
+        </div>
+    }
+    else
+    {
+        @Body
+    }
+</div>
+
+@code {
+    private bool _checking = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        // Tente de restaurer la session depuis localStorage si nécessaire
+        await AuthService.TryRestoreAsync();
+
+        // Est-ce que l'utilisateur est authentifié (token valide ou refresh réussi) ?
+        var isAuth = await AuthService.IsAuthenticatedAsync();
+
+        if (!isAuth)
+        {
+            // Retournera ici après login réussi
+            var returnUrl = Uri.EscapeDataString(Nav.Uri);
+            Nav.NavigateTo($"/login?returnUrl={returnUrl}", forceLoad: true);
+            return;
+        }
+
+        _checking = false;
+        StateHasChanged();
+    }
+}

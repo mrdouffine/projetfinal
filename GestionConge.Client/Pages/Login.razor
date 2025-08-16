@@ -2,117 +2,91 @@
 @using System.ComponentModel.DataAnnotations
 @layout GestionConge.Client.Layout.LoginLayout
 @inject NavigationManager Navigation
-@using GestionConge.Client.Services
-@inject AuthServices AuthService
+@inject GestionConge.Client.Services.AuthService AuthService
 
 <PageTitle>Connexion - GCO</PageTitle>
 
-<div class="login-form">
-    <h4 class="text-center mb-4">Connexion</h4>
+<MudPaper Class="mx-auto mt-12 p-6" Elevation="3" Style="max-width:400px; border-radius:16px;">
+    <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-4">Connexion</MudText>
 
     @if (!string.IsNullOrEmpty(errorMessage))
     {
-        <div class="alert alert-danger" role="alert">
-            <i class="fas fa-exclamation-triangle me-2"></i>
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mb-4">
             @errorMessage
-        </div>
+        </MudAlert>
     }
 
     <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
         <DataAnnotationsValidator />
 
-        <div class="form-floating mb-3">
-            <InputText id="email" class="form-control" @bind-Value="loginModel.Email" placeholder="votre.email@entreprise.com" />
-            <label for="email">
-                <i class="fas fa-envelope me-2"></i>Adresse email
-            </label>
-            <ValidationMessage For="@(() => loginModel.Email)" class="text-danger small" />
-        </div>
+        <MudTextField T="string" Label="Adresse email" For="@(() => loginModel.Email)" 
+                      @bind-Value="loginModel.Email" Required="true" RequiredError="L'adresse email est requise" 
+                      Placeholder="votre.email@entreprise.com" Class="mb-3" />
 
-        <div class="form-floating mb-3">
-            <InputText id="password" type="password" class="form-control" @bind-Value="loginModel.Password" placeholder="Mot de passe" />
-            <label for="password">
-                <i class="fas fa-lock me-2"></i>Mot de passe
-            </label>
-            <ValidationMessage For="@(() => loginModel.Password)" class="text-danger small" />
-        </div>
+        <MudTextField T="string" Label="Mot de passe" For="@(() => loginModel.Password)"
+                      @bind-Value="loginModel.Password" InputType="InputType.Password" 
+                      Required="true" RequiredError="Le mot de passe est requis" 
+                      Placeholder="Mot de passe" Class="mb-3" />
 
-        <div class="form-check mb-3">
-            <InputCheckbox id="rememberMe" class="form-check-input" @bind-Value="loginModel.RememberMe" />
-            <label class="form-check-label" for="rememberMe">
-                Se souvenir de moi
-            </label>
-        </div>
+        <MudCheckBox T="string" @bind-Checked="loginModel.RememberMe" Label="Se souvenir de moi" Class="mb-3" />
 
-        <div class="d-grid">
-            <button type="submit" class="btn btn-login" disabled="@isLoading">
-                @if (isLoading)
-                {
-                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    <span>Connexion en cours...</span>
-                }
-                else
-                {
-                    <i class="fas fa-sign-in-alt me-2"></i>
-                    <span>Se connecter</span>
-                }
-            </button>
-        </div>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Disabled="@isLoading" ButtonType="ButtonType.Submit">
+            @if (isLoading)
+            {
+                <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="me-2" Color="Color.Inherit">
+                    <ChildContent>Connexion en cours...</ChildContent>
+                </MudProgressCircular>
+                
+            }
+            else
+            {
+                <MudIcon Icon="@Icons.Material.Filled.Login" Class="me-2">Se connecter</MudIcon>
+                
+            }
+        </MudButton>
     </EditForm>
 
-    <div class="login-footer">
-        <p class="mb-2">
-            <a href="/forgot-password" class="text-decoration-none">
-                <i class="fas fa-key me-1"></i>
-                Mot de passe oublié ?
-            </a>
-        </p>
-        <p class="mb-0">
-            Pas encore de compte ?
-            <a href="/register" class="text-decoration-none">
-                <i class="fas fa-user-plus me-1"></i>
-                S'inscrire
-            </a>
-        </p>
-    </div>
+    <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-4">
+        <MudLink Href="/forgot-password">Mot de passe oublié ?</MudLink>
+    </MudText>
+    <MudText Typo="Typo.body2" Align="Align.Center">
+        Pas encore de compte ? <MudLink Href="/register">S'inscrire</MudLink>
+    </MudText>
 
-    <div class="divider">
-        <span>ou</span>
-    </div>
+    <MudDivider Class="my-4">ou</MudDivider>
 
-    <div class="demo-accounts">
-        <h6 class="text-center mb-3">Comptes de démonstration</h6>
-        <div class="row g-2">
-            <div class="col-6">
-                <button class="btn btn-outline-primary btn-sm w-100" @onclick="() => LoginAsDemo(DemoUser.Employee)">
-                    <i class="fas fa-user me-1"></i>
-                    Employé
-                </button>
-            </div>
-            <div class="col-6">
-                <button class="btn btn-outline-success btn-sm w-100" @onclick="() => LoginAsDemo(DemoUser.DOT)">
-                    <i class="fas fa-user-tie me-1"></i>
-                    Manager
-                </button>
-            </div>
-            <div class="col-6">
-                <button class="btn btn-outline-info btn-sm w-100" @onclick="() => LoginAsDemo(DemoUser.HR)">
-                    <i class="fas fa-users me-1"></i>
-                    RH
-                </button>
-            </div>
-            <div class="col-6">
-                <button class="btn btn-outline-secondary btn-sm w-100" @onclick="() => LoginAsDemo(DemoUser.Admin)">
-                    <i class="fas fa-crown me-1"></i>
-                    Admin
-                </button>
-            </div>
-        </div>
-        <small class="text-muted d-block text-center mt-2">
-            Cliquez pour vous connecter directement
-        </small>
-    </div>
-</div>
+    <MudText Typo="Typo.subtitle2" Align="Align.Center" Class="mb-3">Comptes de démonstration</MudText>
+    <MudGrid GutterSize="2">
+        <MudItem xs="6">
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" Size="Size.Small"
+                       OnClick="() => LoginAsDemo(DemoUser.Employee)">
+                <MudIcon Icon="@Icons.Material.Filled.Person" Class="me-1" /> Employé
+            </MudButton>
+        </MudItem>
+        <MudItem xs="6">
+            <MudButton Variant="Variant.Outlined" Color="Color.Success" FullWidth="true" Size="Size.Small"
+                       OnClick="() => LoginAsDemo(DemoUser.DOT)">
+                <MudIcon Icon="@Icons.Material.Filled.Work" Class="me-1" /> Manager
+            </MudButton>
+        </MudItem>
+        <MudItem xs="6">
+            <MudButton Variant="Variant.Outlined" Color="Color.Info" FullWidth="true" Size="Size.Small"
+                       OnClick="() => LoginAsDemo(DemoUser.HR)">
+                <MudIcon Icon="@Icons.Material.Filled.Group" Class="me-1" /> RH
+            </MudButton>
+        </MudItem>
+        <MudItem xs="6">
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true" Size="Size.Small"
+                       OnClick="() => LoginAsDemo(DemoUser.Admin)">
+                <MudIcon Icon="@Icons.Material.Filled.AdminPanelSettings" Class="me-1" /> Admin
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+
+    <MudText Typo="Typo.caption" Align="Align.Center" Class="mt-2 text-muted">
+        Cliquez pour vous connecter directement
+    </MudText>
+</MudPaper>
 
 @code {
     private LoginModel loginModel = new();
@@ -148,24 +122,27 @@
         try
         {
             var success = await AuthService.LoginAsync(loginModel.Email, loginModel.Password);
+
             if (success)
             {
-                // Redirection après connexion réussie
                 Navigation.NavigateTo("/");
             }
             else
             {
-                errorMessage = "Identifiants incorrects. Veuillez réessayer.";
+                errorMessage = "Identifiants incorrects ou compte inactif.";
             }
         }
-        catch (Exception)
+        catch (UnauthorizedAccessException)
         {
-            errorMessage = "Une erreur s'est produite lors de la connexion. Veuillez réessayer.";
+            errorMessage = "Accès refusé. Vérifiez vos identifiants.";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erreur lors de la connexion : " + ex.Message;
         }
         finally
         {
             isLoading = false;
-            StateHasChanged();
         }
     }
 

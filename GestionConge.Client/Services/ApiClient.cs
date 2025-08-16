@@ -11,9 +11,9 @@ public class ApiClient
 
 
     private readonly HttpClient _httpClient;
-    private readonly AuthServices _auth;
+    private readonly AuthService _auth;
 
-    public ApiClient(HttpClient httpClient, AuthServices auth)
+    public ApiClient(HttpClient httpClient, AuthService auth)
     {
         _httpClient = httpClient;
         _auth = auth;

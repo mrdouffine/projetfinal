@@ -3,13 +3,14 @@ using GestionConge.Client.Models;
 using Microsoft.JSInterop;
 using System.Net.Http.Json;
 using System.Text.Json;
-using static System.Net.WebRequestMethods;
 
-public class AuthServices
+
+public class AuthService
 {
     private const string LocalStorageKey = "currentUser";
     private readonly SemaphoreSlim _refreshLock = new(1, 1);
     private readonly IJSRuntime _js;
+
 
     // Clé pour stocker les données d'authentification dans le localStorage
     private const string AuthStorageKey = "authData";
@@ -19,17 +20,52 @@ public class AuthServices
 
     public event Action? OnChange;
 
-    public AuthServices(IJSRuntime jsRuntime)
+    public AuthService(IJSRuntime jsRuntime)
     {
         _js = jsRuntime;
     }
 
     public UserSession? GetCurrentUser() => _currentUser;
 
+    // Restaure depuis le localStorage (appelée au démarrage & par SecureLayout)
+    public async Task TryRestoreAsync()
+    {
+        if (_currentUser is not null) return;
+
+        var json = await _js.InvokeAsync<string>("localStorage.getItem", AuthStorageKey);
+        if (string.IsNullOrWhiteSpace(json)) return;
+
+        var auth = JsonSerializer.Deserialize<AuthResponseDto>(json);
+        if (auth is null) return;
+
+        _currentUser = new UserSession
+        {
+            Id = auth.UserId,
+            Email = auth.Email,
+            Nom = auth.UserName,
+            Role = auth.Role
+        };
+        OnChange?.Invoke();
+    }
+
+    // Renvoie true si token OK (et tente un refresh si nécessaire)
+    public async Task<bool> IsAuthenticatedAsync()
+    {
+        var auth = await GetAuthAsync();
+        if (auth is null) return false;
+
+        // token d'accès encore valide ?
+        if (auth.AccessTokenExpires > DateTime.UtcNow.AddMinutes(1))
+            return true;
+
+        // sinon, essaye de rafraîchir
+        var refreshed = await RefreshAccessTokenAsync();
+        return refreshed;
+    }
     public async Task<bool> RegisterAsync(Models.AuthDtos.RegisterDto dto)
     {
         using var _http = new HttpClient { BaseAddress = new Uri("https://localhost:7064") };
-        var res = await _http.PostAsJsonAsync("api/auth/register", dto);
+        var res = await _http.PostAsJsonAsync("api/Auth/register", dto);
         if (!res.IsSuccessStatusCode) return false;
 
         // On reçoit les tokens comme pour login
@@ -44,7 +80,7 @@ public class AuthServices
     {
         using var _httpClient = new HttpClient { BaseAddress = new Uri("https://localhost:7064") };
 
-        var response = await _httpClient.PostAsJsonAsync("/api/auth/login", new { Email = email, Password = password });
+        var response = await _httpClient.PostAsJsonAsync("/api/Auth/login", new { Email = email, Password = password });
         if (!response.IsSuccessStatusCode)
             return false;
 
@@ -115,9 +151,12 @@ public class AuthServices
 
     public async Task LogoutAsync()
     {
+
         _currentUser = null;
         await _js.InvokeVoidAsync("localStorage.removeItem", LocalStorageKey);
         NotifyStateChanged();
+
+        //NavigationManager.NavigateTo("/login");
     }
 
     private async Task SaveUserToLocalStorage()
@@ -184,7 +223,7 @@ public class AuthServices
                 RefreshToken = latest.RefreshToken
             };
 
-            var res = await _http.PostAsJsonAsync("api/auth/refresh", body);
+            var res = await _http.PostAsJsonAsync("api/Auth/refresh", body);
             if (!res.IsSuccessStatusCode) return false;
 
             var newAuth = await res.Content.ReadFromJsonAsync<AuthResponseDto>();
@@ -197,6 +236,22 @@ public class AuthServices
         {
             _refreshLock.Release();
         }
+    }
+
+    private async Task<bool> RefreshAccessTokenAsync()
+    {
+        var auth = await GetAuthAsync();
+        if (auth is null || string.IsNullOrEmpty(auth.RefreshToken)) return false;
+
+        using var http = new HttpClient { BaseAddress = new Uri("https://localhost:7064/") };
+        var resp = await http.PostAsJsonAsync("api/auth/refresh", new { refreshToken = auth.RefreshToken });
+        if (!resp.IsSuccessStatusCode) return false;
+
+        var updated = await resp.Content.ReadFromJsonAsync<AuthResponseDto>();
+        if (updated is null) return false;
+
+        await SaveAuthAsync(updated);
+        return true;
     }
 
     // ---------- Helpers stockage ----------

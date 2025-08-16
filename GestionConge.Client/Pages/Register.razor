@@ -1,47 +1,80 @@
 ﻿@page "/register"
-@inject GestionConge.Client.Services.UserService UserService
+@using GestionConge.Client.Services
+@inject AuthService AuthService
 @inject NavigationManager Navigation
 
 <h3>Inscription</h3>
 
-<EditForm Model="@registerModel" OnValidSubmit="HandleRegister">
+<EditForm Model="@registerDto" OnValidSubmit="HandleRegister">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div>
+    <div class="mb-3">
         <label>Nom :</label>
-        <InputText @bind-Value="registerModel.Nom" />
+        <InputText class="form-control" @bind-Value="registerDto.Nom" />
+        <ValidationMessage For="@(() => registerDto.Nom)" />
     </div>
-    <div>
+
+    <div class="mb-3">
         <label>Email :</label>
-        <InputText @bind-Value="registerModel.Email" />
+        <InputText class="form-control" @bind-Value="registerDto.Email" />
+        <ValidationMessage For="@(() => registerDto.Email)" />
     </div>
-    <div>
+
+    <div class="mb-3">
         <label>Mot de passe :</label>
-        <InputText @bind-Value="registerModel.MotDePasse" type="password" />
+        <InputText class="form-control" @bind-Value="registerDto.MotDePasse" type="password" />
+        <ValidationMessage For="@(() => registerDto.MotDePasse)" />
     </div>
-    <button type="submit">S'inscrire</button>
+
+    <button type="submit" class="btn btn-primary" disabled="@isLoading">
+        @if (isLoading)
+        {
+            <span class="spinner-border spinner-border-sm">Création...</span>
+        }
+        else
+        {
+            <span>S'inscrire</span>
+        }
+    </button>
 </EditForm>
 
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-    <div class="text-danger">@errorMessage</div>
+    <div class="alert alert-danger mt-3">@errorMessage</div>
 }
 
 @code {
-    private GestionConge.Client.Models.UtilisateurDto registerModel = new();
+    private GestionConge.Client.Models.AuthDtos.RegisterDto registerDto = new();
     private string? errorMessage;
+    private bool isLoading = false;
 
     private async Task HandleRegister()
     {
-        var result = await UserService.RegisterAsync(registerModel);
-        if (result)
+        errorMessage = null;
+        isLoading = true;
+
+        try
         {
-            Navigation.NavigateTo("/login");
+            var result = await AuthService.RegisterAsync(registerDto);
+
+            if (result)
+            {
+                // ✅ Après inscription on redirige vers login (ou auto-login avec token)
+                Navigation.NavigateTo("/login");
+            }
+            else
+            {
+                errorMessage = "Impossible de créer le compte. Veuillez réessayer.";
+            }
         }
-        else
+        catch (Exception ex)
         {
-            errorMessage = "Erreur lors de l'inscription. Veuillez réessayer.";
+            errorMessage = "Erreur lors de l'inscription : " + ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
         }
     }
 }
