@@ -1,6 +1,5 @@
 ﻿using GestionConge.Components.DTOs;
 using GestionConge.Components.DTOs.RequestDto;
-using GestionConge.Components.Models;
 using GestionConge.Components.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
