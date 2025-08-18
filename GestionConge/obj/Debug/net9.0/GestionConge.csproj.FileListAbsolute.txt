@@ -49,7 +49,6 @@ C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Micro
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.Extensions.Logging.Abstractions.dll
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.Extensions.Options.dll
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.Extensions.Primitives.dll
-C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.Identity.Abstractions.dll
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.IdentityModel.Abstractions.dll
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.IdentityModel.JsonWebTokens.dll
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.IdentityModel.Logging.dll
@@ -96,3 +95,4 @@ C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\refin
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\GestionConge.pdb
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\GestionConge.genruntimeconfig.cache
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\ref\GestionConge.dll
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.AspNetCore.Components.Authorization.dll

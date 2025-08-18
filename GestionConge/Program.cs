@@ -9,6 +9,7 @@ using GestionConge.Components.Repositories.RepositoriesImpl;
 using GestionConge.Components.Services.IServices;
 using GestionConge.Components.Services.ServicesImpl;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using MudBlazor.Services;
 using Npgsql;
@@ -75,6 +76,9 @@ builder.Services.AddHostedService<ReminderEmailService>();
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 builder.Services.AddScoped<IPdfExportService, PdfExportService>();
 //Register AuthService from GestionConge.Client
+builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<CustomAuthStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthStateProvider>());
 builder.Services.AddScoped<AuthService>();
 
 
