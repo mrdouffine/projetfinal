@@ -1,185 +1,149 @@
 ﻿@page "/login"
-@using System.ComponentModel.DataAnnotations
-@layout GestionConge.Client.Layout.LoginLayout
+@* //allowanonymous *@
+@using Microsoft.AspNetCore.Authorization;
+@attribute [AllowAnonymous]
+@using GestionConge.Client.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthService AuthService
 @inject NavigationManager Navigation
-@inject GestionConge.Client.Services.AuthService AuthService
+@inject ISnackbar Snackbar
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Connexion - GCO</PageTitle>
 
-<MudPaper Class="mx-auto mt-12 p-6" Elevation="3" Style="max-width:400px; border-radius:16px;">
-    <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-4">Connexion</MudText>
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-8">
+    <MudPaper Elevation="4" Class="pa-8">
+        <div class="text-center mb-6">
+            <MudIcon Icon="@Icons.Material.Filled.BusinessCenter" Size="Size.Large" Color="Color.Primary" Class="mb-2"/>
+            <MudText Typo="Typo.h4" Color="Color.Primary" GutterBottom="true">GCO</MudText>
+            <MudText Typo="Typo.h6" Color="Color.Secondary">Gestion de Congés</MudText>
+        </div>
 
-    @if (!string.IsNullOrEmpty(errorMessage))
+        <EditForm Model="@_loginModel" OnValidSubmit="@HandleLogin">
+            <DataAnnotationsValidator />
+            
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h5" Class="mb-4">Connexion</MudText>
+                    
+                    <MudTextField 
+                        @bind-Value="_loginModel.Email"
+                        Label="Email"
+                        Variant="Variant.Outlined"
+                        InputType="InputType.Email"
+                        Icon="@Icons.Material.Filled.Email"
+                        Required="true"
+                        For="@(() => _loginModel.Email)"
+                        Class="mb-4" />
+
+                    <MudTextField 
+                        @bind-Value="_loginModel.Password"
+                        Label="Mot de passe"
+                        Variant="Variant.Outlined"
+                        InputType="InputType.Password"
+                        Icon="@Icons.Material.Filled.Lock"
+                        Required="true"
+                        For="@(() => _loginModel.Password)"
+                        Class="mb-4" />
+
+                    <MudCheckBox T="bool"
+                        @bind-Checked="_rememberMe"
+                        Label="Se souvenir de moi"
+                        Color="Color.Primary"
+                        Class="mb-4" />
+                </MudCardContent>
+                
+                <MudCardActions Class="pa-4">
+                    <MudButton 
+                        ButtonType="ButtonType.Submit"
+                        Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        Size="Size.Large"
+                        FullWidth="true"
+                        Disabled="_isLoading">
+                        @if (_isLoading)
+                        {
+                            <MudProgressCircular Class="mr-2" Size="Size.Small" Indeterminate="true" />
+                            <span>Connexion en cours...</span>
+                        }
+                        else
+                        {
+                            <span>Se connecter</span>
+                        }
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </EditForm>
+
+        <MudDivider Class="my-4" />
+        
+        <div class="text-center">
+            <MudText Typo="Typo.body2">
+                Pas encore de compte ?
+                <MudLink Href="/register" Color="Color.Primary" Underline="Underline.Always">
+                    Créer un compte
+                </MudLink>
+            </MudText>
+        </div>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private readonly LoginModel _loginModel = new();
+    private bool _rememberMe;
+    private bool _isLoading;
+
+    protected override async Task OnInitializedAsync()
     {
-        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mb-4">
-            @errorMessage
-        </MudAlert>
+        // Vérifier si l'utilisateur est déjà connecté
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            Navigation.NavigateTo("/");
+        }
     }
 
-    <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
-        <DataAnnotationsValidator />
-
-        <MudTextField T="string" Label="Adresse email" For="@(() => loginModel.Email)" 
-                      @bind-Value="loginModel.Email" Required="true" RequiredError="L'adresse email est requise" 
-                      Placeholder="votre.email@entreprise.com" Class="mb-3" />
-
-        <MudTextField T="string" Label="Mot de passe" For="@(() => loginModel.Password)"
-                      @bind-Value="loginModel.Password" InputType="InputType.Password" 
-                      Required="true" RequiredError="Le mot de passe est requis" 
-                      Placeholder="Mot de passe" Class="mb-3" />
-
-        <MudCheckBox T="string" @bind-Checked="loginModel.RememberMe" Label="Se souvenir de moi" Class="mb-3" />
-
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Disabled="@isLoading" ButtonType="ButtonType.Submit">
-            @if (isLoading)
-            {
-                <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="me-2" Color="Color.Inherit">
-                    <ChildContent>Connexion en cours...</ChildContent>
-                </MudProgressCircular>
+    private async Task HandleLogin()
+    {
+        _isLoading = true;
+        
+        try
+        {
+            
                 
+            
+
+            var result = await AuthService.LoginAsync(_loginModel.Email, _loginModel.Password);
+
+            if (result)
+            {
+                Snackbar.Add("Connexion réussie ! Bienvenue.", Severity.Success);
+                Navigation.NavigateTo("/");
             }
             else
             {
-                <MudIcon Icon="@Icons.Material.Filled.Login" Class="me-2">Se connecter</MudIcon>
-                
+                // Afficher le message d'erreur retourné par le service
+                Snackbar.Add("Identifiants incorrects. Veuillez réessayer.", Severity.Error);
             }
-        </MudButton>
-    </EditForm>
-
-    <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-4">
-        <MudLink Href="/forgot-password">Mot de passe oublié ?</MudLink>
-    </MudText>
-    <MudText Typo="Typo.body2" Align="Align.Center">
-        Pas encore de compte ? <MudLink Href="/register">S'inscrire</MudLink>
-    </MudText>
-
-    <MudDivider Class="my-4">ou</MudDivider>
-
-    <MudText Typo="Typo.subtitle2" Align="Align.Center" Class="mb-3">Comptes de démonstration</MudText>
-    <MudGrid GutterSize="2">
-        <MudItem xs="6">
-            <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" Size="Size.Small"
-                       OnClick="() => LoginAsDemo(DemoUser.Employee)">
-                <MudIcon Icon="@Icons.Material.Filled.Person" Class="me-1" /> Employé
-            </MudButton>
-        </MudItem>
-        <MudItem xs="6">
-            <MudButton Variant="Variant.Outlined" Color="Color.Success" FullWidth="true" Size="Size.Small"
-                       OnClick="() => LoginAsDemo(DemoUser.DOT)">
-                <MudIcon Icon="@Icons.Material.Filled.Work" Class="me-1" /> Manager
-            </MudButton>
-        </MudItem>
-        <MudItem xs="6">
-            <MudButton Variant="Variant.Outlined" Color="Color.Info" FullWidth="true" Size="Size.Small"
-                       OnClick="() => LoginAsDemo(DemoUser.HR)">
-                <MudIcon Icon="@Icons.Material.Filled.Group" Class="me-1" /> RH
-            </MudButton>
-        </MudItem>
-        <MudItem xs="6">
-            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true" Size="Size.Small"
-                       OnClick="() => LoginAsDemo(DemoUser.Admin)">
-                <MudIcon Icon="@Icons.Material.Filled.AdminPanelSettings" Class="me-1" /> Admin
-            </MudButton>
-        </MudItem>
-    </MudGrid>
-
-    <MudText Typo="Typo.caption" Align="Align.Center" Class="mt-2 text-muted">
-        Cliquez pour vous connecter directement
-    </MudText>
-</MudPaper>
-
-@code {
-    private LoginModel loginModel = new();
-    private string errorMessage = string.Empty;
-    private bool isLoading = false;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Une erreur s'est produite lors de la connexion.", Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
 
     public class LoginModel
     {
-        [Required(ErrorMessage = "L'adresse email est requise")]
+        [Required(ErrorMessage = "L'email est requis")]
         [EmailAddress(ErrorMessage = "Format d'email invalide")]
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Le mot de passe est requis")]
         [MinLength(6, ErrorMessage = "Le mot de passe doit contenir au moins 6 caractères")]
         public string Password { get; set; } = string.Empty;
-
-        public bool RememberMe { get; set; }
-    }
-
-    public enum DemoUser
-    {
-        Employee,
-        DOT,
-        HR,
-        Admin
-    }
-
-    private async Task HandleLogin()
-    {
-        errorMessage = string.Empty;
-        isLoading = true;
-
-        try
-        {
-            var success = await AuthService.LoginAsync(loginModel.Email, loginModel.Password);
-
-            if (success)
-            {
-                Navigation.NavigateTo("/");
-            }
-            else
-            {
-                errorMessage = "Identifiants incorrects ou compte inactif.";
-            }
-        }
-        catch (UnauthorizedAccessException)
-        {
-            errorMessage = "Accès refusé. Vérifiez vos identifiants.";
-        }
-        catch (Exception ex)
-        {
-            errorMessage = "Erreur lors de la connexion : " + ex.Message;
-        }
-        finally
-        {
-            isLoading = false;
-        }
-    }
-
-    private async Task LoginAsDemo(DemoUser userType)
-    {
-        isLoading = true;
-        errorMessage = string.Empty;
-
-        var demoCredentials = userType switch
-        {
-            DemoUser.Employee => ("marie.dubois@entreprise.com", "password123"),
-            DemoUser.DOT => ("jean.martin@entreprise.com", "password123"),
-            DemoUser.HR => ("sophie.laurent@entreprise.com", "password123"),
-            DemoUser.Admin => ("admin@entreprise.com", "password123"),
-            _ => ("", "")
-        };
-
-        try
-        {
-            var success = await AuthService.LoginAsync(demoCredentials.Item1, demoCredentials.Item2);
-            if (success)
-            {
-                Navigation.NavigateTo("/");
-            }
-            else
-            {
-                errorMessage = "Erreur lors de la connexion de démonstration.";
-            }
-        }
-        catch (Exception)
-        {
-            errorMessage = "Une erreur s'est produite lors de la connexion. Veuillez réessayer.";
-        }
-        finally
-        {
-            isLoading = false;
-            StateHasChanged();
-        }
     }
 }

@@ -1,0 +1,14 @@
+﻿@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // var currentUrl = Navigation.Uri;
+        // var loginUrl = $"/login?returnUrl={Uri.EscapeDataString(Navigation.ToBaseRelativePath(currentUrl))}";
+
+        // Petit délai pour éviter les problèmes de navigation
+        await Task.Delay(100);
+        Navigation.NavigateTo("/welcome", forceLoad: true);
+    }
+}

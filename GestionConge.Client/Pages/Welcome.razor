@@ -1,0 +1,38 @@
+﻿@page "/welcome"
+@using Microsoft.AspNetCore.Authorization
+@attribute [AllowAnonymous]
+
+<PageTitle>Bienvenue - GCO</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8">
+    <MudPaper Elevation="4" Class="pa-8 text-center">
+        <MudIcon Icon="@Icons.Material.Filled.BusinessCenter" Size="Size.Large" Color="Color.Primary" Class="mb-4" />
+        <MudText Typo="Typo.h3" Color="Color.Primary" GutterBottom="true">Bienvenue sur GCO</MudText>
+        <MudText Typo="Typo.h6" Color="Color.Secondary" Class="mb-6">Système de Gestion de Congés</MudText>
+
+        <MudText Typo="Typo.body1" Class="mb-6">
+            Gérez facilement vos congés et ceux de votre équipe avec notre plateforme intuitive.
+        </MudText>
+
+        <MudStack Row Justify="Justify.Center" Spacing="4">
+            <MudButton Href="/login"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Filled.Login">
+                Se connecter
+            </MudButton>
+            <MudButton Href="/register"
+                       Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Filled.PersonAdd">
+                S'inscrire
+            </MudButton>
+        </MudStack>
+    </MudPaper>
+</MudContainer>
+
+@code {
+
+}

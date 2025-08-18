@@ -1,279 +1,172 @@
 ﻿@page "/"
-@using GestionConge.Client.Layout
-@layout SecureLayout
-@* Index.razor - Page d'accueil du système de gestion de congés *@
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@attribute [Authorize]
+@* @attribute [AllowAnonymous] *@
 
-<PageTitle>Accueil - GCO</PageTitle>
+<PageTitle>Tableau de bord - GCO</PageTitle>
 
-<div class="dashboard-header">
-    <div class="row align-items-center">
-        <div class="col-md-6">
-            <h1 class="page-title">
-                <i class="fas fa-calendar-alt me-3"></i>
-                Tableau de bord
-            </h1>
-            <p class="page-subtitle">Gestion de Congés - Bienvenue, <strong>Marie Dubois</strong></p>
-        </div>
-        <div class="col-md-6 text-md-end">
-            <div class="quick-actions">
-                <a href="/demande-form" class="btn btn-primary">
-                    <i class="fas fa-plus me-2"></i>
-                    Nouvelle demande
-                </a>
-                <a href="/notifications" class="btn btn-outline-secondary ms-2">
-                    <i class="fas fa-bell me-2"></i>
-                    Notifications
-                    <span class="badge bg-danger ms-1">3</span>
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
+<MudText Typo="Typo.h3" GutterBottom="true">Tableau de bord</MudText>
 
-<!-- Cartes de statistiques -->
-<div class="row mb-4">
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stats-card stats-primary">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h6 class="card-title text-uppercase">Solde disponible</h6>
-                        <h3 class="mb-0">23 jours</h3>
-                        <small class="text-muted">Sur 25 jours annuels</small>
+<MudGrid>
+    <!-- Statistiques rapides -->
+    <MudItem xs="12" sm="6" md="3">
+        <MudCard>
+            <MudCardContent>
+                <div class="d-flex justify-space-between">
+                    <div>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">Congés restants</MudText>
+                        <MudText Typo="Typo.h4">25</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">jours</MudText>
                     </div>
-                    <div class="col-auto">
-                        <i class="fas fa-calendar-check fa-2x"></i>
-                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.BeachAccess" Size="Size.Large" Color="Color.Primary" />
                 </div>
-            </div>
-        </div>
-    </div>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stats-card stats-success">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h6 class="card-title text-uppercase">Demandes approuvées</h6>
-                        <h3 class="mb-0">8</h3>
-                        <small class="text-muted">Cette année</small>
+    <MudItem xs="12" sm="6" md="3">
+        <MudCard>
+            <MudCardContent>
+                <div class="d-flex justify-space-between">
+                    <div>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">Congés pris</MudText>
+                        <MudText Typo="Typo.h4">5</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">jours</MudText>
                     </div>
-                    <div class="col-auto">
-                        <i class="fas fa-check-circle fa-2x"></i>
-                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Large" Color="Color.Success" />
                 </div>
-            </div>
-        </div>
-    </div>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stats-card stats-warning">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h6 class="card-title text-uppercase">En attente</h6>
-                        <h3 class="mb-0">2</h3>
-                        <small class="text-muted">Demandes en cours</small>
+    <MudItem xs="12" sm="6" md="3">
+        <MudCard>
+            <MudCardContent>
+                <div class="d-flex justify-space-between">
+                    <div>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">En attente</MudText>
+                        <MudText Typo="Typo.h4">2</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">demandes</MudText>
                     </div>
-                    <div class="col-auto">
-                        <i class="fas fa-clock fa-2x"></i>
-                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.HourglassEmpty" Size="Size.Large" Color="Color.Warning" />
                 </div>
-            </div>
-        </div>
-    </div>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stats-card stats-info">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h6 class="card-title text-uppercase">Équipe</h6>
-                        <h3 class="mb-0">12 personnes</h3>
-                        <small class="text-muted">3 absents aujourd'hui</small>
+    <MudItem xs="12" sm="6" md="3">
+        <MudCard>
+            <MudCardContent>
+                <div class="d-flex justify-space-between">
+                    <div>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">Équipe</MudText>
+                        <MudText Typo="Typo.h4">8</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">personnes</MudText>
                     </div>
-                    <div class="col-auto">
-                        <i class="fas fa-users fa-2x"></i>
-                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.Group" Size="Size.Large" Color="Color.Info" />
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
-<div class="row">
-    <!-- Mes dernières demandes -->
-    <div class="col-lg-8 mb-4">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
-                    <i class="fas fa-list me-2"></i>
-                    Mes dernières demandes
-                </h5>
-                <a href="/demandes" class="btn btn-sm btn-outline-primary">Voir tout</a>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Période</th>
-                                <th>Type</th>
-                                <th>Durée</th>
-                                <th>Statut</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div>
-                                        <strong>15/03 - 19/03/2024</strong>
-                                        <br><small class="text-muted">Du lundi au vendredi</small>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge bg-primary">Congés payés</span>
-                                </td>
-                                <td>5 jours</td>
-                                <td>
-                                    <span class="badge bg-warning">En attente</span>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-secondary">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div>
-                                        <strong>28/02 - 01/03/2024</strong>
-                                        <br><small class="text-muted">Mercredi au vendredi</small>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge bg-info">Congé maladie</span>
-                                </td>
-                                <td>2 jours</td>
-                                <td>
-                                    <span class="badge bg-success">Approuvé</span>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-secondary">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div>
-                                        <strong>14/02/2024</strong>
-                                        <br><small class="text-muted">Mercredi</small>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge bg-secondary">RTT</span>
-                                </td>
-                                <td>1 jour</td>
-                                <td>
-                                    <span class="badge bg-success">Approuvé</span>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-secondary">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Actions rapides -->
+    <MudItem xs="12" md="6">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Actions rapides</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudStack Spacing="2">
+                    <MudButton Href="/conges/demande" 
+                              Variant="Variant.Filled" 
+                              Color="Color.Primary" 
+                              StartIcon="@Icons.Material.Filled.Add"
+                              FullWidth="true">
+                        Nouvelle demande de congé
+                    </MudButton>
+                    <MudButton Href="/conges/mes-conges" 
+                              Variant="Variant.Outlined" 
+                              Color="Color.Primary" 
+                              StartIcon="@Icons.Material.Filled.List"
+                              FullWidth="true">
+                        Voir mes congés
+                    </MudButton>
+                    <MudButton Href="/conges/calendrier" 
+                              Variant="Variant.Outlined" 
+                              Color="Color.Secondary" 
+                              StartIcon="@Icons.Material.Filled.CalendarMonth"
+                              FullWidth="true">
+                        Calendrier de l'équipe
+                    </MudButton>
+                </MudStack>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
-    <!-- Calendrier et notifications -->
-    <div class="col-lg-4 mb-4">
-        <!-- Prochains congés de l'équipe -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-calendar me-2"></i>
-                    Prochains congés équipe
-                </h6>
-            </div>
-            <div class="card-body">
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-marker bg-primary"></div>
-                        <div class="timeline-content">
-                            <h6 class="mb-1">Jean Martin</h6>
-                            <small class="text-muted">20-24 Mars</small>
-                            <p class="mb-0 small">Congés payés - 5 jours</p>
-                        </div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-marker bg-info"></div>
-                        <div class="timeline-content">
-                            <h6 class="mb-1">Sophie Laurent</h6>
-                            <small class="text-muted">25 Mars</small>
-                            <p class="mb-0 small">RTT - 1 jour</p>
-                        </div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-marker bg-warning"></div>
-                        <div class="timeline-content">
-                            <h6 class="mb-1">Pierre Durand</h6>
-                            <small class="text-muted">2-5 Avril</small>
-                            <p class="mb-0 small">Congés payés - 4 jours</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- Prochains congés -->
+    <MudItem xs="12" md="6">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Prochains congés</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudList T="string">
+                    <MudListItem Icon="@Icons.Material.Filled.Event" Text="Congés d'été">
+                        <SecondaryText>15 - 30 Août 2025</SecondaryText>
+                    </MudListItem>
+                    <MudListItem Icon="@Icons.Material.Filled.Event" Text="Pont de novembre">
+                        <SecondaryText>11 Novembre 2025</SecondaryText>
+                    </MudListItem>
+                    <MudListItem Icon="@Icons.Material.Filled.Event" Text="Congés de Noël">
+                        <SecondaryText>23 Déc - 3 Jan 2026</SecondaryText>
+                    </MudListItem>
+                </MudList>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
-        <!-- Notifications récentes -->
-        <div class="card">
-            <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-bell me-2"></i>
-                    Notifications récentes
-                </h6>
-            </div>
-            <div class="card-body">
-                <div class="notification-item">
-                    <div class="notification-icon bg-success">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <div class="notification-content">
-                        <p class="mb-1"><strong>Demande approuvée</strong></p>
-                        <small class="text-muted">Congés du 28/02 au 01/03 approuvés</small>
-                        <br><small class="text-muted">Il y a 2 heures</small>
-                    </div>
-                </div>
+    <!-- Notifications -->
+    <MudItem xs="12">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Notifications récentes</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTimeline TimelineOrientation="TimelineOrientation.Vertical" TimelinePosition="TimelinePosition.Start">
+                    <MudTimelineItem Color="Color.Success" Icon="@Icons.Material.Filled.CheckCircle">
+                        <ItemContent>
+                            <MudText Typo="Typo.body2" Class="fw-bold">Demande approuvée</MudText>
+                            <MudText Typo="Typo.body2">Votre demande du 15-20 septembre a été approuvée</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Il y a 2 heures</MudText>
+                        </ItemContent>
+                    </MudTimelineItem>
+                    <MudTimelineItem Color="Color.Warning" Icon="@Icons.Material.Filled.Schedule">
+                        <ItemContent>
+                            <MudText Typo="Typo.body2" Class="fw-bold">En attente d'approbation</MudText>
+                            <MudText Typo="Typo.body2">Demande du 10-12 octobre en attente</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Il y a 1 jour</MudText>
+                        </ItemContent>
+                    </MudTimelineItem>
+                    <MudTimelineItem Color="Color.Info" Icon="@Icons.Material.Filled.Info">
+                        <ItemContent>
+                            <MudText Typo="Typo.body2" Class="fw-bold">Rappel</MudText>
+                            <MudText Typo="Typo.body2">N'oubliez pas de planifier vos congés de fin d'année</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Il y a 3 jours</MudText>
+                        </ItemContent>
+                    </MudTimelineItem>
+                </MudTimeline>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
 
-                <div class="notification-item">
-                    <div class="notification-icon bg-primary">
-                        <i class="fas fa-info"></i>
-                    </div>
-                    <div class="notification-content">
-                        <p class="mb-1"><strong>Rappel</strong></p>
-                        <small class="text-muted">N'oubliez pas de valider les demandes en attente</small>
-                        <br><small class="text-muted">Il y a 1 jour</small>
-                    </div>
-                </div>
+@code {
 
-                <div class="notification-item">
-                    <div class="notification-icon bg-info">
-                        <i class="fas fa-calendar"></i>
-                    </div>
-                    <div class="notification-content">
-                        <p class="mb-1"><strong>Nouvelle demande</strong></p>
-                        <small class="text-muted">Jean Martin a soumis une demande</small>
-                        <br><small class="text-muted">Il y a 2 jours</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+}

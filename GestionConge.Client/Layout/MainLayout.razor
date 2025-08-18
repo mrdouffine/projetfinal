@@ -1,4 +1,9 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+@using GestionConge.Client.Services
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
 <MudDialogProvider />
@@ -7,14 +12,16 @@
 <link href="css/site.css" rel="stylesheet" />
 
 <MudLayout>
-    <MudAppBar Elevation="1" Fixed="true">
+    <AuthorizeView>
+        <Authorized>
+    <MudAppBar Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu"
                        Color="Color.Inherit"
                        Edge="Edge.Start"
                        OnClick="@DrawerToggle" />
-        <MudText Typo="Typo.h5" Class="ml-3">
+        <MudText Typo="Typo.h6" Class="ml-3">
             <MudIcon Icon="@Icons.Material.Filled.BusinessCenter" Class="mr-2" />
-            GCO
+                    GCO - Gestion de Congés
         </MudText>
         <MudSpacer />
 
@@ -36,16 +43,19 @@
                        Title="@(_isDarkMode ? "Mode clair" : "Mode sombre")" />
 
         <!-- User Menu -->
-        <MudMenu Icon="@Icons.Material.Filled.AccountCircle"
-                 Color="Color.Inherit"
-                 Direction="Direction.Bottom"
-                 OffsetX="true">
-            <MudMenuItem Icon="@Icons.Material.Filled.Person">Profil</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.Settings">Paramètres</MudMenuItem>
-            <MudDivider />
-            <MudMenuItem Icon="@Icons.Material.Filled.Logout"
-                         OnClick="@Logout">Déconnexion</MudMenuItem>
-        </MudMenu>
+                <MudMenu Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" Direction="Direction.Bottom" OffsetY="true">
+                    <MudMenuItem>
+                        <div class="d-flex flex-column">
+                            <MudText Typo="Typo.body2">@context.User.Identity?.Name</MudText>
+                            <MudText Typo="Typo.caption" Class="text-muted">@context.User.FindFirst("email")?.Value</MudText>
+                        </div>
+                    </MudMenuItem>
+                    <MudDivider />
+                    <MudMenuItem Icon="@Icons.Material.Filled.Person" OnClick="@GoToProfile">Profil</MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Filled.Settings" OnClick="@GoToSettings">Paramètres</MudMenuItem>
+                    <MudDivider />
+                    <MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="@HandleLogout">Déconnexion</MudMenuItem>
+                </MudMenu>
     </MudAppBar>
 
     <MudDrawer @bind-Open="_drawerOpen"
@@ -55,11 +65,18 @@
         <NavMenu />
     </MudDrawer>
 
-    <MudMainContent Class="pt-16 pa-4">
-        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pa-0">
-            @Body
-        </MudContainer>
-    </MudMainContent>
+            <MudMainContent Class="pt-16 px-16">
+                <MudContainer Class="mt-6" MaxWidth="MaxWidth.ExtraExtraLarge">
+                    @Body
+                </MudContainer>
+            </MudMainContent>
+        </Authorized>
+        <NotAuthorized>
+            <MudMainContent>
+                @Body
+            </MudMainContent>
+        </NotAuthorized>
+    </AuthorizeView>
 </MudLayout>
 
 <!-- Error UI -->
@@ -75,8 +92,54 @@
     </div>
 </div>
 
+
+<MudLayout>
+   
+         
+            <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
+                
+                <MudNavMenu>
+                  
+                    @* <AuthorizeView Roles="Manager,Admin">
+                        <MudNavGroup Text="Management" Icon="@Icons.Material.Filled.SupervisorAccount" Expanded="false">
+                            <MudNavLink Href="/management/demandes" Icon="@Icons.Material.Filled.Approval">Demandes à valider</MudNavLink>
+                            <MudNavLink Href="/management/equipe" Icon="@Icons.Material.Filled.Group">Mon équipe</MudNavLink>
+                        </MudNavGroup>
+                    </AuthorizeView> *@
+                   
+                </MudNavMenu>
+            </MudDrawer>
+            
+            
+</MudLayout>
+
+
 @code {
-    private bool _drawerOpen = true;
+    
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private async Task HandleLogout()
+    {
+        await AuthService.LogoutAsync();
+        Snackbar.Add("Vous avez été déconnecté.", Severity.Info);
+        Navigation.NavigateTo("/login");
+    }
+
+    private void GoToProfile()
+    {
+        Navigation.NavigateTo("/profile");
+    }
+
+    private void GoToSettings()
+    {
+        Navigation.NavigateTo("/settings");
+    }
+
     private bool _isDarkMode = true;
     private int _notificationCount = 3; // Exemple
     private MudTheme? _theme = null;
@@ -93,11 +156,6 @@
                 DefaultBorderRadius = "8px"
             }
         };
-    }
-
-    private void DrawerToggle()
-    {
-        _drawerOpen = !_drawerOpen;
     }
 
     private void DarkModeToggle()
