@@ -1,11 +1,30 @@
-﻿<div class="d-flex flex-column" style="height: 100%;">
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using GestionConge.Client.Services
+@using GestionConge.Client.Models
+@using GestionConge.Client.Extensions
+@using GestionConge.Client.Helpers
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ValidationService ValidationService
+
+<div class="d-flex flex-column" style="height: 100%;">
     <!-- Header du menu -->
     <div class="pa-4 text-center">
         <MudAvatar Size="Size.Large" Color="Color.Primary">
-            <MudIcon Icon="@Icons.Material.Filled.Person" />
+            @if (!string.IsNullOrEmpty(CurrentUser?.Avatar))
+            {
+                <MudImage Src="@CurrentUser.Avatar" />
+            }
+            else
+            {
+                <MudIcon Icon="@Icons.Material.Filled.Person" />
+            }
         </MudAvatar>
-        <MudText Typo="Typo.subtitle1" Class="mt-2">John Doe</MudText>
-        <MudText Typo="Typo.body2" Class="mud-text-secondary">Manager</MudText>
+        <MudText Typo="Typo.subtitle1" Class="mt-2">
+            @(CurrentUser?.Nom ?? "Utilisateur")
+        </MudText>
+        <MudText Typo="Typo.body2" Class="mud-text-secondary">
+            @GetUserRole()
+        </MudText>
     </div>
 
     <MudDivider />
@@ -22,34 +41,73 @@
         <MudNavGroup Text="Demandes de congés"
                      Icon="@Icons.Material.Filled.EventNote"
                      Expanded="true">
-            <MudNavLink Href="/demande-form"
+            <MudNavLink Href="/demandes/nouvelle"
                         Icon="@Icons.Material.Filled.Add"
                         IconColor="Color.Info">
                 Nouvelle demande
             </MudNavLink>
-            <MudNavLink Href="/demandes"
+            <MudNavLink Href="/demandes/mes-demandes"
                         Icon="@Icons.Material.Filled.List"
                         IconColor="Color.Success">
                 Mes demandes
             </MudNavLink>
         </MudNavGroup>
 
-        <MudNavLink Href="/validations"
+        <!-- Menu visible pour les managers et admins -->
+        <AuthorizeView Roles="Manager,Admin,DOT">
+            <Authorized>
+                <MudNavLink Href="/validations"
+                            Match="NavLinkMatch.Prefix"
+                            Icon="@Icons.Material.Filled.TaskAlt"
+                            IconColor="Color.Warning">
+                    <div class="d-flex align-center justify-space-between w-100">
+                        <span>Validations</span>
+                        @if (_pendingValidations > 0)
+                        {
+                            <MudBadge Content="@_pendingValidations"
+                                      Color="Color.Error"
+                                      Class="ml-auto" />
+                        }
+                    </div>
+                </MudNavLink>
+
+                <MudNavGroup Text="Management"
+                             Icon="@Icons.Material.Filled.SupervisorAccount"
+                             IconColor="Color.Secondary">
+                    <MudNavLink Href="/management/equipe"
+                                Icon="@Icons.Material.Filled.Group"
+                                IconColor="Color.Info">
+                        Mon équipe
+                    </MudNavLink>
+                    <MudNavLink Href="/management/planning"
+                                Icon="@Icons.Material.Filled.CalendarMonth"
+                                IconColor="Color.Success">
+                        Planning équipe
+                    </MudNavLink>
+                </MudNavGroup>
+            </Authorized>
+        </AuthorizeView>
+
+        <MudNavLink Href="/planning"
                     Match="NavLinkMatch.Prefix"
-                    Icon="@Icons.Material.Filled.TaskAlt"
-                    IconColor="Color.Warning">
-            Validations
-            <MudBadge Content="@_pendingValidations"
-                      Color="Color.Error"
-                      Class="ml-auto"
-                      Visible="@(_pendingValidations > 0)" />
+                    Icon="@Icons.Material.Filled.CalendarToday"
+                    IconColor="Color.Tertiary">
+            Planning personnel
         </MudNavLink>
 
         <MudNavLink Href="/notifications"
                     Match="NavLinkMatch.Prefix"
                     Icon="@Icons.Material.Filled.Notifications"
                     IconColor="Color.Secondary">
-            Notifications
+            <div class="d-flex align-center justify-space-between w-100">
+                <span>Notifications</span>
+                @if (NotificationCount > 0)
+                {
+                    <MudBadge Content="@NotificationCount"
+                              Color="Color.Error"
+                              Class="ml-auto" />
+                }
+            </div>
         </MudNavLink>
 
         <MudNavLink Href="/statistiques"
@@ -62,23 +120,29 @@
         <MudDivider Class="my-2" />
 
         <!-- Section Administration (visible seulement pour les admins) -->
-        @if (_isAdmin)
-        {
-            <MudNavGroup Text="Administration"
-                         Icon="@Icons.Material.Filled.AdminPanelSettings"
-                         IconColor="Color.Error">
-                <MudNavLink Href="/utilisateurs"
-                            Icon="@Icons.Material.Filled.People"
-                            IconColor="Color.Info">
-                    Utilisateurs
-                </MudNavLink>
-                <MudNavLink Href="/parametres"
-                            Icon="@Icons.Material.Filled.Settings"
-                            IconColor="Color.Default">
-                    Paramètres système
-                </MudNavLink>
-            </MudNavGroup>
-        }
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <MudNavGroup Text="Administration"
+                             Icon="@Icons.Material.Filled.AdminPanelSettings"
+                             IconColor="Color.Error">
+                    <MudNavLink Href="/admin/utilisateurs"
+                                Icon="@Icons.Material.Filled.People"
+                                IconColor="Color.Info">
+                        Utilisateurs
+                    </MudNavLink>
+                    <MudNavLink Href="/admin/parametres"
+                                Icon="@Icons.Material.Filled.Settings"
+                                IconColor="Color.Default">
+                        Paramètres système
+                    </MudNavLink>
+                    <MudNavLink Href="/admin/rapports"
+                                Icon="@Icons.Material.Filled.Assessment"
+                                IconColor="Color.Warning">
+                        Rapports
+                    </MudNavLink>
+                </MudNavGroup>
+            </Authorized>
+        </AuthorizeView>
     </MudNavMenu>
 
     <!-- Footer du menu -->
@@ -88,7 +152,8 @@
                    StartIcon="@Icons.Material.Filled.Help"
                    FullWidth="true"
                    Size="Size.Small"
-                   Class="justify-start">
+                   Class="justify-start"
+                   Href="/aide">
             Aide & Support
         </MudButton>
         <MudText Typo="Typo.caption"
@@ -99,13 +164,51 @@
 </div>
 
 @code {
-    private bool _isAdmin = false; // À remplacer par la logique d'authentification
-    private int _pendingValidations = 5; // À récupérer depuis un service
+    [Parameter] public UtilisateurDto? CurrentUser { get; set; }
+    [Parameter] public int NotificationCount { get; set; } = 0;
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     Charger les données utilisateur et les notifications
-    //     _isAdmin = await AuthService.IsUserInRoleAsync("Admin");
-    //     _pendingValidations = await DemandeService.GetPendingValidationsCountAsync();
-    // }
+    private int _pendingValidations = 0;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (CurrentUser != null)
+        {
+            await LoadPendingValidationsAsync();
+        }
+    }
+
+    private async Task LoadPendingValidationsAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.IsInRole("Manager") || authState.User.IsInRole("Admin") || authState.User.IsInRole("DOT"))
+        {
+            try
+            {
+                var result = await ValidationService.GetPendingValidationsCountAsync();
+                if (result.IsSuccess)
+                {
+                    _pendingValidations = result.Data;
+                    StateHasChanged();
+                }
+            }
+            catch
+            {
+                // Gestion silencieuse des erreurs pour ne pas casser l'UI
+                _pendingValidations = 0;
+            }
+        }
+    }
+
+    private string GetUserRole()
+    {
+        if (CurrentUser is null) return "Utilisateur";
+
+        // Logique pour déterminer le rôle affiché
+        if (CurrentUser.Role?.Contains("Admin") == true)
+            return "Administrateur";
+        if (CurrentUser.Role?.Contains("DOT") == true)
+            return "Directeur";
+
+        return "Employé";
+    }
 }

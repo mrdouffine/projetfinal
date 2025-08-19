@@ -233,6 +233,26 @@ namespace GestionConge.Client.Services
             }
         }
 
+        //GetPendingValidationsCountAsync
+        public async Task<ServiceResult<int>> GetPendingValidationsCountAsync()
+        {
+            try
+            {
+                var allValidationsResult = await GetAllAsync();
+                if (allValidationsResult.IsSuccess && allValidationsResult.Data != null)
+                {
+                    var count = allValidationsResult.Data.Count(v => v.Statut == "En attente");
+                    return ServiceResult<int>.Success(count);
+                }
+                return ServiceResult<int>.Failure(allValidationsResult.ErrorMessage);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erreur lors de la récupération du nombre de validations en attente");
+                return ServiceResult<int>.Failure("Erreur lors du traitement");
+            }
+        }
+
         public async Task<ServiceResult<IEnumerable<Validation>>> GetValidationsByValidateurAsync(int validateurId)
         {
             try

@@ -1,14 +1,17 @@
 ﻿@inject NavigationManager Navigation
-@inject IJSRuntime JSRuntime
+@using Microsoft.AspNetCore.Components
 
 @code {
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        // var currentUrl = Navigation.Uri;
-        // var loginUrl = $"/login?returnUrl={Uri.EscapeDataString(Navigation.ToBaseRelativePath(currentUrl))}";
-
-        // Petit délai pour éviter les problèmes de navigation
-        await Task.Delay(100);
-        Navigation.NavigateTo("/", forceLoad: true);
+        var returnUrl = Navigation.ToBaseRelativePath(Navigation.Uri);
+        if (string.IsNullOrEmpty(returnUrl) || returnUrl == "/")
+        {
+            Navigation.NavigateTo("/login", forceLoad: true);
+        }
+        else
+        {
+            Navigation.NavigateTo($"/login?returnUrl={Uri.EscapeDataString(returnUrl)}", forceLoad: true);
+        }
     }
 }

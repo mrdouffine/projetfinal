@@ -1,53 +1,57 @@
 ﻿@inherits LayoutComponentBase
 @using Microsoft.AspNetCore.Components.Authorization
 @using GestionConge.Client.Services
+@using GestionConge.Client.Models
+@using GestionConge.Client.Extensions
+@using GestionConge.Client.Helpers
 @inject AuthService AuthService
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UtilisateurService UtilisateurService
+
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<link href="css/site.css" rel="stylesheet" />
-
 <MudLayout>
     <AuthorizeView>
         <Authorized>
-    <MudAppBar Elevation="0">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu"
-                       Color="Color.Inherit"
-                       Edge="Edge.Start"
-                       OnClick="@DrawerToggle" />
-        <MudText Typo="Typo.h6" Class="ml-3">
-            <MudIcon Icon="@Icons.Material.Filled.BusinessCenter" Class="mr-2" />
+            <MudAppBar Elevation="0">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                               Color="Color.Inherit"
+                               Edge="Edge.Start"
+                               OnClick="@DrawerToggle" />
+                <MudText Typo="Typo.h6" Class="ml-3">
+                    <MudIcon Icon="@Icons.Material.Filled.BusinessCenter" Class="mr-2" />
                     GCO - Gestion de Congés
-        </MudText>
-        <MudSpacer />
+                </MudText>
+                <MudSpacer />
 
-        <!-- Notifications -->
-        <MudIconButton Icon="@Icons.Material.Filled.Notifications"
-                       Color="Color.Inherit"
-                       OnClick="@ShowNotifications">
-            <MudBadge Content="@_notificationCount"
-                      Color="Color.Error"
-                      Overlap="true"
-                      Visible="@(_notificationCount > 0)">
-            </MudBadge>
-        </MudIconButton>
+                <!-- Notifications -->
+                <MudIconButton Icon="@Icons.Material.Filled.Notifications"
+                               Color="Color.Inherit"
+                               OnClick="@ShowNotifications">
+                    <MudBadge Content="@_notificationCount"
+                              Color="Color.Error"
+                              Overlap="true"
+                              Visible="@(_notificationCount > 0)">
+                    </MudBadge>
+                </MudIconButton>
 
-        <!-- Dark/Light Mode Toggle -->
-        <MudIconButton Icon="@DarkLightModeButtonIcon"
-                       Color="Color.Inherit"
-                       OnClick="@DarkModeToggle"
-                       Title="@(_isDarkMode ? "Mode clair" : "Mode sombre")" />
+                <!-- Dark/Light Mode Toggle -->
+                <MudIconButton Icon="@DarkLightModeButtonIcon"
+                               Color="Color.Inherit"
+                               OnClick="@DarkModeToggle"
+                               Title="@(_isDarkMode ? "Mode clair" : "Mode sombre")" />
 
-        <!-- User Menu -->
+                <!-- User Menu -->
                 <MudMenu Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" Direction="Direction.Bottom" OffsetY="true">
                     <MudMenuItem>
                         <div class="d-flex flex-column">
-                            <MudText Typo="Typo.body2">@context.User.Identity?.Name</MudText>
-                            <MudText Typo="Typo.caption" Class="text-muted">@context.User.FindFirst("email")?.Value</MudText>
+                            <MudText Typo="Typo.body2">@_currentUser?.Nom</MudText>
+                            <MudText Typo="Typo.caption" Class="text-muted">@_currentUser?.Email</MudText>
                         </div>
                     </MudMenuItem>
                     <MudDivider />
@@ -56,14 +60,14 @@
                     <MudDivider />
                     <MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="@HandleLogout">Déconnexion</MudMenuItem>
                 </MudMenu>
-    </MudAppBar>
+            </MudAppBar>
 
-    <MudDrawer @bind-Open="_drawerOpen"
-               ClipMode="DrawerClipMode.Always"
-               Elevation="2"
-               Class="mud-width-xs">
-        <NavMenu />
-    </MudDrawer>
+            <MudDrawer @bind-Open="_drawerOpen"
+                       ClipMode="DrawerClipMode.Always"
+                       Elevation="2"
+                       Class="mud-width-xs">
+                <NavMenu CurrentUser="@_currentUser" NotificationCount="@_notificationCount" />
+            </MudDrawer>
 
             <MudMainContent Class="pt-16 px-16">
                 <MudContainer Class="mt-6" MaxWidth="MaxWidth.ExtraExtraLarge">
@@ -92,31 +96,64 @@
     </div>
 </div>
 
-
-<MudLayout>
-   
-         
-            <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
-                
-                <MudNavMenu>
-                  
-                    @* <AuthorizeView Roles="Manager,Admin">
-                        <MudNavGroup Text="Management" Icon="@Icons.Material.Filled.SupervisorAccount" Expanded="false">
-                            <MudNavLink Href="/management/demandes" Icon="@Icons.Material.Filled.Approval">Demandes à valider</MudNavLink>
-                            <MudNavLink Href="/management/equipe" Icon="@Icons.Material.Filled.Group">Mon équipe</MudNavLink>
-                        </MudNavGroup>
-                    </AuthorizeView> *@
-                   
-                </MudNavMenu>
-            </MudDrawer>
-            
-            
-</MudLayout>
-
-
 @code {
-    
     bool _drawerOpen = true;
+    private bool _isDarkMode = false;
+    private int _notificationCount = 0;
+    private MudTheme? _theme = null;
+    private UtilisateurDto? _currentUser = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _theme = new()
+        {
+            PaletteLight = _lightPalette,
+            PaletteDark = _darkPalette,
+            LayoutProperties = new LayoutProperties()
+            {
+                DefaultBorderRadius = "8px"
+            }
+        };
+
+        // Charger les données utilisateur
+        await LoadCurrentUserAsync();
+
+        // Écouter les changements d'état d'authentification
+        AuthStateProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
+    }
+
+    private async Task LoadCurrentUserAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            var userId = authState.User.GetUserId();
+            if (userId.HasValue)
+            {
+                var result = await UtilisateurService.GetByIdAsync(userId.Value);
+                if (result.IsSuccess)
+                {
+                    _currentUser = result.Data;
+                    // Charger le nombre de notifications
+                    await LoadNotificationCountAsync();
+                }
+            }
+        }
+    }
+
+    private async Task LoadNotificationCountAsync()
+    {
+        // Implémentation pour charger le nombre de notifications
+        //var result = await NotificationService.GetUnreadCountAsync(_currentUser.Id);
+        // _notificationCount = result.IsSuccess ? result.Data : 0;
+        _notificationCount = 3; // Temporaire
+    }
+
+    private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
+    {
+        await LoadCurrentUserAsync();
+        StateHasChanged();
+    }
 
     void DrawerToggle()
     {
@@ -140,48 +177,27 @@
         Navigation.NavigateTo("/settings");
     }
 
-    private bool _isDarkMode = true;
-    private int _notificationCount = 3; // Exemple
-    private MudTheme? _theme = null;
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        _theme = new()
-        {
-            PaletteLight = _lightPalette,
-            PaletteDark = _darkPalette,
-            LayoutProperties = new LayoutProperties()
-            {
-                DefaultBorderRadius = "8px"
-            }
-        };
-    }
-
     private void DarkModeToggle()
     {
         _isDarkMode = !_isDarkMode;
-        // Optionnel : sauvegarder la préférence en localStorage
-        // await JSRuntime.InvokeVoidAsync("localStorage.setItem", "darkMode", _isDarkMode.ToString());
+        // TODO: Sauvegarder la préférence
     }
 
     private void ShowNotifications()
     {
-        // Logique pour afficher les notifications
-        // NavigationManager.NavigateTo("/notifications");
+        Navigation.NavigateTo("/notifications");
     }
 
-    private void Logout()
+    public void Dispose()
     {
-        // Logique de déconnexion
-        // AuthService.Logout();
-        // NavigationManager.NavigateTo("/login");
+        AuthStateProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
     }
 
+    // Palettes de couleurs (inchangées)
     private readonly PaletteLight _lightPalette = new()
     {
         Black = "#110e2d",
-        Primary = "#0082bb", // Votre couleur principale
+        Primary = "#0082bb",
         PrimaryContrastText = "#ffffff",
         Secondary = "#f0f4f8",
         AppbarText = "#424242",
@@ -203,7 +219,7 @@
 
     private readonly PaletteDark _darkPalette = new()
     {
-        Primary = "#0082bb", // Votre couleur principale
+        Primary = "#0082bb",
         PrimaryContrastText = "#ffffff",
         Secondary = "#1e293b",
         Surface = "#1e293b",
