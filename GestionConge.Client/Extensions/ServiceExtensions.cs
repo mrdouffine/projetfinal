@@ -10,29 +10,29 @@ namespace GestionConge.Client.Extensions
         /// <summary>
         /// Extension pour gérer facilement les résultats de services avec notifications
         /// </summary>
-        public static async Task HandleServiceResultAsync<T>(
-            this ServiceResult<T> result,
-            ISnackbar snackbar,
-            string? successMessage = null,
-            Action<T>? onSuccess = null)
-        {
-            if (result.IsSuccess)
-            {
-                if (!string.IsNullOrEmpty(successMessage))
-                {
-                    snackbar.Add(successMessage, Severity.Success);
-                }
+        //public static async Task HandleServiceResultAsync<T>(
+        //    this ServiceResult<T> result,
+        //    ISnackbar snackbar,
+        //    string? successMessage = null,
+        //    Action<T>? onSuccess = null)
+        //{
+        //    if (result.IsSuccess)
+        //    {
+        //        if (!string.IsNullOrEmpty(successMessage))
+        //        {
+        //            snackbar.Add(successMessage, Severity.Success);
+        //        }
 
-                if (onSuccess != null && result.Data != null)
-                {
-                    onSuccess(result.Data);
-                }
-            }
-            else
-            {
-                snackbar.Add(result.ErrorMessage, Severity.Error);
-            }
-        }
+        //        if (onSuccess != null && result.Data != null)
+        //        {
+        //            onSuccess(result.Data);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        snackbar.Add(result.ErrorMessage, Severity.Error);
+        //    }
+        //}
 
         /// <summary>
         /// Extension pour convertir ServiceResult en bool avec notification d'erreur
