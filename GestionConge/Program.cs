@@ -137,6 +137,7 @@ app.UseCors("client");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapStaticAssets();
+app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()

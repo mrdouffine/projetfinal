@@ -187,4 +187,30 @@ public class RappelService
             return ServiceResult<IEnumerable<Rappel>>.Failure("Erreur de connexion au serveur");
         }
     }
+
+    //public async Task<ServiceResult<IEnumerable<NotificationDto>>> GetNotificationsUtilisateurAsync(int utilisateurId)
+    //{
+    //    try
+    //    {
+    //        var allRappelsResult = await GetAllAsync();
+
+    //        if (allRappelsResult.IsSuccess && allRappelsResult.Data != null)
+    //        {
+    //            var rappelsUtilisateur = allRappelsResult.Data
+    //                .Where(r => r.UtilisateurId == utilisateurId)
+    //                .OrderBy(r => r.DateEcheance)
+    //                .ToList();
+
+    //            return ServiceResult<IEnumerable<NotificationDto>>.Success(rappelsUtilisateur);
+    //        }
+
+    //        return ServiceResult<IEnumerable<NotificationDto>>.Failure(allRappelsResult.ErrorMessage);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, "Erreur lors de la récupération des rappels de l'utilisateur {UserId}", utilisateurId);
+    //        return ServiceResult<IEnumerable<NotificationDto>>.Failure("Erreur de connexion au serveur");
+    //    }
+    //}
+
 }

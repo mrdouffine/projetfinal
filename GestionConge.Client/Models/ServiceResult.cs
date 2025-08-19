@@ -43,6 +43,8 @@
         public string? PrenomUtilisateur { get; set; }
     }
 
+
+
     public class Rappel
     {
         public int Id { get; set; }
@@ -55,7 +57,20 @@
         // Propriétés de navigation
         public string? NomUtilisateur { get; set; }
         public string? PrenomUtilisateur { get; set; }
+
     }
+    public class NotificationDto {
+            public int Id { get; set; }
+            public string Titre { get; set; } = "";
+            public string Message { get; set; } = "";
+            public string Type { get; set; } = "";
+            public DateTime DateCreation { get; set; }
+            public bool EstLue { get; set; }
+            public string Source { get; set; } = "";
+
+
+
+        }
 
     public class Validation
     {

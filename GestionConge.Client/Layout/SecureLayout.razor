@@ -1,9 +1,12 @@
-﻿@inherits LayoutView
+﻿@* @inherits LayoutView
+@using GestionConge.Client.Layout
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
+@using GestionConge.Client.Services
+@using 
 @inject AuthService AuthService
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" />
@@ -131,7 +134,7 @@
 @code {
     private bool _drawerOpen = true;
     private bool _isDarkMode = false;
-    private ClaimsPrincipal? _currentUser;
+    private Claims? _currentUser;
     private string? _userRole;
     private int _notificationCount = 0;
 
@@ -174,4 +177,4 @@
         await AuthService.LogoutAsync();
         NavigationManager.NavigateTo("/login");
     }
-}
+} *@
