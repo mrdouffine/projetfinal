@@ -1,7 +1,7 @@
-C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\GestionConge.Client.staticwebassets.runtime.json
-C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\GestionConge.Client.staticwebassets.endpoints.json
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\appsettings.Development.json
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\appsettings.json
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\GestionConge.Client.staticwebassets.runtime.json
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\GestionConge.Client.staticwebassets.endpoints.json
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\BlazorDebugProxy\BrowserDebugHost.dll
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\BlazorDebugProxy\BrowserDebugHost.runtimeconfig.json
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\BlazorDebugProxy\BrowserDebugProxy.dll
@@ -28,6 +28,7 @@ C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\MailK
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.AspNetCore.Authorization.dll
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.AspNetCore.Components.dll
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.AspNetCore.Components.Authorization.dll
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.AspNetCore.Components.Forms.dll
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.AspNetCore.Components.Web.dll
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.AspNetCore.Components.WebAssembly.dll
@@ -95,4 +96,3 @@ C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\refin
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\GestionConge.pdb
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\GestionConge.genruntimeconfig.cache
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\ref\GestionConge.dll
-C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.AspNetCore.Components.Authorization.dll
