@@ -1,44 +1,177 @@
-﻿@* @inherits LayoutComponentBase
-@inject NavigationManager Nav
-@inject GestionConge.Client.Services.AuthService AuthService
+﻿@inherits LayoutView
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+@inject AuthService AuthService
 
-<div class="secure-shell">
-    @if (_checking)
-    {
-        <!-- Écran court de chargement -->
-        <div class="d-flex justify-content-center align-items-center" style="min-height:40vh">
-            <div class="spinner-border" role="status"></div>
-            <span class="ms-2">Vérification de la session...</span>
-        </div>
-    }
-    else
-    {
-        @Body
-    }
-</div>
+<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <!-- App Bar -->
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" 
+                      Color="Color.Inherit" 
+                      Edge="Edge.Start" 
+                      OnClick="@((e) => DrawerToggle())" />
+        
+        <MudSpacer />
+        
+        <MudText Typo="Typo.h6" Class="ml-3">GCO - Gestion de Congés</MudText>
+        
+        <MudSpacer />
+        
+        <!-- Notifications -->
+        <MudBadge Content="_notificationCount" 
+                  Overlap="true" 
+                  Class="mx-6 my-4"
+                  Visible="_notificationCount > 0">
+            <MudIconButton Icon="@Icons.Material.Filled.Notifications" 
+                          Color="Color.Inherit"
+                          Href="/notifications" />
+        </MudBadge>
+        
+        <!-- Menu utilisateur -->
+        <MudMenu Icon="@Icons.Material.Filled.Person" 
+                Color="Color.Inherit" 
+                Direction="Direction.Bottom"
+                OffsetX="true">
+            <div class="px-4 py-2">
+                <MudText Typo="Typo.body2">@_currentUser?.Identity?.Name</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@_userRole</MudText>
+            </div>
+            <MudDivider />
+            <MudMenuItem Href="/profil" Icon="@Icons.Material.Filled.AccountCircle">
+                Mon profil
+            </MudMenuItem>
+            <MudMenuItem OnClick="ToggleTheme" Icon="@(_isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)">
+                @(_isDarkMode ? "Mode clair" : "Mode sombre")
+            </MudMenuItem>
+            <MudDivider />
+            <MudMenuItem OnClick="Logout" Icon="@Icons.Material.Filled.Logout">
+                Déconnexion
+            </MudMenuItem>
+        </MudMenu>
+    </MudAppBar>
+
+    <!-- Navigation Drawer -->
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6">Navigation</MudText>
+        </MudDrawerHeader>
+        <MudNavMenu>
+            <!-- Menu Employé -->
+            <MudNavLink Href="/mes-demandes" 
+                       Match="NavLinkMatch.Prefix" 
+                       Icon="@Icons.Material.Filled.Assignment">
+                Mes demandes
+            </MudNavLink>
+            <MudNavLink Href="/demandes/nouvelle" 
+                       Match="NavLinkMatch.Prefix" 
+                       Icon="@Icons.Material.Filled.Add">
+                Nouvelle demande
+            </MudNavLink>
+            <MudNavLink Href="/calendrier" 
+                       Match="NavLinkMatch.Prefix" 
+                       Icon="@Icons.Material.Filled.CalendarMonth">
+                Calendrier équipe
+            </MudNavLink>
+            <MudNavLink Href="/notifications" 
+                       Match="NavLinkMatch.Prefix" 
+                       Icon="@Icons.Material.Filled.Notifications">
+                Notifications
+                @if (_notificationCount > 0)
+                {
+                    <MudChip Size="Size.Small" Color="Color.Primary" Class="ml-2">@_notificationCount</MudChip>
+                }
+            </MudNavLink>
+
+            <!-- Menu Manager/Admin -->
+            <AuthorizeView Roles="Manager,Admin">
+                <MudDivider Class="my-2" />
+                <MudNavGroup Text="Gestion" Icon="@Icons.Material.Filled.ManageAccounts">
+                    <MudNavLink Href="/admin/validations" 
+                               Match="NavLinkMatch.Prefix" 
+                               Icon="@Icons.Material.Filled.CheckCircle">
+                        Validations
+                    </MudNavLink>
+                    <AuthorizeView Roles="Admin">
+                        <MudNavLink Href="/dashboard" 
+                                   Match="NavLinkMatch.Prefix" 
+                                   Icon="@Icons.Material.Filled.Dashboard">
+                            Tableau de bord
+                        </MudNavLink>
+                        <MudNavLink Href="/admin/utilisateurs" 
+                                   Match="NavLinkMatch.Prefix" 
+                                   Icon="@Icons.Material.Filled.People">
+                            Utilisateurs
+                        </MudNavLink>
+                        <MudNavLink Href="/admin/rapports" 
+                                   Match="NavLinkMatch.Prefix" 
+                                   Icon="@Icons.Material.Filled.Analytics">
+                            Rapports
+                        </MudNavLink>
+                    </AuthorizeView>
+                </MudNavGroup>
+            </AuthorizeView>
+        </MudNavMenu>
+    </MudDrawer>
+
+    <!-- Main Content -->
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="my-4">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
 
 @code {
-    private bool _checking = true;
+    private bool _drawerOpen = true;
+    private bool _isDarkMode = false;
+    private ClaimsPrincipal? _currentUser;
+    private string? _userRole;
+    private int _notificationCount = 0;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (!firstRender) return;
-
-        // Tente de restaurer la session depuis localStorage si nécessaire
-        await AuthService.TryRestoreAsync();
-
-        // Est-ce que l'utilisateur est authentifié (token valide ou refresh réussi) ?
-        var isAuth = await AuthService.IsAuthenticatedAsync();
-
-        if (!isAuth)
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        _currentUser = authState.User;
+        _userRole = _currentUser.GetUserRole();
+        
+        if (_currentUser.Identity?.IsAuthenticated == true)
         {
-            // Retournera ici après login réussi
-            var returnUrl = Uri.EscapeDataString(Nav.Uri);
-            Nav.NavigateTo($"/login?returnUrl={returnUrl}", forceLoad: true);
-            return;
+            await LoadNotificationCount();
         }
-
-        _checking = false;
-        StateHasChanged();
+        else
+        {
+            NavigationManager.NavigateTo("/login");
+        }
     }
-} *@
+
+    private async Task LoadNotificationCount()
+    {
+        // Simuler le chargement du nombre de notifications
+        // Dans un vrai projet, vous appelleriez votre service
+        await Task.Delay(100);
+        _notificationCount = 3; // Valeur simulée
+    }
+
+    private void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private void ToggleTheme()
+    {
+        _isDarkMode = !_isDarkMode;
+    }
+
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        NavigationManager.NavigateTo("/login");
+    }
+}

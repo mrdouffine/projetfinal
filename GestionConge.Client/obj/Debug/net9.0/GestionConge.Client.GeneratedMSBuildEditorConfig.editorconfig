@@ -43,6 +43,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XFNlY3VyZUxheW91dC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Dashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Login.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -65,10 +69,6 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Validations.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVmFsaWRhdGlvbnMucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Pages/Welcome.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2VsY29tZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/HP/source/repos/projet/GestionConge/GestionConge.Client/Routes.razor]

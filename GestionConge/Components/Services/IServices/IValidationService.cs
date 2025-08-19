@@ -11,6 +11,9 @@ public interface IValidationService
     Task<int> CreateAsync(Validation validation);
     Task<bool> UpdateAsync(Validation validation);
     Task<bool> TraiterValidationAsync(ValidationRequestDto request);
+    //GetValidationsAujourdhuiAsync()
+
+    Task<IEnumerable<ValidationDto>> GetValidationsAujourdhuiAsync(int valideurId);
 
     Task<bool> DeleteAsync(int id);
 }

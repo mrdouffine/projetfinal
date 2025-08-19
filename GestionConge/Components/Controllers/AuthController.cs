@@ -1,6 +1,7 @@
 ﻿namespace GestionConge.Components.Controllers;
 
 using GestionConge.Components.Auth;
+using GestionConge.Components.DTOs.RequestDto;
 using GestionConge.Components.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -45,5 +46,20 @@ public class AuthController : ControllerBase
             Email = User.FindFirstValue(ClaimTypes.Email),
             Role = User.FindFirstValue(ClaimTypes.Role)
         });
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh([FromBody] string req)
+    {
+        try
+        {
+            var resp = await _auth.RefreshAsync(req);
+            if (resp is null) return Unauthorized(new { message = "Token invalide ou expiré" });
+            return Ok(resp);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }

@@ -12,6 +12,8 @@ public interface IDemandeCongeService
     Task<IEnumerable<DemandeCongeDto>> GetByUtilisateurIdAsync(int utilisateurId);
     Task<IEnumerable<DemandeCongeDto>> GetAssignesAsync(int validateurId);
 
+    Task<IEnumerable<DemandeCongeDto>> GetEnAttenteAsync();
+
     Task<bool> DeleteAsync(int id);
 }
 

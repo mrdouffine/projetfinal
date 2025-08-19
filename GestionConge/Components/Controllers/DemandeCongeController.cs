@@ -73,4 +73,13 @@ public class DemandeCongeController : ControllerBase
         var success = await _service.DeleteAsync(id);
         return success ? NoContent() : NotFound();
     }
+
+    //get demande de conge en attente de validation
+    [Authorize]
+    [HttpGet("en-attente")]
+    public async Task<IActionResult> GetEnAttente()
+    {
+        var demandes = await _service.GetEnAttenteAsync();
+        return Ok(demandes);
+    }
 }

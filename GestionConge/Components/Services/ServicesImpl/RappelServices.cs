@@ -6,11 +6,11 @@ using GestionConge.Components.Repositories.IRepositories;
 using GestionConge.Components.Services.IServices;
 
 
-public class RappelService : IRappelService
+public class RappelServices : IRappelService
 {
     private readonly IRappelRepository _repository;
 
-    public RappelService(IRappelRepository repository)
+    public RappelServices(IRappelRepository repository)
     {
         _repository = repository;
     }

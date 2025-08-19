@@ -1,0 +1,296 @@
+﻿@page "/dashboard"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using GestionConge.Client.Services
+@attribute [Authorize(Roles = "Admin")]
+@using GestionConge.Client.Layout
+@layout SecureLayout
+@inject DemandeCongeService DemandeService
+@inject UtilisateurService UtilisateurService
+@inject ValidationService ValidationService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ISnackbar Snackbar
+
+<PageTitle>Tableau de bord - GCO</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">
+    <MudIcon Icon="@Icons.Material.Filled.Dashboard" Class="mr-3" />
+    Tableau de bord Administrateur
+</MudText>
+
+@if (_loading)
+{
+    <MudProgressLinear Indeterminate="true" Class="mb-4" />
+}
+
+<MudGrid>
+    <!-- Statistiques principales -->
+    <MudItem xs="12" sm="6" md="3">
+        <MudCard>
+            <MudCardContent>
+                <div class="d-flex justify-space-between">
+                    <div>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            Demandes en attente
+                        </MudText>
+                        <MudText Typo="Typo.h4">@_stats.DemandesEnAttente</MudText>
+                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.HourglassEmpty"
+                             Size="Size.Large"
+                             Color="Color.Warning" />
+                </div>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+
+    <MudItem xs="12" sm="6" md="3">
+        <MudCard>
+            <MudCardContent>
+                <div class="d-flex justify-space-between">
+                    <div>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            Utilisateurs actifs
+                        </MudText>
+                        <MudText Typo="Typo.h4">@_stats.UtilisateursActifs</MudText>
+                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.Group"
+                             Size="Size.Large"
+                             Color="Color.Info" />
+                </div>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+
+    <MudItem xs="12" sm="6" md="3">
+        <MudCard>
+            <MudCardContent>
+                <div class="d-flex justify-space-between">
+                    <div>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            Approuvées ce mois
+                        </MudText>
+                        <MudText Typo="Typo.h4">@_stats.ApprouvesCeMois</MudText>
+                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle"
+                             Size="Size.Large"
+                             Color="Color.Success" />
+                </div>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+
+    <MudItem xs="12" sm="6" md="3">
+        <MudCard>
+            <MudCardContent>
+                <div class="d-flex justify-space-between">
+                    <div>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            Total demandes
+                        </MudText>
+                        <MudText Typo="Typo.h4">@_stats.TotalDemandes</MudText>
+                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.Assignment"
+                             Size="Size.Large"
+                             Color="Color.Primary" />
+                </div>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+
+    <!-- Actions rapides -->
+    <MudItem xs="12" md="6">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">
+                        <MudIcon Icon="@Icons.Material.Filled.Speed" Class="mr-2" />
+                        Actions rapides
+                    </MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudStack Spacing="2">
+                    <MudButton Href="/admin/validations"
+                               Variant="Variant.Filled"
+                               Color="Color.Warning"
+                               StartIcon="@Icons.Material.Filled.CheckCircle"
+                               FullWidth="true">
+                        Valider les demandes (@_stats.DemandesEnAttente)
+                    </MudButton>
+                    <MudButton Href="/admin/utilisateurs"
+                               Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.People"
+                               FullWidth="true">
+                        Gérer les utilisateurs
+                    </MudButton>
+                    <MudButton Href="/admin/rapports"
+                               Variant="Variant.Outlined"
+                               Color="Color.Secondary"
+                               StartIcon="@Icons.Material.Filled.Analytics"
+                               FullWidth="true">
+                        Voir les rapports
+                    </MudButton>
+                </MudStack>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+
+    <!-- Dernières activités -->
+    <MudItem xs="12" md="6">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">
+                        <MudIcon Icon="@Icons.Material.Filled.Timeline" Class="mr-2" />
+                        Activités récentes
+                    </MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTimeline TimelineOrientation="TimelineOrientation.Vertical">
+                    @foreach (var activite in _activitesRecentes)
+                    {
+                        <MudTimelineItem Color="@GetActivityColor(activite.Type)"
+                                         Icon="@GetActivityIcon(activite.Type)">
+                            <ItemContent>
+                                <MudText Typo="Typo.body2" Class="fw-bold">
+                                    @activite.Titre
+                                </MudText>
+                                <MudText Typo="Typo.body2">
+                                    @activite.Description
+                                </MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    @activite.Date.ToString("dd/MM/yyyy HH:mm")
+                                </MudText>
+                            </ItemContent>
+                        </MudTimelineItem>
+                    }
+                </MudTimeline>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private bool _loading = true;
+    private DashboardStats _stats = new();
+    private List<ActiviteRecente> _activitesRecentes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDashboardData();
+    }
+
+    private async Task LoadDashboardData()
+    {
+        _loading = true;
+        try
+        {
+            // Charger les statistiques
+            await LoadStats();
+
+            // Charger les activités récentes
+            await LoadActivitesRecentes();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Erreur lors du chargement du tableau de bord", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task LoadStats()
+    {
+        // Utiliser les services pour récupérer les vraies données
+        var demandesResult = await DemandeService.GetAllAsync();
+        var utilisateursResult = await UtilisateurService.GetAllAsync();
+
+        if (demandesResult.IsSuccess && utilisateursResult.IsSuccess)
+        {
+            var demandes = demandesResult.Data ?? new List<Models.DemandeCongeDto>();
+            var utilisateurs = utilisateursResult.Data ?? new List<Models.UtilisateurDto>();
+
+            _stats = new DashboardStats
+            {
+                DemandesEnAttente = demandes.Count(d => d.Statut == "En attente"),
+                // UtilisateursActifs = utilisateurs.Count(u => u.Email),
+                ApprouvesCeMois = demandes.Count(d => d.Statut == "Validé"
+                    && d.DateSoumission.Month == DateTime.Now.Month),
+                // TotalDemandes = demandes.Count
+            };
+        }
+    }
+
+    private async Task LoadActivitesRecentes()
+    {
+        // Simuler des activités récentes - remplacer par de vraies données
+        _activitesRecentes = new List<ActiviteRecente>
+        {
+            new ActiviteRecente
+            {
+                Type = "validation",
+                Titre = "Demande validée",
+                Description = "Jean Martin - Congés payés du 15/03 au 20/03",
+                Date = DateTime.Now.AddHours(-2)
+            },
+            new ActiviteRecente
+            {
+                Type = "creation",
+                Titre = "Nouvelle demande",
+                Description = "Sophie Laurent - RTT le 25/03",
+                Date = DateTime.Now.AddHours(-4)
+            },
+            new ActiviteRecente
+            {
+                Type = "utilisateur",
+                Titre = "Nouvel utilisateur",
+                Description = "Pierre Durand ajouté au système",
+                Date = DateTime.Now.AddDays(-1)
+            }
+        };
+    }
+
+    private Color GetActivityColor(string type)
+    {
+        return type switch
+        {
+            "validation" => Color.Success,
+            "creation" => Color.Info,
+            "utilisateur" => Color.Primary,
+            "rejet" => Color.Error,
+            _ => Color.Default
+        };
+    }
+
+    private string GetActivityIcon(string type)
+    {
+        return type switch
+        {
+            "validation" => Icons.Material.Filled.CheckCircle,
+            "creation" => Icons.Material.Filled.Add,
+            "utilisateur" => Icons.Material.Filled.PersonAdd,
+            "rejet" => Icons.Material.Filled.Cancel,
+            _ => Icons.Material.Filled.Info
+        };
+    }
+
+    private class DashboardStats
+    {
+        public int DemandesEnAttente { get; set; }
+        public int UtilisateursActifs { get; set; }
+        public int ApprouvesCeMois { get; set; }
+        public int TotalDemandes { get; set; }
+    }
+
+    private class ActiviteRecente
+    {
+        public string Type { get; set; } = "";
+        public string Titre { get; set; } = "";
+        public string Description { get; set; } = "";
+        public DateTime Date { get; set; }
+    }
+}

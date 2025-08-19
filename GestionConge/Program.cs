@@ -52,19 +52,19 @@ builder.Services.AddScoped<TestRepository>();
 // Register the DemandeCongeRepository
 builder.Services.AddScoped<IDemandeCongeRepository, DemandeCongeRepository>();
 // Register the DemandeCongeService
-builder.Services.AddScoped<IDemandeCongeService, DemandeCongeService>();
+builder.Services.AddScoped<IDemandeCongeService, GestionConge.Components.Services.ServicesImpl.DemandeCongeService>();
 // Register the UtilisateurRepository and UtilisateurService
 builder.Services.AddScoped<IUtilisateurRepository, UtilisateurRepository>();
-builder.Services.AddScoped<IUtilisateurService, UtilisateurService>();
+builder.Services.AddScoped<IUtilisateurService, UtilisateurServices>();
 // Register the ValidationRepository and ValidationService
 builder.Services.AddScoped<IValidationRepository, ValidationRepository>();
-builder.Services.AddScoped<IValidationService, ValidationService>();
+builder.Services.AddScoped<IValidationService, ValidationServices>();
 // Register the PlanningCongeRepository and PlanningCongeService
 builder.Services.AddScoped<IPlanningCongeRepository, PlanningCongeRepository>();
-builder.Services.AddScoped<IPlanningCongeService, PlanningCongeService>();
+builder.Services.AddScoped<IPlanningCongeService, PlanningCongeServices>();
 // Register the RappelRepository and RappelService
 builder.Services.AddScoped<IRappelRepository, RappelRepository>();
-builder.Services.AddScoped<IRappelService, RappelService>();
+builder.Services.AddScoped<IRappelService, RappelServices>();
 // Register the AuthService
 builder.Services.AddScoped<IAuthService, AuthServices>();
 // Register the EmailService

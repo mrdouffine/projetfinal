@@ -96,6 +96,22 @@ public class DemandeCongeRepository : IDemandeCongeRepository
         }
     }
 
+    //GetEnAttenteAsync l'utilisateur peut voir les demandes de congé en attente de validation auquelles il est assigné et le DOT peut voir toutes les demandes de congé en attente de validation avec l'id du valdeur en paramètre
+    public async Task<IEnumerable<DemandeCongeDto>> GetEnAttenteAsync()
+    {
+        var sql = @"
+        SELECT d.id, d.date_debut, d.date_fin, d.motif, d.statut, d.date_soumission,
+               u.id as UtilisateurId, u.nom as NomUtilisateur, u.email as EmailUtilisateur,
+               v.statut as StatutValidation, v.commentaire as CommentaireValidation, v.datevalidation
+        FROM demandes_conge d
+        JOIN utilisateurs u ON d.utilisateurid = u.id
+        JOIN validations v ON v.demandecongeid = d.id
+        WHERE v.statut = 'En attente'
+        ORDER BY d.date_soumission DESC;
+        ";
+        return await _db.QueryAsync<DemandeCongeDto>(sql);
+    }
+
 
     public async Task<bool> UpdateAsync(DemandeCongeDto demande)
     {

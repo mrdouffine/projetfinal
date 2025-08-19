@@ -34,6 +34,11 @@ public class DemandeCongeService : IDemandeCongeService
             throw new ArgumentException("Impossible de créer une demande pour une date passée");
     }
 
+    // GetEnAttenteAsync le valideur peut récupérer les demandes en attente auquels il est assigné et le DOT peut récupérer toutes les demandes en attente
+    public async Task<IEnumerable<DemandeCongeDto>> GetEnAttenteAsync()
+    {
+        return await _repository.GetEnAttenteAsync();
+    }
     private async Task ValidateNoOverlapAsync(int utilisateurId, DateTime debut, DateTime fin)
     {
         // Vérifier qu'il n'y a pas de chevauchement avec des demandes validées

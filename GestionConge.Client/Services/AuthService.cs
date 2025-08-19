@@ -244,7 +244,7 @@ public class AuthService
         if (auth is null || string.IsNullOrEmpty(auth.RefreshToken)) return false;
 
         using var http = new HttpClient { BaseAddress = new Uri("https://localhost:7064/") };
-        var resp = await http.PostAsJsonAsync("api/auth/refresh", new { refreshToken = auth.RefreshToken });
+        var resp = await http.PostAsJsonAsync("api/Auth/refresh", new { refreshToken = auth.RefreshToken });
         if (!resp.IsSuccessStatusCode) return false;
 
         var updated = await resp.Content.ReadFromJsonAsync<AuthResponseDto>();

@@ -6,14 +6,14 @@ using GestionConge.Components.Models;
 using GestionConge.Components.Repositories.IRepositories;
 using GestionConge.Components.Services.IServices;
 
-public class ValidationService : IValidationService
+public class ValidationServices : IValidationService
 {
     private readonly IValidationRepository _validationRepo;
     private readonly IDemandeCongeRepository _demandeRepo;
     private readonly IUtilisateurRepository _utilisateurRepo;
     private readonly IMailService _mailService;
 
-    public ValidationService(
+    public ValidationServices(
         IValidationRepository validationRepo,
         IDemandeCongeRepository demandeRepo,
         IUtilisateurRepository utilisateurRepo,
@@ -115,6 +115,13 @@ public class ValidationService : IValidationService
         await _demandeRepo.UpdateAsync(demandeToUpdate);
     }
 
+    //GetValidationsAujourdhuiAsync()
+
+    public async Task<IEnumerable<ValidationDto>> GetValidationsAujourdhuiAsync(int valideurId)
+    {
+        var today = DateTime.UtcNow.Date;
+        return await _validationRepo.GetValidationsAujourdhuiAsync(valideurId);
+    }
     private async Task EnvoyerEmailAsync(Utilisateur demandeur, string action, string? commentaire)
     {
         var sujet = action == "rejetée" ? "Demande de congé rejetée" : "Demande de congé validée";

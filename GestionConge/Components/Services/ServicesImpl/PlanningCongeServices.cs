@@ -5,11 +5,11 @@ using GestionConge.Components.Models;
 using GestionConge.Components.Repositories.IRepositories;
 using GestionConge.Components.Services.IServices;
 
-public class PlanningCongeService : IPlanningCongeService
+public class PlanningCongeServices : IPlanningCongeService
 {
     private readonly IPlanningCongeRepository _repository;
 
-    public PlanningCongeService(IPlanningCongeRepository repository)
+    public PlanningCongeServices(IPlanningCongeRepository repository)
     {
         _repository = repository;
     }

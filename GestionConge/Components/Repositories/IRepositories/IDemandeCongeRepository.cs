@@ -14,6 +14,8 @@ public interface IDemandeCongeRepository
     Task<IEnumerable<DemandeCongeDto>> GetAssignesAsync(int validateurId);
     Task<bool> UpdateStatutAsync(int demandeId, string statut);
 
+    Task<IEnumerable<DemandeCongeDto>> GetEnAttenteAsync();
+
     Task<bool> DeleteAsync(int id);
 }
 

@@ -2,11 +2,12 @@
 {
     public class UtilisateurDto
     {
-        public string Nom { get; set; }
+        public int Id { get; set; }
+        public string Nom { get; set; } = string.Empty;
 
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
 
-        public string MotDePasse { get; set; }
+        public string MotDePasse { get; set; } = string.Empty;
 
         public string Role { get; set; } // Exemple : "Employé", "Admin", etc.
 

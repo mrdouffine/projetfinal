@@ -65,4 +65,15 @@ public class ValidationController : ControllerBase
         var success = await _service.DeleteAsync(id);
         return success ? NoContent() : NotFound();
     }
+
+    //GetValidationsAujourdhuiAsync
+    [Authorize]
+    [HttpGet("aujourdhui")]
+    public async Task<IActionResult> GetValidationsAujourdhui(int id)
+    {
+        var validations = await _service.GetValidationsAujourdhuiAsync(id);
+        return Ok(validations);
+    }
+
+
 }

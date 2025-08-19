@@ -1,172 +1,129 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
-@attribute [Authorize]
-@* @attribute [AllowAnonymous] *@
+@attribute [AllowAnonymous]
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
 
-<PageTitle>Tableau de bord - GCO</PageTitle>
+<PageTitle>Bienvenue - GCO</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Tableau de bord</MudText>
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
+    @if (isAuthenticated)
+    {
+        <!-- Redirection automatique vers le dashboard -->
+        <MudContainer MaxWidth="MaxWidth.Medium" Class="text-center">
+            <MudProgressCircular Indeterminate="true" />
+            <MudText Class="mt-4">Redirection en cours...</MudText>
+        </MudContainer>
+    }
+    else
+    {
+        <!-- Page d'accueil pour utilisateurs non connectés -->
+        <MudGrid Justify="Justify.Center">
+            <MudItem xs="12" md="8" lg="6">
+                <MudPaper Elevation="4" Class="pa-8 text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.BusinessCenter"
+                             Size="Size.Large"
+                             Color="Color.Primary"
+                             Class="mb-4" />
+                    <MudText Typo="Typo.h3" Color="Color.Primary" GutterBottom="true">
+                        Bienvenue sur GCO
+                    </MudText>
+                    <MudText Typo="Typo.h6" Color="Color.Secondary" Class="mb-6">
+                        Système de Gestion de Congés d'Entreprise
+                    </MudText>
+                    <MudText Typo="Typo.body1" Class="mb-6">
+                        Gérez facilement vos demandes de congés, consultez vos soldes
+                        et suivez l'état de vos demandes en temps réel.
+                    </MudText>
 
-<MudGrid>
-    <!-- Statistiques rapides -->
-    <MudItem xs="12" sm="6" md="3">
-        <MudCard>
-            <MudCardContent>
-                <div class="d-flex justify-space-between">
-                    <div>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">Congés restants</MudText>
-                        <MudText Typo="Typo.h4">25</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">jours</MudText>
-                    </div>
-                    <MudIcon Icon="@Icons.Material.Filled.BeachAccess" Size="Size.Large" Color="Color.Primary" />
-                </div>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
+                    <MudStack Row Justify="Justify.Center" Spacing="4" Class="mb-6">
+                        <MudButton Href="/login"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Size="Size.Large"
+                                   StartIcon="@Icons.Material.Filled.Login">
+                            Se connecter
+                        </MudButton>
+                        <MudButton Href="/register"
+                                   Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   Size="Size.Large"
+                                   StartIcon="@Icons.Material.Filled.PersonAdd">
+                            S'inscrire
+                        </MudButton>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
 
-    <MudItem xs="12" sm="6" md="3">
-        <MudCard>
-            <MudCardContent>
-                <div class="d-flex justify-space-between">
-                    <div>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">Congés pris</MudText>
-                        <MudText Typo="Typo.h4">5</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">jours</MudText>
-                    </div>
-                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Large" Color="Color.Success" />
-                </div>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-
-    <MudItem xs="12" sm="6" md="3">
-        <MudCard>
-            <MudCardContent>
-                <div class="d-flex justify-space-between">
-                    <div>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">En attente</MudText>
-                        <MudText Typo="Typo.h4">2</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">demandes</MudText>
-                    </div>
-                    <MudIcon Icon="@Icons.Material.Filled.HourglassEmpty" Size="Size.Large" Color="Color.Warning" />
-                </div>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-
-    <MudItem xs="12" sm="6" md="3">
-        <MudCard>
-            <MudCardContent>
-                <div class="d-flex justify-space-between">
-                    <div>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">Équipe</MudText>
-                        <MudText Typo="Typo.h4">8</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">personnes</MudText>
-                    </div>
-                    <MudIcon Icon="@Icons.Material.Filled.Group" Size="Size.Large" Color="Color.Info" />
-                </div>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-
-    <!-- Actions rapides -->
-    <MudItem xs="12" md="6">
-        <MudCard>
-            <MudCardHeader>
-                <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Actions rapides</MudText>
-                </CardHeaderContent>
-            </MudCardHeader>
-            <MudCardContent>
-                <MudStack Spacing="2">
-                    <MudButton Href="/conges/demande" 
-                              Variant="Variant.Filled" 
-                              Color="Color.Primary" 
-                              StartIcon="@Icons.Material.Filled.Add"
-                              FullWidth="true">
-                        Nouvelle demande de congé
-                    </MudButton>
-                    <MudButton Href="/conges/mes-conges" 
-                              Variant="Variant.Outlined" 
-                              Color="Color.Primary" 
-                              StartIcon="@Icons.Material.Filled.List"
-                              FullWidth="true">
-                        Voir mes congés
-                    </MudButton>
-                    <MudButton Href="/conges/calendrier" 
-                              Variant="Variant.Outlined" 
-                              Color="Color.Secondary" 
-                              StartIcon="@Icons.Material.Filled.CalendarMonth"
-                              FullWidth="true">
-                        Calendrier de l'équipe
-                    </MudButton>
-                </MudStack>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-
-    <!-- Prochains congés -->
-    <MudItem xs="12" md="6">
-        <MudCard>
-            <MudCardHeader>
-                <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Prochains congés</MudText>
-                </CardHeaderContent>
-            </MudCardHeader>
-            <MudCardContent>
-                <MudList T="string">
-                    <MudListItem Icon="@Icons.Material.Filled.Event" Text="Congés d'été">
-                        <SecondaryText>15 - 30 Août 2025</SecondaryText>
-                    </MudListItem>
-                    <MudListItem Icon="@Icons.Material.Filled.Event" Text="Pont de novembre">
-                        <SecondaryText>11 Novembre 2025</SecondaryText>
-                    </MudListItem>
-                    <MudListItem Icon="@Icons.Material.Filled.Event" Text="Congés de Noël">
-                        <SecondaryText>23 Déc - 3 Jan 2026</SecondaryText>
-                    </MudListItem>
-                </MudList>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-
-    <!-- Notifications -->
-    <MudItem xs="12">
-        <MudCard>
-            <MudCardHeader>
-                <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Notifications récentes</MudText>
-                </CardHeaderContent>
-            </MudCardHeader>
-            <MudCardContent>
-                <MudTimeline TimelineOrientation="TimelineOrientation.Vertical" TimelinePosition="TimelinePosition.Start">
-                    <MudTimelineItem Color="Color.Success" Icon="@Icons.Material.Filled.CheckCircle">
-                        <ItemContent>
-                            <MudText Typo="Typo.body2" Class="fw-bold">Demande approuvée</MudText>
-                            <MudText Typo="Typo.body2">Votre demande du 15-20 septembre a été approuvée</MudText>
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">Il y a 2 heures</MudText>
-                        </ItemContent>
-                    </MudTimelineItem>
-                    <MudTimelineItem Color="Color.Warning" Icon="@Icons.Material.Filled.Schedule">
-                        <ItemContent>
-                            <MudText Typo="Typo.body2" Class="fw-bold">En attente d'approbation</MudText>
-                            <MudText Typo="Typo.body2">Demande du 10-12 octobre en attente</MudText>
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">Il y a 1 jour</MudText>
-                        </ItemContent>
-                    </MudTimelineItem>
-                    <MudTimelineItem Color="Color.Info" Icon="@Icons.Material.Filled.Info">
-                        <ItemContent>
-                            <MudText Typo="Typo.body2" Class="fw-bold">Rappel</MudText>
-                            <MudText Typo="Typo.body2">N'oubliez pas de planifier vos congés de fin d'année</MudText>
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">Il y a 3 jours</MudText>
-                        </ItemContent>
-                    </MudTimelineItem>
-                </MudTimeline>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-</MudGrid>
+        <!-- Fonctionnalités -->
+        <MudGrid Class="mt-8">
+            <MudItem xs="12" md="4">
+                <MudCard Class="h-100">
+                    <MudCardContent Class="text-center">
+                        <MudIcon Icon="@Icons.Material.Filled.CalendarMonth"
+                                 Size="Size.Large"
+                                 Color="Color.Info"
+                                 Class="mb-3" />
+                        <MudText Typo="Typo.h6" GutterBottom="true">
+                            Gestion Simplifiée
+                        </MudText>
+                        <MudText Typo="Typo.body2">
+                            Créez et gérez vos demandes de congés en quelques clics
+                        </MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudCard Class="h-100">
+                    <MudCardContent Class="text-center">
+                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle"
+                                 Size="Size.Large"
+                                 Color="Color.Success"
+                                 Class="mb-3" />
+                        <MudText Typo="Typo.h6" GutterBottom="true">
+                            Validation Rapide
+                        </MudText>
+                        <MudText Typo="Typo.body2">
+                            Processus de validation automatisé et notifications en temps réel
+                        </MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudCard Class="h-100">
+                    <MudCardContent Class="text-center">
+                        <MudIcon Icon="@Icons.Material.Filled.Analytics"
+                                 Size="Size.Large"
+                                 Color="Color.Warning"
+                                 Class="mb-3" />
+                        <MudText Typo="Typo.h6" GutterBottom="true">
+                            Suivi Complet
+                        </MudText>
+                        <MudText Typo="Typo.body2">
+                            Consultez vos soldes et historiques de congés
+                        </MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    }
+</MudContainer>
 
 @code {
+    private bool isAuthenticated = false;
 
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity?.IsAuthenticated == true;
+
+        if (isAuthenticated)
+        {
+            // Redirection vers dashboard après une petite pause
+            await Task.Delay(1000);
+            NavigationManager.NavigateTo("/dashboard");
+        }
+    }
 }

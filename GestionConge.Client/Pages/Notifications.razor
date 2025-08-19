@@ -1,67 +1,335 @@
 ﻿@page "/notifications"
-@using GestionConge.Client.Layout
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using GestionConge.Client.Services
+@attribute [Authorize]
 @layout SecureLayout
+@inject RappelService RappelService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ISnackbar Snackbar
 
-<h3>Notifications</h3>
+<PageTitle>Notifications - GCO</PageTitle>
 
-@if (notifications == null)
-{
-    <p>Chargement des notifications...</p>
-}
-else if (!notifications.Any())
-{
-    <p>Aucune notification disponible.</p>
-}
-else
-{
-    <div class="list-group">
-        @foreach (var notif in notifications.OrderByDescending(n => n.DateRappel))
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <MudText Typo="Typo.h4" GutterBottom="true">
+            <MudIcon Icon="@Icons.Material.Filled.Notifications" Class="mr-3" />
+            Notifications
+        </MudText>
+        <MudText Typo="Typo.body1" Color="Color.Secondary">
+            Consultez vos notifications et rappels
+        </MudText>
+    </div>
+    <MudButton OnClick="MarquerToutesCommeVues" 
+               Variant="Variant.Outlined" 
+               StartIcon="@Icons.Material.Filled.DoneAll"
+               Disabled="@(!_notifications.Any(n => !n.EstLue))">
+        Tout marquer comme lu
+    </MudButton>
+</div>
+
+<!-- Filtres -->
+<MudCard Class="mb-4">
+    <MudCardContent>
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="3">
+                <MudSelect T="string" @bind-Value="_filtreType" Label="Type" 
+                          Variant="Variant.Outlined" @onchange="ApplyFilters">
+                    <MudSelectItem Value="@("")">Tous les types</MudSelectItem>
+                    <MudSelectItem Value="@("validation")">Validation</MudSelectItem>
+                    <MudSelectItem Value="@("rappel")">Rappel</MudSelectItem>
+                    <MudSelectItem Value="@("system")">Système</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudSelect T="string" @bind-Value="_filtreStatut" Label="Statut" 
+                          Variant="Variant.Outlined" @onchange="ApplyFilters">
+                    <MudSelectItem Value="@("")">Tous les statuts</MudSelectItem>
+                    <MudSelectItem Value="@("non_lu")">Non lues</MudSelectItem>
+                    <MudSelectItem Value="@("lu")">Lues</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudDateRangePicker @bind-DateRange="_filtrePeriode" Label="Période" 
+                                   Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="12" sm="6" md="2" Class="d-flex align-items-end">
+                <MudButton Variant="Variant.Outlined" OnClick="ClearFilters" FullWidth="true">
+                    Effacer
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudCardContent>
+</MudCard>
+
+<!-- Statistiques -->
+<MudGrid Class="mb-4">
+    <MudItem xs="6" sm="3">
+        <MudPaper Class="pa-4 text-center">
+            <MudText Typo="Typo.h6" Color="Color.Info">@_filteredNotifications.Count</MudText>
+            <MudText Typo="Typo.body2">Total</MudText>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="6" sm="3">
+        <MudPaper Class="pa-4 text-center">
+            <MudText Typo="Typo.h6" Color="Color.Warning">
+                @_filteredNotifications.Count(n => !n.EstLue)
+            </MudText>
+            <MudText Typo="Typo.body2">Non lues</MudText>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="6" sm="3">
+        <MudPaper Class="pa-4 text-center">
+            <MudText Typo="Typo.h6" Color="Color.Success">
+                @_filteredNotifications.Count(n => n.Type == "validation")
+            </MudText>
+            <MudText Typo="Typo.body2">Validations</MudText>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="6" sm="3">
+        <MudPaper Class="pa-4 text-center">
+            <MudText Typo="Typo.h6" Color="Color.Secondary">
+                @_filteredNotifications.Count(n => n.Type == "rappel")
+            </MudText>
+            <MudText Typo="Typo.body2">Rappels</MudText>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+<!-- Liste des notifications -->
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">
+                Notifications (@_filteredNotifications.Count)
+            </MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        @if (_loading)
         {
-            <div class="list-group-item list-group-item-action flex-column align-items-start">
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">@notif.NomUtilisateur</h5>
-                    <small class="text-muted">@notif.DateRappel.ToString("dd/MM/yyyy HH:mm")</small>
-                </div>
-                <p class="mb-1">@notif.Message</p>
+            <div class="text-center pa-4">
+                <MudProgressCircular Indeterminate="true" />
+                <MudText Class="mt-2">Chargement des notifications...</MudText>
             </div>
         }
-    </div>
-}
+        else if (!_filteredNotifications.Any())
+        {
+            <div class="text-center pa-8">
+                <MudIcon Icon="@Icons.Material.Filled.NotificationsOff" Size="Size.Large" Color="Color.Secondary" Class="mb-4" />
+                <MudText Typo="Typo.h6" Color="Color.Secondary">Aucune notification</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    Vous n'avez aucune notification pour le moment
+                </MudText>
+            </div>
+        }
+        else
+        {
+            <MudList T="string">
+                @foreach (var notification in _filteredNotifications.OrderByDescending(n => n.DateCreation))
+                {
+                    <MudListItem OnClick="@(() => MarquerCommeLue(notification))"
+                                Class="@(notification.EstLue ? "" : "bg-light")"
+                                Style="cursor: pointer;">
+                        <div class="d-flex w-100 justify-content-between align-items-start">
+                            <div class="d-flex align-items-start">
+                                <MudIcon Icon="@GetNotificationIcon(notification.Type)" 
+                                        Color="@GetNotificationColor(notification.Type)" 
+                                        Class="mr-3 mt-1" />
+                                <div>
+                                    <MudText Typo="@(notification.EstLue ? Typo.body1 : Typo.subtitle1)" 
+                                            GutterBottom="true">
+                                        @notification.Titre
+                                    </MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary" GutterBottom="true">
+                                        @notification.Message
+                                    </MudText>
+                                    <div class="d-flex align-items-center">
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            @notification.DateCreation.ToString("dd/MM/yyyy HH:mm")
+                                        </MudText>
+                                        @if (!string.IsNullOrEmpty(notification.Source))
+                                        {
+                                            <MudDivider Vertical="true" Class="mx-2" />
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                @notification.Source
+                                            </MudText>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                @if (!notification.EstLue)
+                                {
+                                    <MudIcon Icon="@Icons.Material.Filled.Circle" 
+                                            Color="Color.Primary" 
+                                            Size="Size.Small" />
+                                }
+                                <MudMenu Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small">
+                                    <MudMenuItem OnClick="@(() => MarquerCommeLue(notification))">
+                                        @(notification.EstLue ? "Marquer comme non lue" : "Marquer comme lue")
+                                    </MudMenuItem>
+                                    <MudMenuItem OnClick="@(() => SupprimerNotification(notification))"
+                                                Color="Color.Error">
+                                        Supprimer
+                                    </MudMenuItem>
+                                </MudMenu>
+                            </div>
+                        </div>
+                    </MudListItem>
+                    
+                    @if (notification != _filteredNotifications.OrderByDescending(n => n.DateCreation).Last())
+                    {
+                        <MudDivider />
+                    }
+                }
+            </MudList>
+        }
+    </MudCardContent>
+</MudCard>
 
 @code {
-    // Modèle local simplifié pour la démo
-    public class RappelDto
+    private bool _loading = true;
+    private List<NotificationDto> _notifications = new();
+    private List<NotificationDto> _filteredNotifications = new();
+    
+    // Filtres
+    private string _filtreType = "";
+    private string _filtreStatut = "";
+    private DateRange? _filtrePeriode;
+
+    protected override async Task OnInitializedAsync()
     {
-        public string NomUtilisateur { get; set; } = "";
-        public string Message { get; set; } = "";
-        public DateTime DateRappel { get; set; }
+        await LoadNotifications();
     }
 
-    private List<RappelDto>? notifications;
-
-    protected override void OnInitialized()
+    private async Task LoadNotifications()
     {
-        // Données fictives pour la démo
-        notifications = new List<RappelDto>
+        _loading = true;
+        try
         {
-            new RappelDto
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = authState.User.GetUserId();
+
+            if (userId.HasValue)
             {
-                NomUtilisateur = "Alice Dupont",
-                Message = "Votre demande de congé a été approuvée.",
-                DateRappel = DateTime.Now.AddMinutes(-30)
-            },
-            new RappelDto
-            {
-                NomUtilisateur = "Bob Martin",
-                Message = "Nouvelle demande de congé en attente de validation.",
-                DateRappel = DateTime.Now.AddHours(-1)
-            },
-            new RappelDto
-            {
-                NomUtilisateur = "Claire Bernard",
-                Message = "Rappel : vous avez une réunion prévue demain à 10h.",
-                DateRappel = DateTime.Now.AddDays(-1)
+                var result = await RappelService.GetNotificationsAsync(userId.Value);
+                await result.HandleServiceResultAsync(Snackbar,
+                    onSuccess: notifications =>
+                    {
+                        _notifications = notifications.ToList();
+                        ApplyFilters();
+                    });
             }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Erreur lors du chargement des notifications", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void ApplyFilters()
+    {
+        _filteredNotifications = _notifications.Where(n =>
+            (string.IsNullOrEmpty(_filtreType) || n.Type == _filtreType) &&
+            (_filtreStatut == "" ||
+             (_filtreStatut == "non_lu" && !n.EstLue) ||
+             (_filtreStatut == "lu" && n.EstLue)) &&
+            (_filtrePeriode == null ||
+             (n.DateCreation.Date >= _filtrePeriode.Start && n.DateCreation.Date <= _filtrePeriode.End))
+        ).ToList();
+
+        StateHasChanged();
+    }
+
+    private void ClearFilters()
+    {
+        _filtreType = "";
+        _filtreStatut = "";
+        _filtrePeriode = null;
+        ApplyFilters();
+    }
+
+    private string GetNotificationIcon(string type)
+    {
+        return type switch
+        {
+            "validation" => Icons.Material.Filled.CheckCircle,
+            "rappel" => Icons.Material.Filled.Schedule,
+            "system" => Icons.Material.Filled.Settings,
+            "info" => Icons.Material.Filled.Info,
+            _ => Icons.Material.Filled.Notifications
         };
+    }
+
+    private Color GetNotificationColor(string type)
+    {
+        return type switch
+        {
+            "validation" => Color.Success,
+            "rappel" => Color.Warning,
+            "system" => Color.Info,
+            "info" => Color.Primary,
+            _ => Color.Default
+        };
+    }
+
+    private async Task MarquerCommeLue(NotificationDto notification)
+    {
+        var result = await RappelService.MarquerCommeLueAsync(notification.Id);
+        if (result.IsSuccess)
+        {
+            notification.EstLue = !notification.EstLue;
+            StateHasChanged();
+        }
+    }
+
+    private async Task MarquerToutesCommeVues()
+    {
+        var result = await RappelService.MarquerToutesCommeLuesAsync();
+        if (result.HandleWithNotification(Snackbar, "Toutes les notifications ont été marquées comme lues"))
+        {
+            foreach (var notification in _notifications)
+            {
+                notification.EstLue = true;
+            }
+            StateHasChanged();
+        }
+    }
+
+    [Inject] private IDialogService DialogService { get; set; }
+
+    private async Task SupprimerNotification(NotificationDto notification)
+    {
+        var confirmed = await DialogService.ShowMessageBox(
+            "Confirmer la suppression",
+            "Supprimer cette notification ?",
+            "Oui", "Non");
+
+        if (confirmed == true)
+        {
+            var result = await RappelService.SupprimerNotificationAsync(notification.Id);
+            if (result.HandleWithNotification(Snackbar, "Notification supprimée"))
+            {
+                _notifications.Remove(notification);
+                ApplyFilters();
+            }
+        }
+    }
+
+    // Modèle de notification
+    public class NotificationDto
+    {
+        public int Id { get; set; }
+        public string Titre { get; set; } = "";
+        public string Message { get; set; } = "";
+        public string Type { get; set; } = "";
+        public DateTime DateCreation { get; set; }
+        public bool EstLue { get; set; }
+        public string Source { get; set; } = "";
     }
 }

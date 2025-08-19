@@ -7,11 +7,11 @@ using GestionConge.Components.Models;
 using GestionConge.Components.Repositories.IRepositories;
 using GestionConge.Components.Services.IServices;
 
-public class UtilisateurService : IUtilisateurService
+public class UtilisateurServices : IUtilisateurService
 {
     private readonly IUtilisateurRepository _repository;
 
-    public UtilisateurService(IUtilisateurRepository repository)
+    public UtilisateurServices(IUtilisateurRepository repository)
     {
         _repository = repository;
     }
