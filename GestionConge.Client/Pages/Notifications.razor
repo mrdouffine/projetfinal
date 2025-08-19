@@ -3,6 +3,10 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using GestionConge.Client.Services
 @attribute [Authorize]
+@using GestionConge.Client.Models
+@using GestionConge.Client.Extensions
+@using GestionConge.Client.Helpers
+@using GestionConge.Client.Layout
 @layout SecureLayout
 @inject RappelService RappelService
 @inject AuthenticationStateProvider AuthStateProvider
@@ -20,7 +24,7 @@
             Consultez vos notifications et rappels
         </MudText>
     </div>
-    <MudButton OnClick="MarquerToutesCommeVues" 
+    <MudButton
                Variant="Variant.Outlined" 
                StartIcon="@Icons.Material.Filled.DoneAll"
                Disabled="@(!_notifications.Any(n => !n.EstLue))">
@@ -128,7 +132,7 @@
             <MudList T="string">
                 @foreach (var notification in _filteredNotifications.OrderByDescending(n => n.DateCreation))
                 {
-                    <MudListItem OnClick="@(() => MarquerCommeLue(notification))"
+                    <MudListItem
                                 Class="@(notification.EstLue ? "" : "bg-light")"
                                 Style="cursor: pointer;">
                         <div class="d-flex w-100 justify-content-between align-items-start">
@@ -166,7 +170,7 @@
                                             Size="Size.Small" />
                                 }
                                 <MudMenu Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small">
-                                    <MudMenuItem OnClick="@(() => MarquerCommeLue(notification))">
+                                    <MudMenuItem>
                                         @(notification.EstLue ? "Marquer comme non lue" : "Marquer comme lue")
                                     </MudMenuItem>
                                     <MudMenuItem OnClick="@(() => SupprimerNotification(notification))"
@@ -213,7 +217,7 @@
 
             if (userId.HasValue)
             {
-                var result = await RappelService.GetNotificationsAsync(userId.Value);
+                var result = await RappelService.GetRappelsUtilisateurAsync(userId.Value);
                 await result.HandleServiceResultAsync(Snackbar,
                     onSuccess: notifications =>
                     {
@@ -278,28 +282,28 @@
         };
     }
 
-    private async Task MarquerCommeLue(NotificationDto notification)
-    {
-        var result = await RappelService.MarquerCommeLueAsync(notification.Id);
-        if (result.IsSuccess)
-        {
-            notification.EstLue = !notification.EstLue;
-            StateHasChanged();
-        }
-    }
+    // private async Task MarquerCommeLue(NotificationDto notification)
+    // {
+    //     var result = await RappelService.Async(notification.Id);
+    //     if (result.IsSuccess)
+    //     {
+    //         notification.EstLue = !notification.EstLue;
+    //         StateHasChanged();
+    //     }
+    // }
 
-    private async Task MarquerToutesCommeVues()
-    {
-        var result = await RappelService.MarquerToutesCommeLuesAsync();
-        if (result.HandleWithNotification(Snackbar, "Toutes les notifications ont été marquées comme lues"))
-        {
-            foreach (var notification in _notifications)
-            {
-                notification.EstLue = true;
-            }
-            StateHasChanged();
-        }
-    }
+    // private async Task MarquerToutesCommeVues()
+    // {
+    //     var result = await RappelService.MarquerToutesCommeLuesAsync();
+    //     if (result.HandleWithNotification(Snackbar, "Toutes les notifications ont été marquées comme lues"))
+    //     {
+    //         foreach (var notification in _notifications)
+    //         {
+    //             notification.EstLue = true;
+    //         }
+    //         StateHasChanged();
+    //     }
+    // }
 
     [Inject] private IDialogService DialogService { get; set; }
 
@@ -312,8 +316,8 @@
 
         if (confirmed == true)
         {
-            var result = await RappelService.SupprimerNotificationAsync(notification.Id);
-            if (result.HandleWithNotification(Snackbar, "Notification supprimée"))
+            var result = await RappelService.DeleteAsync(notification.Id);
+            if (result.HandleWithNotification(Snackbar))
             {
                 _notifications.Remove(notification);
                 ApplyFilters();
