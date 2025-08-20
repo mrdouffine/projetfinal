@@ -120,6 +120,9 @@ if (app.Environment.IsDevelopment())
     app.UseWebAssemblyDebugging();
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
+    app.UseStatusCodePagesWithReExecute("/error/{0}");
+    
 
 }
 else

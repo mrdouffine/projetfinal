@@ -31,6 +31,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 
 
 
+
 // Restaure la session depuis localStorage avant d'afficher l'app
 //var auth = builder.Build().Services.GetRequiredService<AuthService>();
 //await auth.TryRestoreAsync();
@@ -39,6 +40,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 
 
 await builder.Build().RunAsync();
+
 
 
 // Interface et implémentation pour les notifications

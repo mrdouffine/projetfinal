@@ -31,7 +31,7 @@
 
     <!-- Menu de navigation -->
     <MudNavMenu Class="flex-grow-1 pa-2">
-        <MudNavLink Href="/"
+        <MudNavLink Href="/dashboard"
                     Match="NavLinkMatch.All"
                     Icon="@Icons.Material.Filled.Dashboard"
                     IconColor="Color.Primary">
@@ -41,36 +41,49 @@
         <MudNavGroup Text="Demandes de congés"
                      Icon="@Icons.Material.Filled.EventNote"
                      Expanded="true">
-            <MudNavLink Href="/demandes/nouvelle"
+            <MudNavLink Href="/demande-form/nouvelle"
                         Icon="@Icons.Material.Filled.Add"
                         IconColor="Color.Info">
                 Nouvelle demande
             </MudNavLink>
-            <MudNavLink Href="/demandes/mes-demandes"
+            <MudNavLink Href="/demandes"
                         Icon="@Icons.Material.Filled.List"
                         IconColor="Color.Success">
                 Mes demandes
             </MudNavLink>
+            <MudNavLink Href="/validations"
+                        Match="NavLinkMatch.Prefix"
+                        Icon="@Icons.Material.Filled.TaskAlt"
+                        IconColor="Color.Warning">
+                <div class="d-flex align-center justify-space-between w-100">
+                    <span>Validations</span>
+                    @if (_pendingValidations > 0)
+                    {
+                        <MudBadge Content="@_pendingValidations"
+                                  Color="Color.Error"
+                                  Class="ml-auto" />
+                    }
+                </div>
+            </MudNavLink>
+            <MudNavLink Href="/notifications"
+                        Match="NavLinkMatch.Prefix"
+                        Icon="@Icons.Material.Filled.Notifications"
+                        IconColor="Color.Secondary">
+                <div class="d-flex align-center justify-space-between w-100">
+                    <span>Notifications</span>
+                    @if (NotificationCount > 0)
+                    {
+                        <MudBadge Content="@NotificationCount"
+                                  Color="Color.Error"
+                                  Class="ml-auto" />
+                    }
+                </div>
+            </MudNavLink>
         </MudNavGroup>
 
         <!-- Menu visible pour les managers et admins -->
-        <AuthorizeView Roles="Manager,Admin,DOT">
+        <AuthorizeView Roles="Admin,DOT">
             <Authorized>
-                <MudNavLink Href="/validations"
-                            Match="NavLinkMatch.Prefix"
-                            Icon="@Icons.Material.Filled.TaskAlt"
-                            IconColor="Color.Warning">
-                    <div class="d-flex align-center justify-space-between w-100">
-                        <span>Validations</span>
-                        @if (_pendingValidations > 0)
-                        {
-                            <MudBadge Content="@_pendingValidations"
-                                      Color="Color.Error"
-                                      Class="ml-auto" />
-                        }
-                    </div>
-                </MudNavLink>
-
                 <MudNavGroup Text="Management"
                              Icon="@Icons.Material.Filled.SupervisorAccount"
                              IconColor="Color.Secondary">
@@ -93,21 +106,6 @@
                     Icon="@Icons.Material.Filled.CalendarToday"
                     IconColor="Color.Tertiary">
             Planning personnel
-        </MudNavLink>
-
-        <MudNavLink Href="/notifications"
-                    Match="NavLinkMatch.Prefix"
-                    Icon="@Icons.Material.Filled.Notifications"
-                    IconColor="Color.Secondary">
-            <div class="d-flex align-center justify-space-between w-100">
-                <span>Notifications</span>
-                @if (NotificationCount > 0)
-                {
-                    <MudBadge Content="@NotificationCount"
-                              Color="Color.Error"
-                              Class="ml-auto" />
-                }
-            </div>
         </MudNavLink>
 
         <MudNavLink Href="/statistiques"
@@ -158,7 +156,7 @@
         </MudButton>
         <MudText Typo="Typo.caption"
                  Class="text-center mt-2 mud-text-secondary">
-            Version 1.0.0
+            Version 1.1.2
         </MudText>
     </div>
 </div>
