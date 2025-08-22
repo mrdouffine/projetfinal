@@ -78,16 +78,13 @@
                         For="@(() => _registerModel.ConfirmPassword)"
                         Class="mb-4" />
 
-                    <MudCheckBox  T="bool"
-                        @bind-Checked="_acceptTerms"
-                        Required="true"
-                        RequiredError="Vous devez accepter les conditions d'utilisation"
-                        Color="Color.Primary"
-                        Class="mb-4">
-                        <ChildContent>
-                            J'accepte les 
-                            <MudLink Href="#" Color="Color.Primary">conditions d'utilisation</MudLink>
-                        </ChildContent>
+                    <MudCheckBox @bind-Value="_acceptTerms"
+                                 Required="true"
+                                 RequiredError="Vous devez accepter les conditions d'utilisation"
+                                 Color="Color.Primary"
+                                 Class="mb-4">
+                        J'accepte les
+                        <MudLink Href="#" Color="Color.Primary">conditions d'utilisation</MudLink>
                     </MudCheckBox>
                 </MudCardContent>
                 
@@ -137,7 +134,7 @@
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         if (authState.User.Identity?.IsAuthenticated == true)
         {
-            Navigation.NavigateTo("/");
+            Navigation.NavigateTo("/home");
         }
     }
 
@@ -152,7 +149,7 @@
                 Email = _registerModel.Email,
                 MotDePasse = _registerModel.Password,
                 ConfirmPassword = _registerModel.ConfirmPassword,
-                Nom = _registerModel.LastName
+                Nom = _registerModel.LastName + " " + _registerModel.FirstName,
             };
 
             var result = await AuthService.RegisterAsync(request);
@@ -170,6 +167,8 @@
         }
         catch (Exception ex)
         {
+            // Gérer les exceptions et afficher un message d'erreur
+            Console.Error.WriteLine($"Erreur lors de l'inscription : {ex.Message}");
             Snackbar.Add("Une erreur s'est produite lors de l'inscription.", Severity.Error);
         }
         finally
@@ -192,8 +191,8 @@
 
         [Required(ErrorMessage = "Le mot de passe est requis")]
         [MinLength(8, ErrorMessage = "Le mot de passe doit contenir au moins 8 caractères")]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]", 
-            ErrorMessage = "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial")]
+        // [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]", 
+        //     ErrorMessage = "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial")]
         public string Password { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "La confirmation du mot de passe est requise")]

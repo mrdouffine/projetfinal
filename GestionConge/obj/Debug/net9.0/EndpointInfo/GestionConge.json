@@ -1173,11 +1173,11 @@
       "LoginRequest": {
         "type": "object",
         "properties": {
-          "userNameOrEmail": {
+          "email": {
             "type": "string",
             "nullable": true
           },
-          "password": {
+          "motDePasse": {
             "type": "string",
             "nullable": true
           }

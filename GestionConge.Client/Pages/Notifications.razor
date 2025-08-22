@@ -1,4 +1,5 @@
 ﻿@page "/notifications"
+@layout MainLayout
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using GestionConge.Client.Services
@@ -196,7 +197,7 @@
     private bool _loading = true;
     private List<NotificationDto> _notifications = new();
     private List<NotificationDto> _filteredNotifications = new();
-    
+
     // Filtres
     private string _filtreType = "";
     private string _filtreStatut = "";
@@ -228,6 +229,7 @@
         }
         catch (Exception ex)
         {
+            Console.Error.WriteLine($"Erreur lors du chargement des notifications : {ex.Message}");
             Snackbar.Add("Erreur lors du chargement des notifications", Severity.Error);
         }
         finally
@@ -306,6 +308,11 @@
     // }
 
     [Inject] private IDialogService DialogService { get; set; }
+
+    public Notifications(IDialogService dialogService)
+    {
+        DialogService = dialogService;
+    }
 
     private async Task SupprimerNotification(NotificationDto notification)
     {

@@ -105,18 +105,33 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _theme = new()
-        {
-            PaletteLight = _lightPalette,
-            PaletteDark = _darkPalette,
-            LayoutProperties = new LayoutProperties()
-            {
-                DefaultBorderRadius = "8px"
-            }
-        };
 
-        // Charger les données utilisateur
-        await LoadCurrentUserAsync();
+        try
+        {
+            _theme = new()
+            {
+                PaletteLight = _lightPalette,
+                PaletteDark = _darkPalette,
+                LayoutProperties = new LayoutProperties()
+                {
+                    DefaultBorderRadius = "8px"
+                }
+            };
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erreur d'initialisation du thème : {ex.Message}", Severity.Error);
+        }
+
+        try
+        {
+            // Charger les données utilisateur
+            await LoadCurrentUserAsync();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erreur lors du chargement de l'utilisateur : {ex.Message}", Severity.Error);
+        }
 
         // Écouter les changements d'état d'authentification
         AuthStateProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
@@ -149,10 +164,15 @@
         _notificationCount = 3; // Temporaire
     }
 
+    private bool _isHandlingAuthChange = false;
+
     private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
     {
+        if (_isHandlingAuthChange) return;
+        _isHandlingAuthChange = true;
         await LoadCurrentUserAsync();
         StateHasChanged();
+        _isHandlingAuthChange = false;
     }
 
     void DrawerToggle()

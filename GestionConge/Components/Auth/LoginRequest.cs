@@ -2,6 +2,6 @@
 
 public class LoginRequest
 {
-    public string UserNameOrEmail { get; set; } = ""; // on autorise email OU username
-    public string Password { get; set; } = "";
+    public string Email { get; set; } = ""; // on autorise email OU username
+    public string MotDePasse { get; set; } = "";
 }

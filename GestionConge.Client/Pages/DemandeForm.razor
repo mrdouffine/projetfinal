@@ -1,5 +1,9 @@
 ﻿@page "/demande-form/nouvelle"
 @page "/demande-form/modifier/{Id:int}"
+@layout MainLayout
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
 @using System.ComponentModel.DataAnnotations
 @using GestionConge.Client.Models
 @using GestionConge.Client.Services 
@@ -286,7 +290,12 @@
 
     private async Task LoadSoldeConges()
     {
+        //on load le solde de congés par défaut
         // À adapter selon votre API
+        // Ici, on initialise avec des valeurs par défaut pour l'exemple
+        //faire un vrai appel API pour récupérer le solde de congés de l'utilisateur connecté
+         // _soldeConges = await .GetSoldeAsync();
+
         _soldeConges = new SoldeConges
         {
             CongesPayes = 30

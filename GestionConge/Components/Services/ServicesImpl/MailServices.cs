@@ -7,11 +7,11 @@ using MimeKit;
 
 namespace GestionConge.Components.Services.ServicesImpl;
 
-public class MailService : IMailService
+public class MailServices : IMailService
 {
     private readonly MailSettings _mailSettings;
 
-    public MailService(IOptions<MailSettings> mailSettings)
+    public MailServices(IOptions<MailSettings> mailSettings)
     {
         _mailSettings = mailSettings.Value;
     }

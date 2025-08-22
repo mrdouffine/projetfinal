@@ -1,0 +1,27 @@
+﻿@page "/home"
+@layout MainLayout
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+<PageTitle>Accueil - GCO</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-6">
+    <MudCard Elevation="2" Class="pa-6">
+        <MudCardContent Class="text-center">
+            <MudIcon Icon="@Icons.Material.Filled.Home" Size="Size.Large" Color="Color.Primary" Class="mb-3" />
+
+            <MudText Typo="Typo.h4" GutterBottom="true">
+                Bienvenue sur la plateforme de gestion des congés
+            </MudText>
+
+            <MudText Typo="Typo.body1" Class="mud-text-secondary mb-4">
+                Cette application vous permet de gérer facilement vos demandes de congés,
+                de suivre leur statut et d’accéder aux informations utiles selon votre rôle.
+            </MudText>
+
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/demandes">
+                Accéder à mes demandes
+            </MudButton>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>

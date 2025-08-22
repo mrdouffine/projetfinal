@@ -27,12 +27,12 @@ public class AuthServices : IAuthService
     public async Task<AuthResponse?> LoginAsync(LoginRequest req)
     {
         // Cherche par email, sinon par nom d’utilisateur
-        var user = await _users.GetByEmailAsync(req.UserNameOrEmail)
-                   ?? await _users.GetByUserNameAsync(req.UserNameOrEmail);
+        var user = await _users.GetByEmailAsync(req.Email)
+                   ?? await _users.GetByUserNameAsync(req.Email);
         if (user is null) return null;
 
         // Vérif du mot de passe (BCrypt)
-        if (!BCrypt.Net.BCrypt.Verify(req.Password, user.MotDePasse))
+        if (!BCrypt.Net.BCrypt.Verify(req.MotDePasse, user.MotDePasse))
             return null;
 
         // Générer tokens

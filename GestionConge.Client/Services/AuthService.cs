@@ -64,7 +64,7 @@ public class AuthService
     }
     public async Task<bool> RegisterAsync(Models.AuthDtos.RegisterDto dto)
     {
-        using var _http = new HttpClient { BaseAddress = new Uri("https://localhost:7064") };
+        using var _http = new HttpClient { BaseAddress = new Uri("https://localhost:7064/") };
         var res = await _http.PostAsJsonAsync("api/Auth/register", dto);
         if (!res.IsSuccessStatusCode) return false;
 
@@ -80,7 +80,7 @@ public class AuthService
     {
         using var _httpClient = new HttpClient { BaseAddress = new Uri("https://localhost:7064") };
 
-        var response = await _httpClient.PostAsJsonAsync("/api/Auth/login", new { Email = email, Password = password });
+        var response = await _httpClient.PostAsJsonAsync("/api/Auth/login", new { Email = email, MotDePasse = password });
         if (!response.IsSuccessStatusCode)
             return false;
 
@@ -97,8 +97,9 @@ public class AuthService
         };
 
         // Sauvegarder tokens + infos dans le localStorage
-        var json = JsonSerializer.Serialize(auth);
-        await _js.InvokeVoidAsync("localStorage.setItem", "authData", json);
+        //var json = JsonSerializer.Serialize(auth);
+        //await _js.InvokeVoidAsync("localStorage.setItem", "authData", json);
+        await SaveAuthAsync(auth);
 
         NotifyStateChanged();
         return true;

@@ -1,8 +1,9 @@
 ﻿@page "/dashboard"
+@layout MainLayout
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using GestionConge.Client.Services
-@* @attribute [Authorize(Roles = "Admin")] *@
+@attribute [Authorize(Roles = "Admin")]
 @using GestionConge.Client.Layout
 @* @layout SecureLayout *@
 @inject DemandeCongeService DemandeService
@@ -195,6 +196,7 @@
         }
         catch (Exception ex)
         {
+            Console.Error.WriteLine($"Erreur lors du chargement du tableau de bord : {ex.Message}");
             Snackbar.Add("Erreur lors du chargement du tableau de bord", Severity.Error);
         }
         finally

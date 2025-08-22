@@ -10,12 +10,12 @@ using Npgsql;
 using GestionConge.Components.Services.IServices;
 using GestionConge.Components.Models;
 
-public class ReminderEmailService : BackgroundService
+public class ReminderEmailServices : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IConfiguration _configuration;
 
-    public ReminderEmailService(IServiceProvider serviceProvider, IConfiguration configuration)
+    public ReminderEmailServices(IServiceProvider serviceProvider, IConfiguration configuration)
     {
         _serviceProvider = serviceProvider;
         _configuration = configuration;
@@ -54,7 +54,7 @@ public class ReminderEmailService : BackgroundService
         {
             string email = conge.email;
             string nom = conge.nom;
-            DateTime dateFin = conge.datefin;
+            DateTime? dateFin = conge.datefin;
             MailData mailData = new MailData
             {
                 To = email,

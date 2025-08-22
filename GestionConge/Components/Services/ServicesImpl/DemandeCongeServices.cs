@@ -6,11 +6,11 @@ namespace GestionConge.Components.Services.ServicesImpl;
 
 using GestionConge.Components.DTOs;
 using GestionConge.Components.DTOs.RequestDto;
-public class DemandeCongeService : IDemandeCongeService
+public class DemandeCongeServices : IDemandeCongeService
 {
     private readonly IDemandeCongeRepository _repository;
 
-    public DemandeCongeService(IDemandeCongeRepository repository)
+    public DemandeCongeServices(IDemandeCongeRepository repository)
     {
         _repository = repository;
     }

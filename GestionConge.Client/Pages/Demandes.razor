@@ -1,4 +1,6 @@
 ﻿@page "/demandes"
+@layout MainLayout
+@using MudBlazor    
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using GestionConge.Client.Services
@@ -193,7 +195,7 @@
                             <MudCard Class="h-100">
                                 <MudCardHeader>
                                   <MudCardContent>
-                                    <CardHeaderContent>
+                                    
                                         <div class="d-flex justify-content-between align-items-center">
                                             <MudChip T="string" Color="@GetStatusColor(demande.Statut)" 
                                                     Size="Size.Small">
@@ -211,7 +213,7 @@
                                         </MudText>
                                     }
                                          </div>
-                                    </CardHeaderContent>
+                                    
                                   </MudCardContent>
                                 </MudCardHeader>
                             
@@ -244,7 +246,7 @@
     private List<DemandeCongeDto> _demandes = new();
     private List<DemandeCongeDto> _filteredDemandes = new();
     private string _viewMode = "table";
-    
+
     // Filtres
     private string _filtreStatut = "";
     private string _filtreType = "";
@@ -272,7 +274,7 @@
             {
                 userId = parsedId;
             }
-            
+
             if (userId.HasValue)
             {
                 var result = await DemandeService.GetByUtilisateurAsync(userId.Value);
@@ -287,6 +289,7 @@
         }
         catch (Exception ex)
         {
+            Console.Error.WriteLine($"Erreur lors du chargement des demandes : {ex.Message}");
             Snackbar.Add("Erreur lors du chargement des demandes", Severity.Error);
         }
         finally
@@ -303,7 +306,7 @@
             (_filtrePeriode == null || 
              (d.DateDebut >= _filtrePeriode.Start && d.DateFin <= _filtrePeriode.End))
         ).OrderByDescending(d => d.DateSoumission).ToList();
-        
+
         StateHasChanged();
     }
 
@@ -343,6 +346,11 @@
     }
 
     [Inject] private IDialogService DialogService { get; set; }
+
+    public Demandes(IDialogService dialogService)
+    {
+        DialogService = dialogService;
+    }
 
     private async Task DeleteDemande(DemandeCongeDto demande)
     {

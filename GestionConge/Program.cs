@@ -52,7 +52,7 @@ builder.Services.AddScoped<TestRepository>();
 // Register the DemandeCongeRepository
 builder.Services.AddScoped<IDemandeCongeRepository, DemandeCongeRepository>();
 // Register the DemandeCongeService
-builder.Services.AddScoped<IDemandeCongeService, GestionConge.Components.Services.ServicesImpl.DemandeCongeService>();
+builder.Services.AddScoped<IDemandeCongeService, GestionConge.Components.Services.ServicesImpl.DemandeCongeServices>();
 // Register the UtilisateurRepository and UtilisateurService
 builder.Services.AddScoped<IUtilisateurRepository, UtilisateurRepository>();
 builder.Services.AddScoped<IUtilisateurService, UtilisateurServices>();
@@ -69,9 +69,9 @@ builder.Services.AddScoped<IRappelService, RappelServices>();
 builder.Services.AddScoped<IAuthService, AuthServices>();
 // Register the EmailService
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
-builder.Services.AddScoped<IMailService, MailService>();
+builder.Services.AddScoped<IMailService, MailServices>();
 // Register the EmailSenderService
-builder.Services.AddHostedService<ReminderEmailService>();
+builder.Services.AddHostedService<ReminderEmailServices>();
 // Register the PDF export service
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 builder.Services.AddScoped<IPdfExportService, PdfExportService>();
@@ -80,6 +80,18 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<CustomAuthStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthStateProvider>());
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<UtilisateurService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<ApiService>();
+builder.Services.AddScoped<ApiClient>();
+builder.Services.AddScoped<DemandeCongeService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<PlanningCongeService>();
+builder.Services.AddScoped<RappelService>();
+builder.Services.AddScoped<ValidationService>();
+// Notification service
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddHttpClient<UtilisateurService>();
 
 
 var jwt = builder.Configuration.GetSection("JwtSettings");
@@ -121,7 +133,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseDeveloperExceptionPage();
-    app.UseStatusCodePagesWithReExecute("/error/{0}");
     
 
 }
@@ -133,6 +144,9 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAntiforgery();
 
 app.MapControllers(); // <- important pour activer les routes API
 app.UseAntiforgery();

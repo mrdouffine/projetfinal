@@ -1,46 +1,65 @@
-﻿namespace GestionConge.Client.Services;
-
-using Microsoft.AspNetCore.Components.Authorization;
-using System.Security.Claims;
-using System.Text.Json;
+﻿using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 
-
+namespace GestionConge.Client.Services
+{
     public class CustomAuthStateProvider : AuthenticationStateProvider
     {
         private readonly ILogger<CustomAuthStateProvider> _logger;
+        private readonly IJSRuntime _jsRuntime;
         private ClaimsPrincipal _currentUser = new(new ClaimsIdentity());
 
-        public CustomAuthStateProvider(ILogger<CustomAuthStateProvider> logger)
+        private const string TokenKey = "authToken";
+
+        public CustomAuthStateProvider(ILogger<CustomAuthStateProvider> logger, IJSRuntime jsRuntime)
         {
             _logger = logger;
+            _jsRuntime = jsRuntime;
         }
 
-        public override Task<AuthenticationState> GetAuthenticationStateAsync()
+        public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            return Task.FromResult(new AuthenticationState(_currentUser));
+            string? token = null;
+
+            try
+            {
+                // ⚠️ Peut échouer pendant le prerendering → on capture
+                token = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", TokenKey);
+            }
+            catch (InvalidOperationException)
+            {
+                // On est en mode prerendering (pas encore de JS dispo)
+                _logger.LogWarning("JSRuntime indisponible (prerendering). Retour utilisateur anonyme.");
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                var user = GetClaimsFromToken(token);
+                _currentUser = user;
+            }
+
+            return new AuthenticationState(_currentUser);
         }
 
-        public Task NotifyUserAuthenticationAsync(string token)
+        public async Task NotifyUserAuthenticationAsync(string token)
         {
+            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", TokenKey, token);
+
             var authenticatedUser = GetClaimsFromToken(token);
-            var authState = Task.FromResult(new AuthenticationState(authenticatedUser));
-
             _currentUser = authenticatedUser;
-            NotifyAuthenticationStateChanged(authState);
 
-            return authState;
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(authenticatedUser)));
         }
 
-        public Task NotifyUserLogoutAsync()
+        public async Task NotifyUserLogoutAsync()
         {
+            await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", TokenKey);
+
             var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
-            var authState = Task.FromResult(new AuthenticationState(anonymousUser));
-
             _currentUser = anonymousUser;
-            NotifyAuthenticationStateChanged(authState);
 
-            return authState;
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(anonymousUser)));
         }
 
         private ClaimsPrincipal GetClaimsFromToken(string token)
@@ -58,7 +77,6 @@ using System.IdentityModel.Tokens.Jwt;
                 var jwtToken = jwtHandler.ReadJwtToken(token);
                 var claims = jwtToken.Claims.ToList();
 
-                // Ajouter les claims standard si ils n'existent pas
                 if (!claims.Any(c => c.Type == ClaimTypes.Name))
                 {
                     var emailClaim = claims.FirstOrDefault(c => c.Type == "email" || c.Type == ClaimTypes.Email);
@@ -78,3 +96,4 @@ using System.IdentityModel.Tokens.Jwt;
             }
         }
     }
+}

@@ -1,47 +1,43 @@
 using GestionConge.Client.Services;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
-using System.Diagnostics.Metrics;
+
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
-
+// MudBlazor
 builder.Services.AddMudServices();
+
+builder.Services.AddScoped<UtilisateurService>();
+
+
+// Authentication
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<CustomAuthStateProvider>();
-builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthStateProvider>());
+builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
+    provider.GetRequiredService<CustomAuthStateProvider>());
 builder.Services.AddScoped<AuthService>();
-// Remplace BaseAddress par l'URL de ton back-end API
+
+// HttpClient configuré pour votre API
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("https://localhost:7064/api/")
-}); 
+    BaseAddress = new Uri("https://localhost:7064/")
+});
+
+// Services API
 builder.Services.AddScoped<ApiService>();
 builder.Services.AddScoped<ApiClient>();
 
+// Services métier
 builder.Services.AddScoped<DemandeCongeService>();
 builder.Services.AddScoped<UserService>();
-// Services métier - Enregistrement de tous les services
 builder.Services.AddScoped<PlanningCongeService>();
 builder.Services.AddScoped<RappelService>();
-builder.Services.AddScoped<UtilisateurService>();
 builder.Services.AddScoped<ValidationService>();
 
 // Service utilitaire pour les notifications
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
-
-
-
-// Restaure la session depuis localStorage avant d'afficher l'app
-//var auth = builder.Build().Services.GetRequiredService<AuthService>();
-//await auth.TryRestoreAsync();
-
-//var authServices = new AuthServices(builder.Services.BuildServiceProvider().GetRequiredService<IJSRuntime>());
-
-
 await builder.Build().RunAsync();
-
-
 
 // Interface et implémentation pour les notifications
 public interface INotificationService

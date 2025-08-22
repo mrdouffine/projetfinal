@@ -1,8 +1,70 @@
-﻿<Router AppAssembly="typeof(Program).Assembly">
+﻿@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Authorization
+<Router AppAssembly="@typeof(Program).Assembly" 
+        AdditionalAssemblies="new[] { typeof(GestionConge.Client._Imports).Assembly }">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
-
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)">
+            <NotAuthorized>
+                @if (context.User.Identity?.IsAuthenticated != true)
+                {
+                    <div class="d-flex justify-center align-center" style="height: 100vh;">
+                        <MudPaper Class="pa-8 text-center" Elevation="4">
+                            <MudIcon Icon="@Icons.Material.Filled.Login" Size="Size.Large" Color="Color.Primary" />
+                            <MudText Typo="Typo.h5" Class="mt-4">Connexion requise</MudText>
+                            <MudText Typo="Typo.body1" Class="mt-2 mb-4">
+                                Veuillez vous connecter pour accéder à cette page.
+                            </MudText>
+                            <MudButton Variant="Variant.Filled" 
+                                       Color="Color.Primary" 
+                                       Href="/login"
+                                       StartIcon="@Icons.Material.Filled.Login">
+                                Se connecter
+                            </MudButton>
+                        </MudPaper>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex justify-center align-center" style="height: 100vh;">
+                        <MudPaper Class="pa-8 text-center" Elevation="4">
+                            <MudIcon Icon="@Icons.Material.Filled.Block" Size="Size.Large" Color="Color.Warning" />
+                            <MudText Typo="Typo.h5" Class="mt-4">Accès refusé</MudText>
+                            <MudText Typo="Typo.body1" Class="mt-2">
+                                Vous n'avez pas les permissions nécessaires pour accéder à cette page.
+                            </MudText>
+                        </MudPaper>
+                    </div>
+                }
+            </NotAuthorized>
+            <Authorizing>
+                <div class="d-flex justify-center align-center" style="height: 100vh;">
+                    <MudStack AlignItems="AlignItems.Center">
+                        <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
+                        <MudText Class="mt-4">Vérification des autorisations...</MudText>
+                    </MudStack>
+                </div>
+            </Authorizing>
+        </AuthorizeRouteView>
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
-
+    <NotFound>
+        <PageTitle>Page non trouvée</PageTitle>
+        <LayoutView Layout="@typeof(Layout.MainLayout)">
+            <div class="d-flex justify-center align-center" style="height: 100vh;">
+                <MudPaper Class="pa-8 text-center" Elevation="4">
+                    <MudIcon Icon="@Icons.Material.Filled.Error" Size="Size.Large" Color="Color.Error" />
+                    <MudText Typo="Typo.h5" Class="mt-4">Page non trouvée</MudText>
+                    <MudText Typo="Typo.body1" Class="mt-2 mb-4">
+                        La page demandée n'existe pas.
+                    </MudText>
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Primary" 
+                               Href="/"
+                               StartIcon="@Icons.Material.Filled.Home">
+                        Retour à l'accueil
+                    </MudButton>
+                </MudPaper>
+            </div>
+        </LayoutView>
+    </NotFound>
 </Router>
