@@ -1,6 +1,7 @@
 ﻿@page "/demande-form/nouvelle"
 @page "/demande-form/modifier/{Id:int}"
 @layout MainLayout
+@attribute [Authorize]
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
