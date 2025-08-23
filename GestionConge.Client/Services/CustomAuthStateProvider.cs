@@ -1,20 +1,22 @@
-﻿using System.Security.Claims;
+﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Authorization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace GestionConge.Client.Services
 {
     public class CustomAuthStateProvider : AuthenticationStateProvider
     {
         private readonly ILogger<CustomAuthStateProvider> _logger;
-        private readonly IJSRuntime _jsRuntime;
+        private readonly ILocalStorageService _localStorage;
         private ClaimsPrincipal _currentUser = new(new ClaimsIdentity());
 
         private const string TokenKey = "authToken";
 
-        public CustomAuthStateProvider(ILogger<CustomAuthStateProvider> logger, IJSRuntime jsRuntime)
+        public CustomAuthStateProvider(ILogger<CustomAuthStateProvider> logger, ILocalStorageService localStorage)
         {
             _logger = logger;
-            _jsRuntime = jsRuntime;
+            _localStorage = localStorage;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -23,13 +25,11 @@ namespace GestionConge.Client.Services
 
             try
             {
-                // ⚠️ Peut échouer pendant le prerendering → on capture
-                token = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", TokenKey);
+                token = await _localStorage.GetItemAsync<string>(TokenKey);
             }
-            catch (InvalidOperationException)
+            catch (Exception ex)
             {
-                // On est en mode prerendering (pas encore de JS dispo)
-                _logger.LogWarning("JSRuntime indisponible (prerendering). Retour utilisateur anonyme.");
+                _logger.LogWarning(ex, "Impossible de lire le token depuis localStorage");
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
 
@@ -44,7 +44,7 @@ namespace GestionConge.Client.Services
 
         public async Task NotifyUserAuthenticationAsync(string token)
         {
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", TokenKey, token);
+            await _localStorage.SetItemAsync(TokenKey, token);
 
             var authenticatedUser = GetClaimsFromToken(token);
             _currentUser = authenticatedUser;
@@ -54,7 +54,7 @@ namespace GestionConge.Client.Services
 
         public async Task NotifyUserLogoutAsync()
         {
-            await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", TokenKey);
+            await _localStorage.RemoveItemAsync(TokenKey);
 
             var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
             _currentUser = anonymousUser;
@@ -77,6 +77,7 @@ namespace GestionConge.Client.Services
                 var jwtToken = jwtHandler.ReadJwtToken(token);
                 var claims = jwtToken.Claims.ToList();
 
+                // Ajoute ClaimTypes.Name si absent
                 if (!claims.Any(c => c.Type == ClaimTypes.Name))
                 {
                     var emailClaim = claims.FirstOrDefault(c => c.Type == "email" || c.Type == ClaimTypes.Email);

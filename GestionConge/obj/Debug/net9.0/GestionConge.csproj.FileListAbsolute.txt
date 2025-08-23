@@ -96,3 +96,4 @@ C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\refin
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\GestionConge.pdb
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\GestionConge.genruntimeconfig.cache
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\ref\GestionConge.dll
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Blazored.LocalStorage.dll

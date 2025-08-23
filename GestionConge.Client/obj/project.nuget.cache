@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "yQhDzc8cyqs=",
+  "dgSpecHash": "RgkGzwj9/mE=",
   "success": true,
   "projectFilePath": "C:\\Users\\HP\\source\\repos\\projet\\GestionConge\\GestionConge.Client\\GestionConge.Client.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\HP\\.nuget\\packages\\blazored.localstorage\\4.5.0\\blazored.localstorage.4.5.0.nupkg.sha512",
     "C:\\Users\\HP\\.nuget\\packages\\microsoft.aspnetcore.authorization\\9.0.8\\microsoft.aspnetcore.authorization.9.0.8.nupkg.sha512",
     "C:\\Users\\HP\\.nuget\\packages\\microsoft.aspnetcore.components\\9.0.8\\microsoft.aspnetcore.components.9.0.8.nupkg.sha512",
     "C:\\Users\\HP\\.nuget\\packages\\microsoft.aspnetcore.components.analyzers\\9.0.8\\microsoft.aspnetcore.components.analyzers.9.0.8.nupkg.sha512",

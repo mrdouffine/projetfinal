@@ -1,41 +1,39 @@
-﻿namespace GestionConge.Client.Services;
+﻿using Blazored.LocalStorage;
 using GestionConge.Client.Models;
-using Microsoft.JSInterop;
-using System.Net.Http.Json;
-using System.Text.Json;
+using GestionConge.Client.Services;
 
+namespace GestionConge.Client.Services;
 
 public class AuthService
 {
-    private const string LocalStorageKey = "currentUser";
+    private const string AuthStorageKey = "authData";  // objet complet (pour refresh, etc.)
+    private const string TokenKey = "authToken";       // pur JWT (lu par CustomAuthStateProvider)
+
     private readonly SemaphoreSlim _refreshLock = new(1, 1);
-    private readonly IJSRuntime _js;
-
-
-    // Clé pour stocker les données d'authentification dans le localStorage
-    private const string AuthStorageKey = "authData";
-
+    private readonly ILocalStorageService _localStorage;
+    private readonly CustomAuthStateProvider _authProvider;
+    private readonly HttpClient _http; // injecté (conseillé)
 
     private UserSession? _currentUser;
-
     public event Action? OnChange;
 
-    public AuthService(IJSRuntime jsRuntime)
+    public AuthService(ILocalStorageService localStorage,
+                       CustomAuthStateProvider authProvider,
+                       HttpClient httpFactory)
     {
-        _js = jsRuntime;
+        _localStorage = localStorage;
+        _authProvider = authProvider;
+        _http = httpFactory;
+        _http.BaseAddress = new Uri("https://localhost:7064/");
     }
 
     public UserSession? GetCurrentUser() => _currentUser;
 
-    // Restaure depuis le localStorage (appelée au démarrage & par SecureLayout)
     public async Task TryRestoreAsync()
     {
         if (_currentUser is not null) return;
 
-        var json = await _js.InvokeAsync<string>("localStorage.getItem", AuthStorageKey);
-        if (string.IsNullOrWhiteSpace(json)) return;
-
-        var auth = JsonSerializer.Deserialize<AuthResponseDto>(json);
+        var auth = await _localStorage.GetItemAsync<AuthResponseDto>(AuthStorageKey);
         if (auth is null) return;
 
         _currentUser = new UserSession
@@ -45,192 +43,100 @@ public class AuthService
             Nom = auth.UserName,
             Role = auth.Role
         };
+
+        // S’assure que le provider a bien un token (au cas où)
+        var existingToken = await _localStorage.GetItemAsStringAsync(TokenKey);
+        if (string.IsNullOrWhiteSpace(existingToken) && !string.IsNullOrWhiteSpace(auth.AccessToken))
+        {
+            await _localStorage.SetItemAsync(TokenKey, auth.AccessToken);
+            await _authProvider.NotifyUserAuthenticationAsync(auth.AccessToken);
+        }
+
         OnChange?.Invoke();
     }
 
-    // Renvoie true si token OK (et tente un refresh si nécessaire)
-    public async Task<bool> IsAuthenticatedAsync()
+    public async Task<bool> RegisterAsync(AuthDtos.RegisterDto dto)
     {
-        var auth = await GetAuthAsync();
-        if (auth is null) return false;
-
-        // token d'accès encore valide ?
-        if (auth.AccessTokenExpires > DateTime.UtcNow.AddMinutes(1))
-            return true;
-
-        // sinon, essaye de rafraîchir
-        var refreshed = await RefreshAccessTokenAsync();
-        return refreshed;
-    }
-    public async Task<bool> RegisterAsync(Models.AuthDtos.RegisterDto dto)
-    {
-        using var _http = new HttpClient { BaseAddress = new Uri("https://localhost:7064/") };
         var res = await _http.PostAsJsonAsync("api/Auth/register", dto);
         if (!res.IsSuccessStatusCode) return false;
 
-        // On reçoit les tokens comme pour login
         var auth = await res.Content.ReadFromJsonAsync<AuthResponseDto>();
         if (auth is null) return false;
 
-        await SaveAuthAsync(auth);
+        await SaveAuthAsync(auth, notifyProvider: true);
         return true;
     }
 
     public async Task<bool> LoginAsync(string email, string password)
     {
-        using var _httpClient = new HttpClient { BaseAddress = new Uri("https://localhost:7064") };
-
-        var response = await _httpClient.PostAsJsonAsync("/api/Auth/login", new { Email = email, MotDePasse = password });
-        if (!response.IsSuccessStatusCode)
-            return false;
+        var response = await _http.PostAsJsonAsync("api/Auth/login", new { Email = email, MotDePasse = password });
+        if (!response.IsSuccessStatusCode) return false;
 
         var auth = await response.Content.ReadFromJsonAsync<AuthResponseDto>();
-        if (auth == null) return false;
+        if (auth is null) return false;
 
-        // Construire une session utilisateur
-        _currentUser = new UserSession
-        {
-            Id = auth.UserId,
-            Email = auth.Email,
-            Nom = auth.UserName,
-            Role = auth.Role
-        };
-
-        // Sauvegarder tokens + infos dans le localStorage
-        //var json = JsonSerializer.Serialize(auth);
-        //await _js.InvokeVoidAsync("localStorage.setItem", "authData", json);
-        await SaveAuthAsync(auth);
-
-        NotifyStateChanged();
+        await SaveAuthAsync(auth, notifyProvider: true);
+        OnChange?.Invoke();
         return true;
     }
 
-
-    //public async Task<bool> RegisterAsync(string nom,string email, string password,string role)
-    //{
-    //    // Appeler ton backend API pour authentifier
-
-    //    // Exemple simplifié : POST /api/auth/login { email, password }
-    //    // Ici on simule la requête, à remplacer par ton vrai appel HTTP
-
-    //    // Exemple avec HttpClient (injecté dans ce service ou passé en paramètre)
-
-    //    var registerSuccess = false;
-
-    //    // Simuler un appel API avec HttpClient (à adapter)
-    //    using var _httpClient = new HttpClient { BaseAddress = new Uri("https://localhost:7064") };
-
-    //    var response = await _httpClient.PostAsJsonAsync("/api/auth/register", new {Nom = nom, Email = email, Password = password, Role = role});
-    //    if(response.IsSuccessStatusCode)
-    //    {
-    //        registerSuccess = true;
-    //        //var user = await response.Content.ReadFromJsonAsync<UserSession>();
-    //        //_currentUser = user;
-    //        //await SaveUserToLocalStorage();
-    //        //registerSuccess = true;
-    //    }
-
-
-    //    //// Pour démo, on simule un user  
-    //    //if (email == "test@example.com" && password == "password")
-    //    //{
-    //    //    _currentUser = new UserSession
-    //    //    {
-    //    //        Id = 1,
-    //    //        Email = email,
-    //    //        Nom = "Test User",
-    //    //        Role = "User"
-    //    //    };
-    //    //    await SaveUserToLocalStorage();
-    //    //    registerSuccess = true;
-    //    //}
-
-    //    NotifyStateChanged();
-
-    //    return registerSuccess;
-    //}
-
     public async Task LogoutAsync()
     {
-
         _currentUser = null;
-        await _js.InvokeVoidAsync("localStorage.removeItem", LocalStorageKey);
-        NotifyStateChanged();
+        await _localStorage.RemoveItemAsync(AuthStorageKey);
+        await _localStorage.RemoveItemAsync(TokenKey);
 
-        //NavigationManager.NavigateTo("/login");
+        await _authProvider.NotifyUserLogoutAsync();
+        OnChange?.Invoke();
     }
 
-    private async Task SaveUserToLocalStorage()
-    {
-        if (_currentUser != null)
-        {
-            var json = JsonSerializer.Serialize(_currentUser);
-            await _js.InvokeVoidAsync("localStorage.setItem", LocalStorageKey, json);
-        }
-    }
+    // --- Tokens ---
 
-    public async Task LoadUserFromLocalStorageAsync()
-    {
-        var json = await _js.InvokeAsync<string>("localStorage.getItem", LocalStorageKey);
-        if (!string.IsNullOrEmpty(json))
-        {
-            _currentUser = JsonSerializer.Deserialize<UserSession>(json);
-            NotifyStateChanged();
-        }
-    }
-    // ---------- Récupère un access token valide (refresh auto si proche d’expiration) ----------
     public async Task<string> GetAccessTokenAsync()
     {
-        var auth = await GetAuthAsync();
-        if (auth is null) throw new Exception("Utilisateur non connecté");
+        var auth = await _localStorage.GetItemAsync<AuthResponseDto>(AuthStorageKey);
+        if (auth is null || string.IsNullOrEmpty(auth.AccessToken))
+            throw new Exception("Utilisateur non connecté");
 
-        // marge (skew) pour rafraîchir un peu avant l’expiration
         var skew = TimeSpan.FromSeconds(60);
         if (DateTime.UtcNow + skew >= auth.AccessTokenExpires)
         {
             var refreshed = await RefreshTokenAsync(auth);
             if (!refreshed)
             {
-                // refresh impossible -> logout
                 await LogoutAsync();
                 throw new Exception("Session expirée, veuillez vous reconnecter.");
             }
-            auth = await GetAuthAsync();
+            auth = await _localStorage.GetItemAsync<AuthResponseDto>(AuthStorageKey);
         }
 
-        return auth!.AccessToken;
+        return auth!.AccessToken!;
     }
 
-    // ---------- Appelle /api/auth/refresh en étant thread-safe ----------
     private async Task<bool> RefreshTokenAsync(AuthResponseDto currentAuth)
     {
-        var _http = new HttpClient { BaseAddress = new Uri("https://localhost:7064") };
-        // si déjà expiré côté refresh -> inutile d’essayer
-        if (DateTime.UtcNow >= currentAuth.RefreshTokenExpires)
-            return false;
+        if (DateTime.UtcNow >= currentAuth.RefreshTokenExpires) return false;
 
         await _refreshLock.WaitAsync();
         try
         {
-            // double-check après le lock
-            var latest = await GetAuthAsync();
+            // double-check après lock
+            var latest = await _localStorage.GetItemAsync<AuthResponseDto>(AuthStorageKey);
             if (latest is null) return false;
             if (DateTime.UtcNow + TimeSpan.FromSeconds(60) < latest.AccessTokenExpires)
-                return true; // quelqu’un a déjà rafraîchi
+                return true;
 
-            var body = new RefreshRequestDto
+            var res = await _http.PostAsJsonAsync("api/Auth/refresh", new
             {
-                AccessToken = latest.AccessToken,
-                RefreshToken = latest.RefreshToken
-            };
-
-            var res = await _http.PostAsJsonAsync("api/Auth/refresh", body);
+                accessToken = latest.AccessToken,
+                refreshToken = latest.RefreshToken
+            });
             if (!res.IsSuccessStatusCode) return false;
 
             var newAuth = await res.Content.ReadFromJsonAsync<AuthResponseDto>();
             if (newAuth is null) return false;
 
-            await SaveAuthAsync(newAuth);
+            await SaveAuthAsync(newAuth, notifyProvider: true);
             return true;
         }
         finally
@@ -239,35 +145,18 @@ public class AuthService
         }
     }
 
-    private async Task<bool> RefreshAccessTokenAsync()
+    // --- Helpers ---
+
+    private async Task SaveAuthAsync(AuthResponseDto auth, bool notifyProvider)
     {
-        var auth = await GetAuthAsync();
-        if (auth is null || string.IsNullOrEmpty(auth.RefreshToken)) return false;
+        // 1) on garde l’objet complet pour le refresh
+        await _localStorage.SetItemAsync(AuthStorageKey, auth);
 
-        using var http = new HttpClient { BaseAddress = new Uri("https://localhost:7064/") };
-        var resp = await http.PostAsJsonAsync("api/Auth/refresh", new { refreshToken = auth.RefreshToken });
-        if (!resp.IsSuccessStatusCode) return false;
+        // 2) on met le pur JWT à disposition du provider
+        if (!string.IsNullOrWhiteSpace(auth.AccessToken))
+            await _localStorage.SetItemAsync(TokenKey, auth.AccessToken);
 
-        var updated = await resp.Content.ReadFromJsonAsync<AuthResponseDto>();
-        if (updated is null) return false;
-
-        await SaveAuthAsync(updated);
-        return true;
-    }
-
-    // ---------- Helpers stockage ----------
-    private async Task<AuthResponseDto?> GetAuthAsync()
-    {
-        var json = await _js.InvokeAsync<string>("localStorage.getItem", AuthStorageKey);
-        return string.IsNullOrWhiteSpace(json)
-            ? null
-            : JsonSerializer.Deserialize<AuthResponseDto>(json);
-    }
-
-    private async Task SaveAuthAsync(AuthResponseDto auth)
-    {
-       
-        // met à jour la session en mémoire
+        // 3) maj session en mémoire
         _currentUser = new UserSession
         {
             Id = auth.UserId,
@@ -276,12 +165,9 @@ public class AuthService
             Role = auth.Role
         };
 
-        var json = JsonSerializer.Serialize(auth);
-        await _js.InvokeVoidAsync("localStorage.setItem", AuthStorageKey, json);
+        if (notifyProvider && !string.IsNullOrWhiteSpace(auth.AccessToken))
+            await _authProvider.NotifyUserAuthenticationAsync(auth.AccessToken);
+
         OnChange?.Invoke();
     }
-
-
-
-    private void NotifyStateChanged() => OnChange?.Invoke();
 }

@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using DinkToPdf;
 using DinkToPdf.Contracts;
 using GestionConge.Client.Services;
@@ -36,6 +37,7 @@ builder.Services.AddScoped<IDbConnection>(sp =>
 // Add MudBlazor services
 builder.Services.AddMudServices();
 
+builder.Services.AddBlazoredLocalStorage();
 
 builder.Services.AddControllers(); // <- important
 // Swagger/OpenAPI

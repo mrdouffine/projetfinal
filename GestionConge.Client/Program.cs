@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using GestionConge.Client.Services;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
@@ -7,6 +8,8 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 // MudBlazor
 builder.Services.AddMudServices();
 
+// Blazored LocalStorage
+builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<UtilisateurService>();
 
 
