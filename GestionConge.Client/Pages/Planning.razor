@@ -1,7 +1,585 @@
 ﻿@page "/planning"
 @attribute [Authorize]
 @layout MainLayout
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.ComponentModel.DataAnnotations
+@using GestionConge.Client.Models
+@using GestionConge.Client.Services
+@inject PlanningCongeService PlanningService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<PageTitle>Planification Annuelle - GCO</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge">
+    <MudText Typo="Typo.h4" GutterBottom="true">
+        <MudIcon Icon="@Icons.Material.Filled.CalendarMonth" Class="mr-3" />
+        Planification de vos congés @_anneeSelectionnee
+    </MudText>
+
+    <MudText Typo="Typo.body1" Color="Color.Secondary" Class="mb-6">
+        Planifiez vos 30 jours de congés annuels à l'avance pour une meilleure organisation.
+    </MudText>
+
+    <!-- Sélecteur d'année et informations du solde -->
+    <MudGrid Class="mb-6">
+        <MudItem xs="12" md="3">
+            <MudSelect T="int" @bind-Value="_anneeSelectionnee" @bind-Value:after="OnAnneeChanged"
+                       Label="Année" Variant="Variant.Outlined">
+                @for (int i = DateTime.Now.Year; i <= DateTime.Now.Year + 2; i++)
+                {
+                    <MudSelectItem Value="@i">@i</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+
+        <MudItem xs="12" md="9">
+            <MudGrid>
+                <MudItem xs="12" sm="3">
+                    <MudPaper Class="pa-4 text-center" Style="background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%); color: white;">
+                        <MudIcon Icon="@Icons.Material.Filled.DateRange" Size="Size.Large" Class="mb-2" />
+                        <MudText Typo="Typo.h5">30</MudText>
+                        <MudText Typo="Typo.body2">Jours alloués</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="3">
+                    <MudPaper Class="pa-4 text-center" Style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); color: white;">
+                        <MudIcon Icon="@Icons.Material.Filled.Schedule" Size="Size.Large" Class="mb-2" />
+                        <MudText Typo="Typo.h5">@_soldeInfo.TotalPlanifie</MudText>
+                        <MudText Typo="Typo.body2">Jours planifiés</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="3">
+                    <MudPaper Class="pa-4 text-center" Style="background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%); color: white;">
+                        <MudIcon Icon="@Icons.Material.Filled.Pending" Size="Size.Large" Class="mb-2" />
+                        <MudText Typo="Typo.h5">@_soldeInfo.SoldeRestant</MudText>
+                        <MudText Typo="Typo.body2">Jours restants</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="3">
+                    <MudPaper Class="pa-4 text-center" Style="background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%); color: white;">
+                        <MudIcon Icon="@Icons.Material.Filled.TrendingUp" Size="Size.Large" Class="mb-2" />
+                        <MudText Typo="Typo.h5">@(_soldeInfo.TotalPlanifie * 100 / 30)%</MudText>
+                        <MudText Typo="Typo.body2">Planification</MudText>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid>
+        <!-- Formulaire d'ajout de planning -->
+        <MudItem xs="12" lg="4">
+            <MudCard Class="mb-4">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">
+                        <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-2" />
+                        Ajouter une période
+                    </MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <EditForm Model="_nouveauPlanning" OnValidSubmit="AjouterPlanning">
+                        <MudGrid>
+                            <MudItem xs="12">
+                                <MudDatePicker @bind-Date="_nouveauPlanning.DateDebut"
+                                               @bind-Date:after="CalculerDuree"
+                                               Label="Date de début"
+                                               Variant="Variant.Outlined"
+                                               Required="true"
+                                               MinDate="new DateTime(_anneeSelectionnee, 1, 1)"
+                                               MaxDate="new DateTime(_anneeSelectionnee, 12, 31)" />
+                                <ValidationMessage For="@(() => _nouveauPlanning.DateDebut)" />
+                            </MudItem>
+
+                            <MudItem xs="12">
+                                <MudDatePicker @bind-Date="_nouveauPlanning.DateFin"
+                                               @bind-Date:after="CalculerDuree"
+                                               Label="Date de fin"
+                                               Variant="Variant.Outlined"
+                                               Required="true"
+                                               MinDate="_nouveauPlanning.DateDebut"
+                                               MaxDate="new DateTime(_anneeSelectionnee, 12, 31)" />
+                                <ValidationMessage For="@(() => _nouveauPlanning.DateFin)" />
+                            </MudItem>
+
+                            <MudItem xs="12">
+                                <MudTextField T="int"
+                                              Label="Durée calculée (jours ouvrés)"
+                                              Value="@_dureeCalculee"
+                                              ReadOnly="true"
+                                              Variant="Variant.Outlined"
+                                              HelperText="@GetHelperText()" />
+                            </MudItem>
+
+                            <MudItem xs="12">
+                                <MudTextField T="string"
+                                              @bind-Value="_nouveauPlanning.Motif"
+                                              Label="Motif (optionnel)"
+                                              Variant="Variant.Outlined"
+                                              Lines="3"
+                                              MaxLength="500" />
+                            </MudItem>
+
+                            <MudItem xs="12">
+                                <MudButton ButtonType="ButtonType.Submit"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Disabled="@(_isLoading || _dureeCalculee == 0 || _dureeCalculee > _soldeInfo.SoldeRestant)"
+                                           StartIcon="@Icons.Material.Filled.Add"
+                                           FullWidth="true">
+                                    @if (_isLoading)
+                                    {
+                                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                                        <span>Ajout en cours...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Ajouter au planning</span>
+                                    }
+                                </MudButton>
+                            </MudItem>
+                        </MudGrid>
+                    </EditForm>
+                </MudCardContent>
+            </MudCard>
+
+            <!-- Suggestions de planification -->
+            <MudCard>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">
+                        <MudIcon Icon="@Icons.Material.Filled.Lightbulb" Class="mr-2" />
+                        Suggestions
+                    </MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudList T="string" Dense="true">
+                        <MudListItem Icon="@Icons.Material.Filled.Info" IconColor="Color.Info">
+                            <MudText Typo="Typo.body2">
+                                <b>Quota mensuel :</b> 2,5 jours par mois en moyenne
+                            </MudText>
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.TrendingUp" IconColor="Color.Success">
+                            <MudText Typo="Typo.body2">
+                                <b>Recommandation :</b> Étalez vos congés sur l'année
+                            </MudText>
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.Warning" IconColor="Color.Warning">
+                            <MudText Typo="Typo.body2">
+                                <b>Attention :</b> Évitez les périodes de forte charge
+                            </MudText>
+                        </MudListItem>
+                    </MudList>
+
+                    @if (_soldeInfo.SoldeRestant > 0)
+                    {
+                        <MudButton Variant="Variant.Text"
+                                   Color="Color.Secondary"
+                                   StartIcon="@Icons.Material.Filled.AutoAwesome"
+                                   OnClick="SuggererPlanification"
+                                   Class="mt-3">
+                            Suggestion automatique
+                        </MudButton>
+                    }
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Liste des plannings existants -->
+        <MudItem xs="12" lg="8">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">
+                            <MudIcon Icon="@Icons.Material.Filled.Event" Class="mr-2" />
+                            Périodes planifiées (@_plannings.Count())
+                        </MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudButton Variant="Variant.Text"
+                                   Color="Color.Secondary"
+                                   StartIcon="@Icons.Material.Filled.Refresh"
+                                   OnClick="ChargerPlannings">
+                            Actualiser
+                        </MudButton>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    @if (_plannings.Any())
+                    {
+                        <MudTimeline TimelineOrientation="TimelineOrientation.Vertical">
+                            @foreach (var planning in _plannings.OrderBy(p => p.DateDebut))
+                            {
+                                <MudTimelineItem Color="@GetCouleurPeriode(planning)" Size="Size.Large">
+                                    <ItemOpposite>
+                                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                            @GetMoisPeriode(planning)
+                                        </MudText>
+                                    </ItemOpposite>
+                                    <ItemContent>
+                                        <MudCard Outlined="true" Class="mb-2">
+                                            <MudCardContent Class="py-2">
+                                                <div class="d-flex justify-space-between align-center">
+                                                    <div>
+                                                        <MudText Typo="Typo.subtitle1">
+                                                            <b>@planning.DateDebut.ToString("dd/MM") - @planning.DateFin.ToString("dd/MM")</b>
+                                                        </MudText>
+                                                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                                            @CalculerJoursOuvrables(planning.DateDebut, planning.DateFin) jour(s) ouvré(s)
+                                                        </MudText>
+                                                        @if (!string.IsNullOrEmpty(planning.Motif))
+                                                        {
+                                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                                @planning.Motif
+                                                            </MudText>
+                                                        }
+                                                    </div>
+                                                    <div>
+                                                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                                                       Color="Color.Primary"
+                                                                       Size="Size.Small"
+                                                                       OnClick="@(() => ModifierPlanning(planning))" />
+                                                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                                       Color="Color.Error"
+                                                                       Size="Size.Small"
+                                                                       OnClick="@(() => SupprimerPlanning(planning.Id))" />
+                                                    </div>
+                                                </div>
+                                            </MudCardContent>
+                                        </MudCard>
+                                    </ItemContent>
+                                </MudTimelineItem>
+                            }
+                        </MudTimeline>
+                    }
+                    else
+                    {
+                        <div class="text-center pa-8">
+                            <MudIcon Icon="@Icons.Material.Filled.EventBusy" Size="Size.Large" Color="Color.Secondary" Class="mb-4" />
+                            <MudText Typo="Typo.h6" Color="Color.Secondary">
+                                Aucune période planifiée pour @_anneeSelectionnee
+                            </MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-4">
+                                Commencez par ajouter vos premières périodes de congés
+                            </MudText>
+                        </div>
+                    }
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
 
 @code {
+    private int _anneeSelectionnee = DateTime.Now.Year;
+    private int _utilisateurId = 1; // À récupérer depuis l'authentification
+    private bool _isLoading = false;
+    private bool _disposed = false;
+    private int _dureeCalculee = 0;
 
+    private PlanningModel _nouveauPlanning = new();
+    private List<PlanningCongeDto> _plannings = new();
+    private SoldeInfo _soldeInfo = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_disposed) return;
+
+        try
+        {
+            // TODO: Récupérer l'ID utilisateur depuis l'authentification
+            // var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            // _utilisateurId = GetUserIdFromAuth(authState);
+
+            await ChargerDonnees();
+        }
+        catch (Exception ex)
+        {
+            if (!_disposed)
+                Snackbar?.Add($"Erreur lors du chargement : {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task OnAnneeChanged()
+    {
+        if (!_disposed)
+        {
+            await ChargerDonnees();
+        }
+    }
+
+    private async Task ChargerDonnees()
+    {
+        if (_disposed) return;
+
+        await Task.WhenAll(
+            ChargerPlannings(),
+            ChargerSoldeInfo()
+        );
+    }
+
+    private async Task ChargerPlannings()
+    {
+        if (_disposed) return;
+
+        try
+        {
+            // Appel à votre API pour récupérer les plannings de l'utilisateur pour l'année
+            // var result = await PlanningService.GetByUtilisateurAsync(_utilisateurId, _anneeSelectionnee);
+            // _plannings = result?.Where(p => p.DateDebut.Year == _anneeSelectionnee || p.DateFin.Year == _anneeSelectionnee).ToList() ?? new();
+
+            // Simulation pour l'exemple
+            _plannings = new List<PlanningCongeDto>();
+
+            if (!_disposed)
+                StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            if (!_disposed)
+                Snackbar?.Add($"Erreur lors du chargement des plannings : {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task ChargerSoldeInfo()
+    {
+        if (_disposed) return;
+
+        try
+        {
+            // Appel à votre API pour récupérer le solde
+            // var result = await PlanningService.GetSoldeRestantAsync(_utilisateurId, _anneeSelectionnee);
+            // _soldeInfo = result ?? new();
+
+            // Calcul temporaire basé sur les plannings actuels
+            var totalPlanifie = _plannings.Sum(p => CalculerJoursOuvrables(p.DateDebut, p.DateFin));
+            _soldeInfo = new SoldeInfo
+            {
+                AnneeReference = _anneeSelectionnee,
+                TotalPlanifie = totalPlanifie,
+                SoldeRestant = Math.Max(0, 30 - totalPlanifie)
+            };
+
+            if (!_disposed)
+                StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            if (!_disposed)
+                Snackbar?.Add($"Erreur lors du chargement du solde : {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void CalculerDuree()
+    {
+        if (_nouveauPlanning.DateDebut.HasValue && _nouveauPlanning.DateFin.HasValue
+            && _nouveauPlanning.DateFin >= _nouveauPlanning.DateDebut)
+        {
+            _dureeCalculee = CalculerJoursOuvrables(_nouveauPlanning.DateDebut.Value, _nouveauPlanning.DateFin.Value);
+        }
+        else
+        {
+            _dureeCalculee = 0;
+        }
+    }
+
+    private async Task AjouterPlanning()
+    {
+        if (_disposed || _isLoading) return;
+
+        _isLoading = true;
+        try
+        {
+            var planning = new PlanningCongeDto
+            {
+                UtilisateurId = _utilisateurId,
+                DateDebut = _nouveauPlanning.DateDebut!.Value,
+                DateFin = _nouveauPlanning.DateFin!.Value,
+                Motif = _nouveauPlanning.Motif,
+                DateCreation = DateTime.Now
+            };
+
+            // Appel à votre API
+            // var success = await PlanningService.AjouterPlanningAvecVerificationsAsync(planning);
+
+            // Simulation pour l'exemple
+            var success = true; // Remplacer par l'appel API réel
+
+            if (success)
+            {
+                Snackbar?.Add("Période ajoutée avec succès !", Severity.Success);
+                _nouveauPlanning = new PlanningModel(); // Reset du formulaire
+                _dureeCalculee = 0;
+                await ChargerDonnees();
+            }
+            else
+            {
+                Snackbar?.Add("Impossible d'ajouter cette période (conflit ou quota dépassé)", Severity.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            if (!_disposed)
+                Snackbar?.Add($"Erreur : {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            if (!_disposed)
+            {
+                _isLoading = false;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task SupprimerPlanning(int planningId)
+    {
+        if (_disposed) return;
+
+        var confirmation = await JSRuntime.InvokeAsync<bool>("confirm", "Êtes-vous sûr de vouloir supprimer cette période ?");
+        if (!confirmation) return;
+
+        try
+        {
+            // var success = await PlanningService.DeleteAsync(planningId);
+            var success = true; // Simulation
+
+            if (success)
+            {
+                Snackbar?.Add("Période supprimée avec succès !", Severity.Success);
+                await ChargerDonnees();
+            }
+            else
+            {
+                Snackbar?.Add("Erreur lors de la suppression", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            if (!_disposed)
+                Snackbar?.Add($"Erreur : {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void ModifierPlanning(PlanningCongeDto planning)
+    {
+        // TODO: Implémenter la modification
+        Snackbar?.Add("Fonctionnalité de modification à implémenter", Severity.Info);
+    }
+
+    private async Task SuggererPlanification()
+    {
+        if (_disposed) return;
+
+        // Logique de suggestion automatique
+        var joursRestants = _soldeInfo.SoldeRestant;
+        if (joursRestants <= 0) return;
+
+        // Suggestion simple : répartir les jours restants en périodes d'une semaine
+        var periodesSuggeres = new List<string>();
+        var moisLibres = new[] { 7, 8, 12 }; // Juillet, Août, Décembre
+
+        foreach (var mois in moisLibres)
+        {
+            if (joursRestants >= 5)
+            {
+                periodesSuggeres.Add($"1 semaine en {GetNomMois(mois)}");
+                joursRestants -= 5;
+            }
+        }
+
+        var message = periodesSuggeres.Any()
+            ? $"Suggestions : {string.Join(", ", periodesSuggeres)}"
+            : "Planifiez vos congés selon vos besoins personnels";
+
+        Snackbar?.Add(message, Severity.Info);
+    }
+
+    // Méthodes utilitaires
+    private int CalculerJoursOuvrables(DateTime debut, DateTime fin)
+    {
+        int jours = 0;
+        for (var date = debut; date <= fin; date = date.AddDays(1))
+        {
+            if (date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday)
+                jours++;
+        }
+        return jours;
+    }
+
+    private string GetHelperText()
+    {
+        if (_dureeCalculee == 0) return "Sélectionnez les dates";
+        if (_dureeCalculee > _soldeInfo.SoldeRestant)
+            return $"⚠️ Dépasse le solde restant ({_soldeInfo.SoldeRestant} jours)";
+        return $"✓ Solde après ajout : {_soldeInfo.SoldeRestant - _dureeCalculee} jours";
+    }
+
+    private Color GetCouleurPeriode(PlanningCongeDto planning)
+    {
+        var mois = planning.DateDebut.Month;
+        return mois switch
+        {
+            >= 6 and <= 8 => Color.Success,  // Été
+            12 or 1 => Color.Info,           // Hiver
+            _ => Color.Primary                // Autres
+        };
+    }
+
+
+
+    private string GetMoisPeriode(PlanningCongeDto planning)
+    {
+        return planning.DateDebut.Month == planning.DateFin.Month
+            ? GetNomMois(planning.DateDebut.Month)
+            : $"{GetNomMois(planning.DateDebut.Month)}-{GetNomMois(planning.DateFin.Month)}";
+    }
+
+    private string GetNomMois(int mois)
+    {
+        return mois switch
+        {
+            1 => "Jan",
+            2 => "Fév",
+            3 => "Mar",
+            4 => "Avr",
+            5 => "Mai",
+            6 => "Juin",
+            7 => "Juil",
+            8 => "Août",
+            9 => "Sep",
+            10 => "Oct",
+            11 => "Nov",
+            12 => "Déc",
+            _ => ""
+        };
+    }
+
+    public void Dispose()
+    {
+        _disposed = true;
+    }
+
+    // Modèles
+    public class PlanningModel
+    {
+        [Required(ErrorMessage = "La date de début est requise")]
+        public DateTime? DateDebut { get; set; }
+
+        [Required(ErrorMessage = "La date de fin est requise")]
+        public DateTime? DateFin { get; set; }
+
+        [StringLength(500, ErrorMessage = "Le motif ne peut pas dépasser 500 caractères")]
+        public string Motif { get; set; } = "";
+    }
+
+    public class SoldeInfo
+    {
+        public int AnneeReference { get; set; }
+        public int TotalPlanifie { get; set; }
+        public int SoldeRestant { get; set; }
+    }
 }
