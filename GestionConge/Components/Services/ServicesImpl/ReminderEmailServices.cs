@@ -1,5 +1,4 @@
 ﻿namespace GestionConge.Components.Services.ServicesImpl;
-
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System;

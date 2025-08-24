@@ -1,24 +1,24 @@
 ﻿@page "/demande-form/nouvelle"
 @page "/demande-form/modifier/{Id:int}"
 @layout MainLayout
-@attribute [Authorize]
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
 @using System.ComponentModel.DataAnnotations
 @using GestionConge.Client.Models
-@using GestionConge.Client.Services 
+@using GestionConge.Client.Services
 @inject DemandeCongeService DemandeService
 @inject UserService UtilisateurService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
+@implements IDisposable
 
 <PageTitle>@(_isEditMode ? "Modifier la demande" : "Nouvelle demande") - GCO</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large">
     <MudText Typo="Typo.h4" GutterBottom="true">
-        <MudIcon Icon="@(_isEditMode ? Icons.Material.Filled.Edit : Icons.Material.Filled.Add)" Class="mr-3" />
+        <MudIcon Icon="@(_isEditMode? Icons.Material.Filled.Edit : Icons.Material.Filled.Add)" Class="mr-3" />
         @(_isEditMode ? "Modifier votre demande de congés" : "Créer une nouvelle demande de congés")
     </MudText>
     <MudText Typo="Typo.body1" Color="Color.Secondary" Class="mb-6">
@@ -65,20 +65,6 @@
                 <MudCardContent>
                     <EditForm Model="_demandeModel" OnValidSubmit="HandleSubmit">
                         <MudGrid>
-                            @* <MudItem xs="12" sm="6">
-                                <MudSelect T="string" @bind-Value="_demandeModel.TypeConge" Label="Type de congé" Variant="Variant.Outlined" Required="true">
-                                    <MudSelectItem Value="">-- Sélectionnez un type --</MudSelectItem>
-                                    <MudSelectItem Value="Congés payés">Congés payés</MudSelectItem>
-                                    <MudSelectItem Value="RTT">RTT</MudSelectItem>
-                                    <MudSelectItem Value="Congé maladie">Congé maladie</MudSelectItem>
-                                    <MudSelectItem Value="Congé sans solde">Congé sans solde</MudSelectItem>
-                                    <MudSelectItem Value="Congé formation">Congé formation</MudSelectItem>
-                                    <MudSelectItem Value="Congé maternité">Congé maternité</MudSelectItem>
-                                    <MudSelectItem Value="Congé paternité">Congé paternité</MudSelectItem>
-                                </MudSelect>
-                                <ValidationMessage For="@(() => _demandeModel.TypeConge)" />
-                            </MudItem> *@
-
                             @if (_isEditMode && _currentDemande != null)
                             {
                                 <MudItem xs="12" sm="6">
@@ -87,12 +73,22 @@
                             }
 
                             <MudItem xs="12" sm="6">
-                                <MudDatePicker @bind-Date="_demandeModel.DateDebut" Label="Date de début" Variant="Variant.Outlined" Required="true" MinDate="DateTime.Today.AddDays(1)" />
+                                <MudDatePicker @bind-Date="_demandeModel.DateDebut"
+                                               @bind-Date:after="OnDateChanged"
+                                               Label="Date de début"
+                                               Variant="Variant.Outlined"
+                                               Required="true"
+                                               MinDate="DateTime.Today.AddDays(1)" />
                                 <ValidationMessage For="@(() => _demandeModel.DateDebut)" />
                             </MudItem>
 
                             <MudItem xs="12" sm="6">
-                                <MudDatePicker @bind-Date="_demandeModel.DateFin" Label="Date de fin" Variant="Variant.Outlined" Required="true" MinDate="_demandeModel.DateDebut" />
+                                <MudDatePicker @bind-Date="_demandeModel.DateFin"
+                                               @bind-Date:after="OnDateChanged"
+                                               Label="Date de fin"
+                                               Variant="Variant.Outlined"
+                                               Required="true"
+                                               MinDate="_demandeModel.DateDebut" />
                                 <ValidationMessage For="@(() => _demandeModel.DateFin)" />
                             </MudItem>
 
@@ -101,35 +97,13 @@
                             </MudItem>
 
                             <MudItem xs="12" sm="6">
-                                <MudCheckBox T="bool" @bind-Checked="_demandeModel.DemiJournee" Label="Demi-journée (premier/dernier jour)" />
+                                <MudCheckBox T="bool" @bind-Checked="_demandeModel.DemiJournee" @bind-Checked:after="OnDateChanged" Label="Demi-journée (premier/dernier jour)" />
                             </MudItem>
 
                             <MudItem xs="12">
                                 <MudTextField T="string" @bind-Value="_demandeModel.Motif" Label="Motif" Variant="Variant.Outlined" Lines="3" Counter="500" MaxLength="500" />
                                 <ValidationMessage For="@(() => _demandeModel.Motif)" />
                             </MudItem>
-
-                            @* <MudItem xs="12">
-                                <MudSelect T="string" @bind-Value="_demandeModel.ValidateurEmail" Label="Validateur" Variant="Variant.Outlined" Required="true">
-                                    <MudSelectItem Value="">-- Sélectionnez un validateur --</MudSelectItem>
-                                    @foreach (var validateur in _validateurs)
-                                    {
-                                        <MudSelectItem Value="@validateur.Email">@validateur.Nom</MudSelectItem>
-                                    }
-                                </MudSelect>
-                            <!-- Remplacement de la ligne problématique pour corriger CS0839 -->
-                            <MudSelect T="string" @bind-Value="_demandeModel.TypeConge" Label="Type de congé" Variant="Variant.Outlined" Required="true">
-                                <MudSelectItem Value="">-- Sélectionnez un type --</MudSelectItem>
-                                <MudSelectItem Value="Congés payés">Congés payés</MudSelectItem>
-                                <MudSelectItem Value="RTT">RTT</MudSelectItem>
-                                <MudSelectItem Value="Congé maladie">Congé maladie</MudSelectItem>
-                                <MudSelectItem Value="Congé sans solde">Congé sans solde</MudSelectItem>
-                                <MudSelectItem Value="Congé formation">Congé formation</MudSelectItem>
-                                <MudSelectItem Value="Congé maternité">Congé maternité</MudSelectItem>
-                                <MudSelectItem Value="Congé paternité">Congé paternité</MudSelectItem>
-                            </MudSelect>
-                                <ValidationMessage For="@(() => _demandeModel.ValidateurEmail)" />
-                            </MudItem> *@
 
                             <MudItem xs="12">
                                 <MudCheckBox T="bool" @bind-Checked="_demandeModel.Confirmation" Required="true" Label="Je confirme que les informations saisies sont exactes et que j'ai vérifié mon solde de congés" />
@@ -210,44 +184,6 @@
                     </MudList>
                 </MudCardContent>
             </MudCard>
-
-            <!-- Calendrier de l'équipe -->
-            @* <MudCard>
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6">
-                            <MudIcon Icon="@Icons.Material.Filled.Group" Class="mr-2" />
-                            Congés prévus de l'équipe
-                        </MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent>
-                    @if (_congesEquipe.Any())
-                    {
-                        @foreach (var conge in _congesEquipe.Take(5))
-                        {
-                            <div class="d-flex align-items-center mb-3">
-                                <MudAvatar Color="Color.Primary" Size="Size.Small" Class="mr-3">
-                                    @conge.NomUtilisateur.First()
-                                </MudAvatar>
-                                <div>
-                                    <MudText Typo="Typo.body2">@conge.NomUtilisateur</MudText>
-                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                        @conge.DateDebut.ToString("dd/MM") - @conge.DateFin.ToString("dd/MM")
-                                        (@conge.TypeConge)
-                                    </MudText>
-                                </div>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">
-                            Aucun congé prévu dans l'équipe
-                        </MudText>
-                    }
-                </MudCardContent>
-            </MudCard> *@
         </MudItem>
     </MudGrid>
 </MudContainer>
@@ -255,8 +191,10 @@
 @code {
     [Parameter] public int? Id { get; set; }
 
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
     private bool _isEditMode => Id.HasValue;
     private bool _isLoading = false;
+    private bool _disposed = false;
     private int _calculatedDays = 0;
 
     private DemandeModel _demandeModel = new();
@@ -266,71 +204,123 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadValidateurs();
-        await LoadSoldeConges();
-
-        if (_isEditMode)
+        try
         {
-            await LoadExistingDemande();
-        }
-        else
-        {
-            _demandeModel.DateDebut = DateTime.Today.AddDays(14);
-            _demandeModel.DateFin = DateTime.Today.AddDays(14);
-        }
+            if (_disposed) return;
 
-        CalculateNombreJours();
+            await LoadValidateurs();
+            await LoadSoldeConges();
+
+            if (_isEditMode)
+            {
+                await LoadExistingDemande();
+            }
+            else
+            {
+                _demandeModel.DateDebut = DateTime.Today.AddDays(14);
+                _demandeModel.DateFin = DateTime.Today.AddDays(14);
+            }
+
+            CalculateNombreJours();
+        }
+        catch (Exception ex) when (!_disposed)
+        {
+            Snackbar?.Add($"Erreur lors du chargement : {ex.Message}", Severity.Error);
+        }
     }
 
     private async Task LoadValidateurs()
     {
-        // À adapter selon votre API
-        var result = await UtilisateurService.GetAllAsync();
-        _validateurs = result ?? new();
+        if (_disposed) return;
+
+        try
+        {
+            var result = await UtilisateurService.GetAllAsync();
+            if (!_disposed)
+            {
+                _validateurs = result ?? new();
+            }
+        }
+        catch (Exception ex) when (!_disposed)
+        {
+            Snackbar?.Add($"Erreur lors du chargement des validateurs : {ex.Message}", Severity.Error);
+        }
     }
 
     private async Task LoadSoldeConges()
     {
-        //on load le solde de congés par défaut
-        // À adapter selon votre API
-        // Ici, on initialise avec des valeurs par défaut pour l'exemple
-        //faire un vrai appel API pour récupérer le solde de congés de l'utilisateur connecté
-         // _soldeConges = await .GetSoldeAsync();
+        if (_disposed) return;
 
-        _soldeConges = new SoldeConges
+        try
         {
-            CongesPayes = 30
-            
-        };
+            // Appel API réel à implémenter
+            await Task.Delay(100, _cancellationTokenSource.Token);
+
+            if (!_disposed)
+            {
+                _soldeConges = new SoldeConges
+                {
+                    CongesPayes = 30,
+                    RTT = 10,
+                    UtilisesCeMois = 2
+                };
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Opération annulée, ne rien faire
+        }
+        catch (Exception ex) when (!_disposed)
+        {
+            Snackbar?.Add($"Erreur lors du chargement du solde : {ex.Message}", Severity.Error);
+        }
     }
 
     private async Task LoadExistingDemande()
     {
-        if (Id.HasValue)
+        if (Id.HasValue && !_disposed)
         {
-            var result = await DemandeService.GetByIdAsync(Id.Value);
+            try
+            {
+                var result = await DemandeService.GetByIdAsync(Id.Value);
 
-            if (result != null )
-            {
-                _currentDemande = result.Data;
-                _demandeModel.TypeConge = _currentDemande.TypeConge ?? "";
-                _demandeModel.DateDebut = _currentDemande.DateDebut;
-                _demandeModel.DateFin = _currentDemande.DateFin;
-                _demandeModel.Motif = _currentDemande.Motif ?? "";
-                _demandeModel.ValidateurEmail = ""; // À adapter si info disponible
-                _demandeModel.DemiJournee = false; // À adapter si info disponible
-                _demandeModel.Confirmation = true;
+                if (!_disposed && result != null)
+                {
+                    _currentDemande = result.Data;
+                    _demandeModel.TypeConge = _currentDemande.TypeConge ?? "";
+                    _demandeModel.DateDebut = _currentDemande.DateDebut;
+                    _demandeModel.DateFin = _currentDemande.DateFin;
+                    _demandeModel.Motif = _currentDemande.Motif ?? "";
+                    _demandeModel.ValidateurEmail = "";
+                    _demandeModel.DemiJournee = false;
+                    _demandeModel.Confirmation = true;
+                }
+                else if (!_disposed)
+                {
+                    Snackbar?.Add("Demande non trouvée", Severity.Error);
+                    NavigationManager?.NavigateTo("/demandes");
+                }
             }
-            else
+            catch (Exception ex) when (!_disposed)
             {
-                Snackbar.Add("Demande non trouvée", Severity.Error);
-                NavigationManager.NavigateTo("/demandes");
+                Snackbar?.Add($"Erreur lors du chargement de la demande : {ex.Message}", Severity.Error);
+                NavigationManager?.NavigateTo("/demandes");
             }
+        }
+    }
+
+    private void OnDateChanged()
+    {
+        if (!_disposed)
+        {
+            CalculateNombreJours();
         }
     }
 
     private void CalculateNombreJours()
     {
+        if (_disposed) return;
+
         if (_demandeModel.DateDebut.HasValue && _demandeModel.DateFin.HasValue
             && _demandeModel.DateFin >= _demandeModel.DateDebut)
         {
@@ -350,11 +340,17 @@
         {
             _calculatedDays = 0;
         }
-        StateHasChanged();
+
+        if (!_disposed)
+        {
+            InvokeAsync(StateHasChanged);
+        }
     }
 
     private async Task HandleSubmit()
     {
+        if (_disposed || _isLoading) return;
+
         _isLoading = true;
         try
         {
@@ -365,49 +361,62 @@
             {
                 DateDebut = _demandeModel.DateDebut!.Value,
                 DateFin = _demandeModel.DateFin!.Value,
-                // TypeConge = _demandeModel.TypeConge,
                 Motif = _demandeModel.Motif
-                // Ajoutez d'autres propriétés si elles existent dans le DTO
             };
 
             if (_isEditMode && _currentDemande != null)
             {
-                // Appel à la méthode de mise à jour
                 await DemandeService.UpdateAsync(_currentDemande.Id, request);
-                Snackbar.Add("Demande modifiée avec succès !", Severity.Success);
+                if (!_disposed)
+                {
+                    Snackbar?.Add("Demande modifiée avec succès !", Severity.Success);
+                }
             }
             else
             {
                 await DemandeService.CreateAsync(request);
-                Snackbar.Add("Demande créée avec succès !", Severity.Success);
+                if (!_disposed)
+                {
+                    Snackbar?.Add("Demande créée avec succès !", Severity.Success);
+                }
             }
-            NavigationManager.NavigateTo("/mes-demandes");
+
+            if (!_disposed)
+            {
+                NavigationManager?.NavigateTo("/mes-demandes");
+            }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!_disposed)
         {
-            Snackbar.Add($"Erreur : {ex.Message}", Severity.Error);
+            Snackbar?.Add($"Erreur : {ex.Message}", Severity.Error);
         }
         finally
         {
-            _isLoading = false;
+            if (!_disposed)
+            {
+                _isLoading = false;
+                await InvokeAsync(StateHasChanged);
+            }
         }
     }
 
     private bool ValidateForm()
     {
+        if (_disposed) return false;
+
         if (_demandeModel.DateDebut < DateTime.Today.AddDays(1))
         {
-            Snackbar.Add("La date de début ne peut pas être dans le passé", Severity.Error);
+            Snackbar?.Add("La date de début ne peut pas être dans le passé", Severity.Error);
             return false;
         }
         if (_demandeModel.DateFin < _demandeModel.DateDebut)
         {
-            Snackbar.Add("La date de fin ne peut pas être antérieure à la date de début", Severity.Error);
+            Snackbar?.Add("La date de fin ne peut pas être antérieure à la date de début", Severity.Error);
             return false;
         }
         if (_calculatedDays == 0)
         {
-            Snackbar.Add("La période sélectionnée ne contient aucun jour ouvré", Severity.Error);
+            Snackbar?.Add("La période sélectionnée ne contient aucun jour ouvré", Severity.Error);
             return false;
         }
         return true;
@@ -415,6 +424,8 @@
 
     private void ResetForm()
     {
+        if (_disposed) return;
+
         if (_currentDemande != null)
         {
             _demandeModel.TypeConge = _currentDemande.TypeConge ?? "";
@@ -425,6 +436,13 @@
             _demandeModel.DemiJournee = false;
             CalculateNombreJours();
         }
+    }
+
+    public void Dispose()
+    {
+        _disposed = true;
+        _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource?.Dispose();
     }
 
     public class DemandeModel
@@ -455,4 +473,3 @@
         public int UtilisesCeMois { get; set; }
     }
 }
-

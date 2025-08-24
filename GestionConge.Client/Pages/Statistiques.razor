@@ -1,7 +1,10 @@
-﻿@* @page "/statistiques"
+﻿@page "/statistiques"
     @using GestionConge.Client.Layout
+@using Microsoft.AspNetCore.Authorization
+@using GestionConge.Client.Services
+@using GestionConge.Client.Models
     @attribute [Authorize]
-@layout SecureLayout
+
 @inject GestionConge.Client.Services.StatistiqueService StatistiqueService
 
 <h3>Statistiques</h3>
@@ -13,12 +16,12 @@
 else
 {
     <ul>
-        <li>Total des demandes : @statistiques.TotalDemandes</li>
-        <li>Demandes validées : @statistiques.DemandesValidees</li>
-        <li>Demandes refusées : @statistiques.DemandesRefusees</li>
-        <li>Utilisateurs inscrits : @statistiques.TotalUtilisateurs</li>
+        <li>Total des demandes : @statistiques.TotalDemandesConge</li>
+        <li>Demandes validées : @statistiques.TotalDemandesApprouvees</li>
+        <li>Demandes refusées : @statistiques.TotalDemandesRefusees</li>
+        <li>Utilisateurs inscrits : @statistiques.TotalEmployes</li>
     </ul>
-    <ChartComponent Data="@statistiques.ChartData" />
+    @* <ChartComponent Data="@statistiques.ChartData" /> *@
 }
 
 @code {
@@ -28,4 +31,4 @@ else
     {
         statistiques = await StatistiqueService.GetStatistiquesAsync();
     }
-} *@
+}

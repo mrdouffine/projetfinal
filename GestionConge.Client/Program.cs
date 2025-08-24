@@ -37,6 +37,8 @@ builder.Services.AddScoped<PlanningCongeService>();
 builder.Services.AddScoped<RappelService>();
 builder.Services.AddScoped<ValidationService>();
 
+
+
 // Service utilitaire pour les notifications
 builder.Services.AddScoped<INotificationService, NotificationService>();
 

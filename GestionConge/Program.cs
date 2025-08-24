@@ -126,6 +126,17 @@ builder.Services.AddCors(opt =>
               .AllowCredentials());
 });
 
+
+// 
+builder.Services.AddServerSideBlazor(options =>
+{
+    options.DetailedErrors = true; // Seulement en développement
+    options.DisconnectedCircuitMaxRetained = 100;
+    options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(3);
+    options.JSInteropDefaultCallTimeout = TimeSpan.FromMinutes(1);
+    options.MaxBufferedUnacknowledgedRenderBatches = 10;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

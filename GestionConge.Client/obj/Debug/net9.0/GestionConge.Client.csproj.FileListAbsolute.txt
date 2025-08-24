@@ -1178,10 +1178,10 @@ C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\bin\Debug\net9.
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\bin\Debug\net9.0\Blazored.LocalStorage.dll
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\obj\Debug\net9.0\webcil\Blazored.LocalStorage.wasm
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\obj\Debug\net9.0\compressed\rzhpdnkv0l-12n6dz54qr.gz
-C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\bin\Debug\net9.0\wwwroot\_framework\GestionConge.Client.hzwo77z9hr.wasm
-C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\bin\Debug\net9.0\wwwroot\_framework\GestionConge.Client.4w3pv3i0vc.pdb
-C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\bin\Debug\net9.0\wwwroot\_framework\GestionConge.Client.hzwo77z9hr.wasm.gz
-C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\bin\Debug\net9.0\wwwroot\_framework\GestionConge.Client.4w3pv3i0vc.pdb.gz
-C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\obj\Debug\net9.0\compressed\bgbmvu1tqo-hzwo77z9hr.gz
-C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\obj\Debug\net9.0\compressed\azt6sxfrei-4w3pv3i0vc.gz
-C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\obj\Debug\net9.0\compressed\tfjc2c7lii-t31m9aj7g5.gz
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\bin\Debug\net9.0\wwwroot\_framework\GestionConge.Client.hhk4v12cq5.wasm
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\bin\Debug\net9.0\wwwroot\_framework\GestionConge.Client.m719t5nh2t.pdb
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\bin\Debug\net9.0\wwwroot\_framework\GestionConge.Client.hhk4v12cq5.wasm.gz
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\bin\Debug\net9.0\wwwroot\_framework\GestionConge.Client.m719t5nh2t.pdb.gz
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\obj\Debug\net9.0\compressed\bgbmvu1tqo-hhk4v12cq5.gz
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\obj\Debug\net9.0\compressed\azt6sxfrei-m719t5nh2t.gz
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge.Client\obj\Debug\net9.0\compressed\tfjc2c7lii-tgfk76hx0x.gz
