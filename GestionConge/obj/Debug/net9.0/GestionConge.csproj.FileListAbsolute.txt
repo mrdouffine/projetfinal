@@ -97,3 +97,11 @@ C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\Gesti
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\GestionConge.genruntimeconfig.cache
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\ref\GestionConge.dll
 C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Blazored.LocalStorage.dll
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.AspNetCore.Components.WebAssembly.Authentication.dll
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.Authentication.WebAssembly.Msal.dll
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.Extensions.Diagnostics.dll
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.Extensions.Diagnostics.Abstractions.dll
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.Extensions.Http.dll
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge\bin\Debug\net9.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\compressed\f32kn295nz-gcvjxldlff.gz
+C:\Users\HP\source\repos\projet\GestionConge\GestionConge\obj\Debug\net9.0\compressed\15pbu7u8t4-igqowc5fw6.gz

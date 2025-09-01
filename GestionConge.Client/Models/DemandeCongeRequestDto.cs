@@ -9,5 +9,6 @@
         public DateTime DateFin { get; set; }
 
         public string Motif { get; set; }
+        
     }
 }

@@ -17,7 +17,7 @@ public class ValidationController : ControllerBase
         _service = service;
     }
 
-    [Authorize(Roles ="Admin")]
+    //[Authorize(Roles ="Admin")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -25,7 +25,7 @@ public class ValidationController : ControllerBase
         return Ok(result);
     }
 
-    [Authorize(Roles ="DOT")]
+    //[Authorize(Roles ="DOT")]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -33,7 +33,7 @@ public class ValidationController : ControllerBase
         return validation is not null ? Ok(validation) : NotFound();
     }
 
-    [Authorize]
+    //[Authorize]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] Validation validation)
     {
@@ -41,7 +41,7 @@ public class ValidationController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id }, validation);
     }
 
-    [Authorize]
+    //[Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] Validation validation)
     {
@@ -50,7 +50,7 @@ public class ValidationController : ControllerBase
         return success ? NoContent() : NotFound();
     }
 
-    [Authorize]
+    //[Authorize]
     [HttpPost("traiter")]
     public async Task<IActionResult> TraiterValidation([FromBody] ValidationRequestDto request)
     {
@@ -58,7 +58,7 @@ public class ValidationController : ControllerBase
         return success ? Ok(new { message = "Validation traitée." }) : BadRequest("Erreur lors du traitement.");
     }
 
-    [Authorize]
+    //[Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -67,7 +67,7 @@ public class ValidationController : ControllerBase
     }
 
     //GetValidationsAujourdhuiAsync
-    [Authorize]
+    //[Authorize]
     [HttpGet("aujourdhui")]
     public async Task<IActionResult> GetValidationsAujourdhui(int id)
     {

@@ -17,7 +17,7 @@ public class UtilisateurService
     {
         try
         {
-            var response = await _httpClient.GetAsync("api/Utilisateur");
+            var response = await _httpClient.GetAsync("https://localhost:7064/api/Utilisateur");
 
             if (response.IsSuccessStatusCode)
             {
@@ -34,11 +34,30 @@ public class UtilisateurService
         }
     }
 
+    public async Task<ServiceResult<IEnumerable<UtilisateurDto>>> GetAllUsersNotAdminAsync()
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync("https://localhost:7064/api/Utilisateur/valideurs");
+            if (response.IsSuccessStatusCode)
+            {
+                var utilisateurs = await response.Content.ReadFromJsonAsync<IEnumerable<UtilisateurDto>>();
+                return ServiceResult<IEnumerable<UtilisateurDto>>.Success(utilisateurs ?? new List<UtilisateurDto>());
+            }
+            return ServiceResult<IEnumerable<UtilisateurDto>>.Failure($"Erreur lors de la récupération: {response.StatusCode}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erreur lors de la récupération des utilisateurs non-admin");
+            return ServiceResult<IEnumerable<UtilisateurDto>>.Failure("Erreur de connexion au serveur");
+        }
+    }
+
     public async Task<ServiceResult<UtilisateurDto>> GetByIdAsync(int id)
     {
         try
         {
-            var response = await _httpClient.GetAsync($"api/Utilisateur/{id}");
+            var response = await _httpClient.GetAsync($"https://localhost:7064/api/Utilisateur/{id}");
 
             if (response.IsSuccessStatusCode)
             {

@@ -8,6 +8,9 @@ using GestionConge.Components.Models;
 public interface IUtilisateurRepository
 {
     Task<IEnumerable<Utilisateur>> GetAllAsync();
+
+    //Récupérer les tous les utilisateurs en retournant leurs noms sauf l'Admin
+    Task<IEnumerable<Utilisateur>> GetAllUsersNotAdminAsync();
     Task<Utilisateur?> GetByIdAsync(int? id);
     Task<int> CreateAsync(UtilisateurAuth utilisateurAuth);
 
@@ -15,6 +18,12 @@ public interface IUtilisateurRepository
     Task<UtilisateurAuth?> GetByEmailAndPasswordAsync(string email, string password);
     Task<bool> UpdateAsync(UtilisateurDto utilisateurDto);
     Task<IEnumerable<Utilisateur>> GetSubordonnesAsync(int superieurId);
+
+    // Set le supérieur d'un utilisateur
+    Task<bool> SetSuperieurAsync(int utilisateurId, int? superieurId);
+
+    Task<int?> GetUtilisateurIdByNameAsync(string nom);
+    Task<IEnumerable<Utilisateur>> GetUtilisateursByNameAsync(string nom);
     Task<Utilisateur?> GetByRoleAsync(string role);
     Task<UtilisateurAuth?> GetByEmailAsync(string email);
     Task<bool> DeleteAsync(int id);

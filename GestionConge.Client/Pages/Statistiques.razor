@@ -1,5 +1,5 @@
 ﻿@page "/statistiques"
-    @using GestionConge.Client.Layout
+    @*@using GestionConge.Client.Layout
 @using Microsoft.AspNetCore.Authorization
 @using GestionConge.Client.Services
 @using GestionConge.Client.Models
@@ -21,14 +21,7 @@ else
         <li>Demandes refusées : @statistiques.TotalDemandesRefusees</li>
         <li>Utilisateurs inscrits : @statistiques.TotalEmployes</li>
     </ul>
-    @* <ChartComponent Data="@statistiques.ChartData" /> *@
+    @* <ChartComponent Data="@statistiques.ChartData" />
 }
+    *@
 
-@code {
-    private GestionConge.Client.Models.StatistiquesDto? statistiques;
-
-    protected override async Task OnInitializedAsync()
-    {
-        statistiques = await StatistiqueService.GetStatistiquesAsync();
-    }
-}

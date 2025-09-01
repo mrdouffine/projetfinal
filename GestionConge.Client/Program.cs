@@ -1,6 +1,7 @@
 using Blazored.LocalStorage;
 using GestionConge.Client.Services;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using MudBlazor.Services;
 
 
@@ -21,10 +22,17 @@ builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
 builder.Services.AddScoped<AuthService>();
 
 // HttpClient configuré pour votre API
-builder.Services.AddScoped(sp => new HttpClient
+
+//builder.Services.AddScoped(sp => new HttpClient
+//{
+//    BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"] ?? builder.HostEnvironment.BaseAddress)
+//});
+builder.Services.AddHttpClient("MonApi", client =>
 {
-    BaseAddress = new Uri("https://localhost:7064/")
-});
+    client.BaseAddress = new Uri("https://localhost:7064/"); // L'URL de votre API
+}).AddHttpMessageHandler<AuthorizationMessageHandler>();
+
+builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("MonApi"));
 
 // Services API
 builder.Services.AddScoped<ApiService>();

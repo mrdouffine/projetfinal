@@ -1,0 +1,23 @@
+"id","nom","email","role","motdepasse","superieurid","refreshtoken","refreshtokenexpirydate"
+1,"Alice Dupont","alice@example.com","Employe","hashed_pw1",2,NULL,NULL
+2,"Bob Martin","jamesbondlaterreur@gmail.com","RH","hashed_pw2",4,NULL,NULL
+3,"Claire Durand","claire@example.com","Employe","hashed_pw3",2,NULL,NULL
+4,"David DOT","david@example.com","DOT","hashed_pw4",NULL,NULL,NULL
+5,"Admin Root","admin@example.com","Admin","hashed_pw5",NULL,NULL,NULL
+6,"Boblee Martinique","gggg@gmail.com","RH","hashed_pw2",4,NULL,NULL
+7,"Jean Dupont","kojjey2@gmail.com","Employe","MotDePasse123!",2,NULL,NULL
+8,"Jean Dupont","jean.dupont@example.com","Employe","MotDePasse123!",2,NULL,NULL
+9,"Jean Dupont","jean.dt@example.com","Employe","MotDePasse123!",2,NULL,NULL
+10,"vladimir","douffanelom@gmail.com","Employe","1225",2,NULL,NULL
+11,"Guillaume Genoux","gui@gmail.com","Employe","$2a$11$Z1WNJWqddhVHNQMuyMe4OuRQQmbc1B5JDpuuiZdLgDr8u5kR3oBVK",NULL,"7277691b8cd4897a8f193023dde70eef3f9a1c3bac686f40b1aca58ee7f0076d","2025-08-21 17:31:06.561944"
+12,"Trash manga","trash@gmail.com","Admin","$2a$11$ZtMUdYPq4IWLkdjY7FuMIO/aiELMfDxrryow8kg5587VN1lUi2ch6",NULL,"8d61452a742d41190bca606245e819e0df65225dfca9c3a79bbd00cf54aa8292","2025-08-21 17:45:09.145029"
+13,"string","string","string","$2a$11$vgQQb1Lf0OLL90pw1Z0zQOqSwO3puUe1KpvdCIgfxqmke0wyZQdI.",NULL,"50f7a4089e05243abfe47c36c875c99eb3ab22367ef8394b1abdc2ddaf5767db","2025-08-23 17:51:11.110559"
+14,"Jey reece","jjj@entreprisecom","Employe","$2a$11$5iQSV9cjsk8CLKJWyhxPb.X27Y7AMHbX5n6kVl9EAxCgXHcwM7VF2",NULL,"7d4a6d750aa479194b08353834be867c7cdcda881ecece2e8a2865c9c715804c","2025-08-23 21:00:54.663231"
+15,"Lower man","jdjfjjf@gmail.com","Employe","$2a$11$tCJ9B79B.SbVG0EEtLrGdeOAlNAtP93cGAvjerQQR1av5cmBku5cS",NULL,"71527eea112a936ce27fd94ad54f444ae2abce2e110355b80ac14d7c42f845a2","2025-09-06 15:34:51.598221"
+16,"me kol","jej@gmail.com","Employe","$2a$11$Bk1xx/Ksvah5rAwYEbj5AuYrMx5npNX6yLYraGXY9zeoPArsbDp3O",NULL,"a0dace88df60b7e9008b7b2858e8af43fb75c1fbcd1839c0deefdc7c9bd88344","2025-08-29 21:43:23.315993"
+17,"me koljk","jeej@gmail.com","Employe","$2a$11$gyQ6R0/ODt12evHbpyd1yeCo9MpYjr/iR369rZm2sAjiHXsVl6iF6",NULL,"b6bf33aa74529ea6e02841fcb3a1458b82fb11b87c3dca841e19f9a6c8cc177c","2025-08-29 22:15:04.10271"
+18,"jkk jj","je8ej@gmail.com","Employe","$2a$11$kZ/9Ua2kMogu4Zjq33nleevMsA.pPmOj3IPwAAiYIVmY3qYsn7f4O",NULL,"45b6973efde559d154a673a0cb1e33f6fbd7065cf15391e3893eef4abb09320e","2025-08-30 11:37:08.342784"
+19,"jdjndn jdjd","ej@gmail.com","Employe","$2a$11$pXLSf.WP1FnEQlt076xBtuObDqvFZ.sl8Dbaskq7BpBbTTQGPavx.",NULL,"641c7ae106c1a650671c183315bd07815672f6a4925f4d891aff269125bbdecd","2025-08-30 11:37:54.167468"
+20,"djz jddh","ejjj@gmail.com","Employe","$2a$11$0gbRQtCp11Tw3x.uQClfju6B.HbVH4CyTvXP.44HF02.Ia3HrOEgS",NULL,"1c7afc973000aaae7ef87942c057a163e0b08ce4711ee6d127cb4beaba83c78a","2025-09-08 05:34:19.640423"
+21,"ko kyo","kyo@gmail.com","Admin","$2a$11$l1lr5aXfrYsizjTIybtB0.ujF6nxaDyzcNe015fWRRZkaiXYGJ.F6",NULL,"c723737127a4bf4fdcf9a4e71aae5651f23e36641985d3ceb810ea18370295da","2025-08-31 19:29:50.96161"
+22,"jssihs shhshs","euujj@gmail.com","Employe","$2a$11$NNp7TdXlJeFf.1ta.fdltuBUtlHw5eQFRLn3X2BdW1cTRfCM7veoK",NULL,"6eefacdb5fdb950338215ae075454156c848f25d829a3f5a5d3583819e3483dc","2025-09-07 12:42:27.418112"

@@ -12,11 +12,13 @@ public class DemandeCongeService
         _logger = logger;
     }
 
+
+
     public async Task<ServiceResult<IEnumerable<DemandeCongeDto>>> GetAllAsync()
     {
         try
         {
-            var response = await _httpClient.GetAsync("api/DemandeConge");
+            var response = await _httpClient.GetAsync("https://localhost:7064/api/DemandeConge");
 
             if (response.IsSuccessStatusCode)
             {
@@ -33,11 +35,77 @@ public class DemandeCongeService
         }
     }
 
+    //Methode pour   en prenant le nom de l'utilisateur
+    public async Task<int?> GetUtilisateurIdByNameAsync(string nom)
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync($"https://localhost:7064/api/Utilisateur/by-name/{nom}");
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Deserialize into a List<UtilisateurDto>
+                var utilisateurs = await response.Content.ReadFromJsonAsync<List<UtilisateurDto>>();
+
+                // Assuming the API returns only one user, or you want the first one
+                var utilisateur = utilisateurs?.FirstOrDefault();
+
+                return utilisateur?.Id;
+            }
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return null; // Utilisateur non trouvé
+            }
+            _logger.LogError("Erreur lors de la récupération de l'utilisateur par nom: {StatusCode}", response.StatusCode);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erreur lors de la récupération de l'utilisateur par nom");
+            return null;
+        }
+    }
+
+
+    //méthode qui utilise GetUtilisateurIdByNameAsync pour set le supérieur id
+    public async Task<ServiceResult<bool>> SetSuperieurByNameAsync(int? utilisateurId, string? nomSuperieur)
+    {
+        try
+        {
+            int? superieurId = null;
+            if (!string.IsNullOrEmpty(nomSuperieur))
+            {
+                superieurId = await GetUtilisateurIdByNameAsync(nomSuperieur);
+                if (superieurId == null)
+                {
+                    return ServiceResult<bool>.Failure("Supérieur non trouvé");
+                }
+            }
+            var response = await _httpClient.PatchAsJsonAsync($"https://localhost:7064/api/Utilisateur/superieur/{utilisateurId}", superieurId);
+            if (response.IsSuccessStatusCode)
+            {
+                return ServiceResult<bool>.Success(true);
+            }
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return ServiceResult<bool>.Failure("Utilisateur non trouvé");
+            }
+            return ServiceResult<bool>.Failure($"Erreur lors de la mise à jour du supérieur: {response.StatusCode}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erreur lors de la mise à jour du supérieur pour l'utilisateur {UserId}", utilisateurId);
+            return ServiceResult<bool>.Failure("Erreur de connexion au serveur");
+        }
+    }
+
+
     public async Task<ServiceResult<DemandeCongeDto>> GetByIdAsync(int id)
     {
         try
         {
-            var response = await _httpClient.GetAsync($"api/DemandeConge/{id}");
+            var response = await _httpClient.GetAsync($"https://localhost:7064/api/DemandeConge/{id}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -63,7 +131,7 @@ public class DemandeCongeService
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("api/DemandeConge", demande);
+            var response = await _httpClient.PostAsJsonAsync("https://localhost:7064/api/DemandeConge", demande);
 
             if (response.IsSuccessStatusCode)
             {
@@ -89,7 +157,7 @@ public class DemandeCongeService
     {
         try
         {
-            var response = await _httpClient.PutAsJsonAsync($"api/DemandeConge/{demande.Id}", demande);
+            var response = await _httpClient.PutAsJsonAsync($"https://localhost:7064/api/DemandeConge/{demande.Id}", demande);
 
             if (response.IsSuccessStatusCode)
             {
@@ -115,7 +183,7 @@ public class DemandeCongeService
     {
         try
         {
-            var response = await _httpClient.GetAsync("api/DemandeConge/en-attente");
+            var response = await _httpClient.GetAsync("https://localhost:7064/api/DemandeConge/en-attente");
             if (response.IsSuccessStatusCode)
             {
                 var demandes = await response.Content.ReadFromJsonAsync<IEnumerable<DemandeCongeDto>>();
@@ -134,7 +202,7 @@ public class DemandeCongeService
     {
         try
         {
-            var response = await _httpClient.PutAsJsonAsync($"api/DemandeConge/{id}", demande);
+            var response = await _httpClient.PutAsJsonAsync($"https://localhost:7064/api/DemandeConge/{id}", demande);
             if (response.IsSuccessStatusCode)
             {
                 return ServiceResult<bool>.Success(true);
@@ -156,7 +224,7 @@ public class DemandeCongeService
     {
         try
         {
-            var response = await _httpClient.GetAsync($"api/DemandeConge/utilisateur/{utilisateurId}");
+            var response = await _httpClient.GetAsync($"https://localhost:7064/api/DemandeConge/utilisateur/{utilisateurId}");
 
             if (response.IsSuccessStatusCode)
             {

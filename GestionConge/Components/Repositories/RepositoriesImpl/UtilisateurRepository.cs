@@ -24,10 +24,40 @@ public class UtilisateurRepository : IUtilisateurRepository
         return await _db.QueryAsync<Utilisateur>(sql);
     }
 
+    public async Task<IEnumerable<Utilisateur>> GetAllUsersNotAdminAsync()
+    {
+        var sql = "SELECT nom FROM utilisateurs WHERE role != 'Admin' ";
+        return await _db.QueryAsync<Utilisateur>(sql);
+    }
+
+
+
     public async Task<Utilisateur?> GetByIdAsync(int? id)
     {
         var sql = "SELECT * FROM utilisateurs WHERE id = @Id";
         return await _db.QueryFirstOrDefaultAsync<Utilisateur>(sql, new { Id = id });
+    }
+
+    public async Task<bool> SetSuperieurAsync(int utilisateurId, int? superieurId)
+    {
+                var sql = @"
+        UPDATE utilisateurs
+        SET superieurid = @SuperieurId
+        WHERE id = @UtilisateurId";
+        var rows = await _db.ExecuteAsync(sql, new { SuperieurId = superieurId, UtilisateurId = utilisateurId });
+        return rows > 0;
+    }
+
+    public async Task<int?> GetUtilisateurIdByNameAsync(string nom)
+    {
+                var sql = "SELECT id FROM utilisateurs WHERE nom = @Nom";
+        return await _db.ExecuteScalarAsync<int?>(sql, new { Nom = nom });
+    }
+
+    public async Task<IEnumerable<Utilisateur>> GetUtilisateursByNameAsync(string nom)
+    {
+        var sql = "SELECT * FROM utilisateurs WHERE nom = @Nom";
+        return await _db.QueryAsync<Utilisateur>(sql, new { Nom = nom });
     }
 
     public async Task<int> CreateAsync(UtilisateurAuth utilisateurAuth)

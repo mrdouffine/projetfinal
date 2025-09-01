@@ -1,30 +1,48 @@
 ﻿using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-
 namespace GestionConge.Client.Services
 {
     public class CustomAuthStateProvider : AuthenticationStateProvider
     {
         private readonly ILogger<CustomAuthStateProvider> _logger;
         private readonly ILocalStorageService _localStorage;
+        private readonly IJSRuntime _jsRuntime; // Injecte le JSRuntime
         private ClaimsPrincipal _currentUser = new(new ClaimsIdentity());
+        private bool _isPrerendering = true; // Ajoute un drapeau pour le pré-rendu
 
         private const string TokenKey = "authToken";
 
-        public CustomAuthStateProvider(ILogger<CustomAuthStateProvider> logger, ILocalStorageService localStorage)
+        public CustomAuthStateProvider(ILogger<CustomAuthStateProvider> logger, ILocalStorageService localStorage, IJSRuntime jsRuntime)
         {
             _logger = logger;
             _localStorage = localStorage;
+            _jsRuntime = jsRuntime;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            string? token = null;
+            // Vérifie si le JSRuntime est disponible pour le client
+            if (_isPrerendering)
+            {
+                // Tente d'appeler une méthode JS simple pour vérifier la disponibilité
+                // C'est une astuce courante pour détecter si on est sur le serveur ou le client
+                try
+                {
+                    await _jsRuntime.InvokeVoidAsync("console.log", "Client-side rendering started.");
+                    _isPrerendering = false; // Le JS interop a réussi, on est sur le client.
+                }
+                catch (InvalidOperationException)
+                {
+                    // L'appel JS a échoué, on est toujours sur le serveur.
+                    return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+                }
+            }
 
+            string? token = null;
             try
             {
+                // Cette ligne est maintenant sûre, car _isPrerendering est faux.
                 token = await _localStorage.GetItemAsync<string>(TokenKey);
             }
             catch (Exception ex)

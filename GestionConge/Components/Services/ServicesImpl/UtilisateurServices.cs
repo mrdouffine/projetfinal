@@ -17,6 +17,7 @@ public class UtilisateurServices : IUtilisateurService
     }
 
     public Task<IEnumerable<Utilisateur>> GetAllAsync() => _repository.GetAllAsync();
+    public Task<IEnumerable<Utilisateur>> GetAllUsersNotAdminAsync() => _repository.GetAllUsersNotAdminAsync();
     public Task<Utilisateur?> GetByIdAsync(int id) => _repository.GetByIdAsync(id);
     public async Task<int> CreateAsync(UtilisateurAuth utilisateurAuth)
     {
@@ -31,10 +32,11 @@ public class UtilisateurServices : IUtilisateurService
         _repository.GetByEmailAndPasswordAsync(email, password);
 
     public Task<bool> UpdateAsync(UtilisateurDto utilisateurDto) => _repository.UpdateAsync(utilisateurDto);
+    public Task<bool> SetSuperieurAsync(int utilisateurId, int? superieurId) => _repository.SetSuperieurAsync(utilisateurId, superieurId);
     public Task<IEnumerable<Utilisateur>> GetSubordonnesAsync(int superieurId) =>
     _repository.GetSubordonnesAsync(superieurId);
-
-
+    public Task<int?> GetUtilisateurIdByNameAsync(string nom) => _repository.GetUtilisateurIdByNameAsync(nom);
+    public Task<IEnumerable<Utilisateur>> GetUtilisateursByNameAsync(string nom) => _repository.GetUtilisateursByNameAsync(nom);
     private async Task ValidateUniqueEmailAsync(string email)
     {
         // Vérifier que l'email n'existe pas déjà

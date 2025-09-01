@@ -17,7 +17,7 @@ namespace GestionConge.Client.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/Validation");
+                var response = await _httpClient.GetAsync("https://localhost:7064/api/Validation");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -116,7 +116,7 @@ namespace GestionConge.Client.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/Validation/aujourdhui");
+                var response = await _httpClient.GetAsync("https://localhost:7064/api/Validation/aujourdhui");
                 if (response.IsSuccessStatusCode)
                 {
                     var validations = await response.Content.ReadFromJsonAsync<IEnumerable<Validation>>();
@@ -134,7 +134,7 @@ namespace GestionConge.Client.Services
         {
             try
             {
-                var response = await _httpClient.PostAsJsonAsync("api/Validation/traiter", request);
+                var response = await _httpClient.PostAsJsonAsync("https://localhost:7064/api/Validation/traiter", request);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -161,7 +161,7 @@ namespace GestionConge.Client.Services
         {
             try
             {
-                var response = await _httpClient.DeleteAsync($"api/Validation/{id}");
+                var response = await _httpClient.DeleteAsync($"https://localhost:7064/api/Validation/{id}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -253,7 +253,7 @@ namespace GestionConge.Client.Services
             }
         }
 
-        public async Task<ServiceResult<IEnumerable<Validation>>> GetValidationsByValidateurAsync(int validateurId)
+        public async Task<ServiceResult<IEnumerable<Validation>>> GetValidationsByValidateurAsync(int? validateurId)
         {
             try
             {
@@ -277,5 +277,7 @@ namespace GestionConge.Client.Services
                 return ServiceResult<IEnumerable<Validation>>.Failure("Erreur lors du traitement");
             }
         }
+
+
     }
 }

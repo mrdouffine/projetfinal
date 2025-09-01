@@ -3,7 +3,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using GestionConge.Client.Services
-@attribute [Authorize(Roles = "Admin,Employe,DOT")]
+@attribute [Authorize]
 @using GestionConge.Client.Models
 @using GestionConge.Client.Layout
 @using GestionConge.Client.Extensions
@@ -39,13 +39,13 @@
 <MudGrid Class="mb-4">
     <MudItem xs="6" sm="3">
         <MudPaper Class="pa-4 text-center">
-            <MudText Typo="Typo.h6" Color="Color.Warning">@_demandesEnAttente.Count</MudText>
+            <MudText Typo="Typo.h6" Color="Color.Warning">@_validationsEnAttente.Count</MudText>
             <MudText Typo="Typo.body2">En attente</MudText>
         </MudPaper>
     </MudItem>
     <MudItem xs="6" sm="3">
         <MudPaper Class="pa-4 text-center">
-            <MudText Typo="Typo.h6" Color="Color.Error">@_demandesUrgentes.Count</MudText>
+            <MudText Typo="Typo.h6" Color="Color.Error">@_validationsUrgentes.Count</MudText>
             <MudText Typo="Typo.body2">Urgentes</MudText>
         </MudPaper>
     </MudItem>
@@ -103,7 +103,7 @@
     <MudCardHeader>
         <CardHeaderContent>
             <MudText Typo="Typo.h6">
-                Demandes à valider (@_filteredDemandes.Count)
+                Demandes à valider (@_filteredValidations.Count)
             </MudText>
         </CardHeaderContent>
         <CardHeaderActions>
@@ -119,7 +119,7 @@
                 <MudText Class="mt-2">Chargement des demandes...</MudText>
             </div>
         }
-        else if (!_filteredDemandes.Any())
+        else if (!_filteredValidations.Any())
         {
             <div class="text-center pa-8">
                 <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Large" Color="Color.Success" Class="mb-4" />
@@ -133,7 +133,7 @@
         {
             @if (_viewMode == "table")
             {
-                <MudDataGrid T="DemandeCongeDto" Items="_filteredDemandes"
+                <MudDataGrid T="Validation" Items="_filteredValidations"
                              Sortable="true" Filterable="false"
                              RowsPerPage="10">
                     <Columns>
@@ -145,12 +145,11 @@
                                 }
                             </CellTemplate>
                         </TemplateColumn>
-                        <PropertyColumn Property="x => x.NomUtilisateur" Title="Employé" />
-                        <PropertyColumn Property="x => x.TypeConge" Title="Type" />
-                        <PropertyColumn Property="x => x.DateDebut" Title="Début" Format="dd/MM/yyyy" />
+                        <PropertyColumn Property="x => x.NomValidateur" Title="Employé" />
+                        @* <PropertyColumn Property="x => x.DateDebut" Title="Début" Format="dd/MM/yyyy" />
                         <PropertyColumn Property="x => x.DateFin" Title="Fin" Format="dd/MM/yyyy" />
                         @* <PropertyColumn Property="x => x.NombreJours" Title="Jours" /> *@
-                        <PropertyColumn Property="x => x.DateSoumission" Title="Soumise le" Format="dd/MM/yyyy" />
+                        @* <PropertyColumn Property="x => x.DateSoumission" Title="Soumise le" Format="dd/MM/yyyy" /> *@
                         <TemplateColumn Title="Actions" Sortable="false">
                             <CellTemplate>
                                 <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small">
@@ -178,15 +177,15 @@
             else
             {
                 <MudGrid>
-                    @foreach (var demande in _filteredDemandes)
+                    @foreach (var validation in _filteredValidations)
                     {
                         <MudItem xs="12" sm="6" md="4">
-                            <MudCard Class="h-100" Style="@(IsUrgent(demande) ? "border-left: 4px solid red;" : "")">
+                            <MudCard Class="h-100" Style="@(IsUrgent(validation) ? "border-left: 4px solid red;" : "")">
                                 <MudCardHeader>
                                     <CardHeaderContent>
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <MudText Typo="Typo.h6">@demande.NomUtilisateur</MudText>
-                                            @if (IsUrgent(demande))
+                                            <MudText Typo="Typo.h6">@validation.NomValidateur</MudText>
+                                            @if (IsUrgent(validation))
                                             {
                                                 <MudIcon Icon="@Icons.Material.Filled.PriorityHigh"
                                                          Color="Color.Error"
@@ -194,38 +193,38 @@
                                             }
                                         </div>
                                         <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                            Soumise le @demande.DateSoumission.ToString("dd/MM/yyyy")
+                                            Soumise le @validation.DateValidation.ToString("dd/MM/yyyy")
                                         </MudText>
                                     </CardHeaderContent>
                                 </MudCardHeader>
                                 <MudCardContent>
-                                    <MudText Typo="Typo.subtitle1" GutterBottom="true">
+                                    @* <MudText Typo="Typo.subtitle1" GutterBottom="true">
                                         @demande.TypeConge
-                                    </MudText>
-                                    <MudText Typo="Typo.body2" GutterBottom="true">
-                                        Du @demande.DateDebut.ToString("dd/MM")
-                                        au @demande.DateFin.ToString("dd/MM/yyyy")
-                                    </MudText>
+                                    </MudText> *@
+                                    @* <MudText Typo="Typo.body2" GutterBottom="true">
+                                        Du @validation.DateDebut.ToString("dd/MM")
+                                        au @validation.DateFin.ToString("dd/MM/yyyy")
+                                    </MudText> *@
                                     @* <MudText Typo="Typo.body2" Color="Color.Secondary">
                                         @demande.NombreJours jour@(demande.NombreJours > 1 ? "s" : "")
                                     </MudText> *@
-                                    @if (!string.IsNullOrEmpty(demande.CommentaireValidation))
+                                    @if (!string.IsNullOrEmpty(validation.Commentaire))
                                     {
                                         <MudText Typo="Typo.caption" Class="mt-2">
-                                            "@demande.CommentaireValidation"
+                                            "@validation.Commentaire"
                                         </MudText>
                                     }
                                 </MudCardContent>
                                 <MudCardActions>
                                     <MudIconButton Icon="@Icons.Material.Filled.Visibility"
-                                                   OnClick="@(() => VoirDetails(demande.Id))"
+                                                   OnClick="@(() => VoirDetails(validation.Id))"
                                                    Size="Size.Small" />
                                     <MudIconButton Icon="@Icons.Material.Filled.Check"
-                                                   OnClick="@(() => ApprouverDemande(demande))"
+                                                   OnClick="@(() => ApprouverDemande(validation))"
                                                    Size="Size.Small"
                                                    Color="Color.Success" />
                                     <MudIconButton Icon="@Icons.Material.Filled.Close"
-                                                   OnClick="@(() => RejeterDemande(demande))"
+                                                   OnClick="@(() => RejeterDemande(validation))"
                                                    Size="Size.Small"
                                                    Color="Color.Error" />
                                 </MudCardActions>
@@ -248,7 +247,7 @@
     </TitleContent>
     <DialogContent>
         <MudText GutterBottom="true">
-            Êtes-vous sûr de vouloir rejeter la demande de <strong>@_selectedDemande?.NomUtilisateur</strong> ?
+            Êtes-vous sûr de vouloir rejeter la demande de <strong>@_selectedValidation?.NomValidateur</strong> ?
         </MudText>
         <MudTextField @bind-Value="_commentaireRejet"
                       Label="Commentaire (obligatoire)"
@@ -269,9 +268,9 @@
 
 @code {
     private bool _loading = true;
-    private List<DemandeCongeDto> _demandesEnAttente = new();
-    private List<DemandeCongeDto> _filteredDemandes = new();
-    private List<DemandeCongeDto> _demandesUrgentes = new();
+    private List<Validation> _validationsEnAttente = new();
+    private List<Validation> _filteredValidations = new();
+    private List<Validation> _validationsUrgentes = new();
     private int _validationsAujourdhui = 0;
     private string _viewMode = "table";
 
@@ -282,15 +281,15 @@
 
     // Dialog de rejet
     private bool _showRejectDialog = false;
-    private DemandeCongeDto? _selectedDemande;
+    private Validation? _selectedValidation;
     private string _commentaireRejet = "";
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadDemandesEnAttente();
+        await LoadValidationEnAttente();
     }
 
-    private async Task LoadDemandesEnAttente()
+    private async Task LoadValidationEnAttente()
     {
         _loading = true;
         try
@@ -300,12 +299,12 @@
 
             if (validateurId.HasValue)
             {
-                var result = await DemandeService.GetDemandesEnAttenteAsync();
+                var result = await ValidationService.GetValidationsByValidateurAsync(validateurId);
                 await result.HandleServiceResultAsync(Snackbar,
-                    onSuccess: demandes =>
+                    onSuccess: validations =>
                     {
-                        _demandesEnAttente = demandes.ToList();
-                        _demandesUrgentes = _demandesEnAttente.Where(IsUrgent).ToList();
+                        _validationsEnAttente = validations.ToList();
+                        _validationsUrgentes = _validationsEnAttente.Where(IsUrgent).ToList();
                         ApplyFilters();
                     });
 
@@ -316,7 +315,7 @@
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Erreur lors du chargement des demandes : {ex.Message}");
-            Snackbar.Add("Erreur lors du chargement des demandes", Severity.Error);
+            Snackbar.Add("Erreur lors du chargement des demandes à valider", Severity.Error);
         }
         finally
         {
@@ -342,15 +341,15 @@
 
     private void ApplyFilters()
     {
-        _filteredDemandes = _demandesEnAttente.Where(d =>
+        _filteredValidations = _validationsEnAttente.Where(v =>
             (_filtreUrgence == "" ||
-             (_filtreUrgence == "urgent" && IsUrgent(d)) ||
-             (_filtreUrgence == "normal" && !IsUrgent(d))) &&
-            (string.IsNullOrEmpty(_filtreType) || d.TypeConge == _filtreType) &&
+             (_filtreUrgence == "urgent" && IsUrgent(v)) ||
+             (_filtreUrgence == "normal" && !IsUrgent(v))) &&
+            (string.IsNullOrEmpty(_filtreType)) &&
             (string.IsNullOrEmpty(_filtreEmploye) ||
-             d.NomUtilisateur.Contains(_filtreEmploye, StringComparison.OrdinalIgnoreCase))
-        ).OrderBy(d => IsUrgent(d) ? 0 : 1)
-         .ThenBy(d => d.DateSoumission)
+             v.NomValidateur.Contains(_filtreEmploye, StringComparison.OrdinalIgnoreCase))
+        ).OrderBy(v => IsUrgent(v) ? 0 : 1)
+         .ThenBy(v => v.DateValidation)
          .ToList();
 
         StateHasChanged();
@@ -369,15 +368,14 @@
         _viewMode = _viewMode == "table" ? "cards" : "table";
     }
 
-    private bool IsUrgent(DemandeCongeDto demande)
+    private bool IsUrgent(Validation validation)
     {
         // Une demande est urgente si :
         // - Elle commence dans moins de 3 jours
         // - Elle a été soumise il y a plus de 5 jours
-        var joursAvantDebut = (demande.DateDebut - DateTime.Today).Days;
-        var joursDepuisSoumission = (DateTime.Today - demande.DateSoumission.Date).Days;
-
-        return joursAvantDebut <= 3 || joursDepuisSoumission >= 5;
+        // var joursAvantDebut = (validation.DateDebut - DateTime.Today).Days;
+        // var joursDepuisSoumission = (DateTime.Today - validation.DateSoumission.Date).Days;
+        return (validation.DateValidation - DateTime.Today).TotalDays <= 3;
     }
 
     private string GetTempsReponseModyen()
@@ -386,15 +384,15 @@
         return "2.3j";
     }
 
-    private void VoirDetails(int demandeId) => NavigationManager.NavigateTo($"/validations/details/{demandeId}");
+    private void VoirDetails(int validationId) => NavigationManager.NavigateTo($"/validations/details/{validationId}");
 
     [Inject] private IDialogService DialogService { get; set; }
 
-    private async Task ApprouverDemande(DemandeCongeDto demande)
+    private async Task ApprouverDemande(Validation validation)
     {
         var confirmed = await DialogService.ShowMessageBox(
             "Confirmer l'approbation",
-            $"Approuver la demande de {demande.NomUtilisateur} ?",
+            $"Approuver la demande de {validation.NomValidateur} ?",
             "Oui", "Non");
 
         if (confirmed == true)
@@ -404,7 +402,7 @@
 
             if (validateurId.HasValue)
             {
-                var result = await ValidationService.ApprouverDemandeAsync(demande.Id, validateurId.Value);
+                var result = await ValidationService.ApprouverDemandeAsync(validation.Id, validateurId.Value);
                 if (result.HandleWithNotification(Snackbar))
                 {
                     await RefreshData();
@@ -413,16 +411,16 @@
         }
     }
 
-    private void RejeterDemande(DemandeCongeDto demande)
+    private void RejeterDemande(Validation validation)
     {
-        _selectedDemande = demande;
+        _selectedValidation = validation;
         _commentaireRejet = "";
         _showRejectDialog = true;
     }
 
     private async Task ConfirmRejet()
     {
-        if (_selectedDemande == null || string.IsNullOrWhiteSpace(_commentaireRejet))
+        if (_selectedValidation == null || string.IsNullOrWhiteSpace(_commentaireRejet))
             return;
 
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
@@ -431,7 +429,7 @@
         if (validateurId.HasValue)
         {
             var result = await ValidationService.RejeterDemandeAsync(
-                _selectedDemande.Id,
+                _selectedValidation.Id,
                 validateurId.Value,
                 _commentaireRejet);
 
@@ -445,6 +443,6 @@
 
     private async Task RefreshData()
     {
-        await LoadDemandesEnAttente();
+        await LoadValidationEnAttente();
     }
 }

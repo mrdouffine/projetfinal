@@ -63,6 +63,14 @@
               "target": "Package",
               "version": "[9.*, )"
             },
+            "Microsoft.Authentication.WebAssembly.Msal": {
+              "target": "Package",
+              "version": "[9.0.8, )"
+            },
+            "Microsoft.Extensions.Http": {
+              "target": "Package",
+              "version": "[9.0.8, )"
+            },
             "Microsoft.NET.ILLink.Tasks": {
               "suppressParent": "All",
               "target": "Package",

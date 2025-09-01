@@ -8,7 +8,7 @@ public class DemandeCongeRequestDto
 
     public DateTime DateFin { get; set; }
 
-    public string Motif { get; set; }
+    public string Motif { get; set; } = string.Empty;
 
     //public int? SuperieurId { get; set; }
 

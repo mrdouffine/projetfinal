@@ -27,7 +27,7 @@
             Gérez vos demandes de congés et consultez leur statut
         </MudText>
     </div>
-    <MudButton Href="/demandes/nouvelle"
+    <MudButton Href="/demande-form/nouvelle"
                Variant="Variant.Filled"
                Color="Color.Primary"
                StartIcon="@Icons.Material.Filled.Add">
@@ -44,9 +44,8 @@
                           Variant="Variant.Outlined" @onchange="ApplyFilters">
                     <MudSelectItem Value="@("")">Tous les statuts</MudSelectItem>
                     <MudSelectItem Value="@("En attente")">En attente</MudSelectItem>
-                    <MudSelectItem Value="@("Approuvé")">Approuvé</MudSelectItem>
+                    <MudSelectItem Value="@("Validé")">Validé</MudSelectItem>
                     <MudSelectItem Value="@("Rejeté")">Rejeté</MudSelectItem>
-                    <MudSelectItem Value="@("Annulé")">Annulé</MudSelectItem>
                 </MudSelect>
             </MudItem>
             <MudItem xs="12" sm="6" md="3">
@@ -92,7 +91,7 @@
     <MudItem xs="6" sm="3">
         <MudPaper Class="pa-4 text-center">
             <MudText Typo="Typo.h6" Color="Color.Success">
-                @_filteredDemandes.Count(d => d.Statut == "Approuvé")
+                @_filteredDemandes.Count(d => d.Statut == "Validé")
             </MudText>
             <MudText Typo="Typo.body2">Approuvées</MudText>
         </MudPaper>
@@ -136,7 +135,7 @@
                 <MudText Typo="Typo.body2" Color="Color.Secondary">
                     Créez votre première demande de congé
                 </MudText>
-                <MudButton Class="mt-4" Href="/demandes/nouvelle" 
+                <MudButton Class="mt-4" Href="/demande-form/nouvelle" 
                           Variant="Variant.Filled" Color="Color.Primary">
                     Nouvelle demande
                 </MudButton>
@@ -328,9 +327,9 @@
         return statut switch
         {
             "En attente" => Color.Warning,
-            "Approuvé" => Color.Success,
+            "Validé" => Color.Success,
             "Rejeté" => Color.Error,
-            "Annulé" => Color.Secondary,
+            // "Annulé" => Color.Secondary,
             _ => Color.Default
         };
     }
@@ -342,7 +341,7 @@
 
     private void EditDemande(int id)
     {
-        NavigationManager.NavigateTo($"/demandes/modifier/{id}");
+        NavigationManager.NavigateTo($"/demande-form/modifier/{id}");
     }
 
     [Inject] private IDialogService DialogService { get; set; }

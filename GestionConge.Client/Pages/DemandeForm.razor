@@ -7,8 +7,9 @@
 @using System.ComponentModel.DataAnnotations
 @using GestionConge.Client.Models
 @using GestionConge.Client.Services
+@using System.Security.Claims;
 @inject DemandeCongeService DemandeService
-@inject UserService UtilisateurService
+@inject UtilisateurService UtilisateurService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
@@ -36,13 +37,13 @@
                         <MudText Typo="Typo.body2">Congés payés disponibles</MudText>
                     </MudPaper>
                 </MudItem>
-                <MudItem xs="12" sm="4">
+                @* <MudItem xs="12" sm="4">
                     <MudPaper Class="pa-4 text-center" Style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                         <MudIcon Icon="@Icons.Material.Filled.Schedule" Size="Size.Large" Class="mb-2" />
                         <MudText Typo="Typo.h5">@_soldeConges.RTT</MudText>
                         <MudText Typo="Typo.body2">RTT disponibles</MudText>
                     </MudPaper>
-                </MudItem>
+                </MudItem> *@
                 <MudItem xs="12" sm="4">
                     <MudPaper Class="pa-4 text-center" Style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                         <MudIcon Icon="@Icons.Material.Filled.TrendingUp" Size="Size.Large" Class="mb-2" />
@@ -103,6 +104,15 @@
                             <MudItem xs="12">
                                 <MudTextField T="string" @bind-Value="_demandeModel.Motif" Label="Motif" Variant="Variant.Outlined" Lines="3" Counter="500" MaxLength="500" />
                                 <ValidationMessage For="@(() => _demandeModel.Motif)" />
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudSelect T="string" @bind-Value="_demandeModel.ValidateurEmail" Label="Sélectionner un validateur" Variant="Variant.Outlined" Required="true">
+                                    @foreach (var user in _validateurs)
+                                    {
+                                        <MudSelectItem T="string" Value="@user.Nom">@user.Nom</MudSelectItem>
+                                    }
+                                </MudSelect>
+                                <ValidationMessage For="@(() => _demandeModel.ValidateurEmail)" />
                             </MudItem>
 
                             <MudItem xs="12">
@@ -235,14 +245,24 @@
 
         try
         {
-            var result = await UtilisateurService.GetAllAsync();
-            if (!_disposed)
+            // 1. Appelle le service
+            var result = await UtilisateurService.GetAllUsersNotAdminAsync();
+
+            // 2. Vérifie si l'appel a réussi avant d'accéder aux données
+            if (result.IsSuccess && result.Data != null && !_disposed)
             {
-                _validateurs = result ?? new();
+                // 3. Si c'est un succès, filtre les données
+                _validateurs = result.Data.ToList();
+            }
+            else if (!_disposed)
+            {
+                // 4. Gère l'échec de la requête
+                Snackbar?.Add($"Erreur lors du chargement des validateurs : {result.ErrorMessage}", Severity.Error);
             }
         }
         catch (Exception ex) when (!_disposed)
         {
+            // 5. Gère les exceptions inattendues (erreurs de réseau, etc.)
             Snackbar?.Add($"Erreur lors du chargement des validateurs : {ex.Message}", Severity.Error);
         }
     }
@@ -261,8 +281,7 @@
                 _soldeConges = new SoldeConges
                 {
                     CongesPayes = 30,
-                    RTT = 10,
-                    UtilisesCeMois = 2
+                    UtilisesCeMois = 0
                 };
             }
         }
@@ -287,7 +306,6 @@
                 if (!_disposed && result != null)
                 {
                     _currentDemande = result.Data;
-                    _demandeModel.TypeConge = _currentDemande.TypeConge ?? "";
                     _demandeModel.DateDebut = _currentDemande.DateDebut;
                     _demandeModel.DateFin = _currentDemande.DateFin;
                     _demandeModel.Motif = _currentDemande.Motif ?? "";
@@ -357,13 +375,37 @@
             if (!ValidateForm())
                 return;
 
+            // récupérer l'id de l'utilisateur connecté
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            var utilisateurId = user.GetUserId();
+
+
+            var ValidateurNom = _demandeModel.ValidateurEmail;
+
+            // Await the asynchronous call and store the result
+            var result = await DemandeService.SetSuperieurByNameAsync(utilisateurId, ValidateurNom);
+
+            // Check the result to handle success or failure
+            if (result.IsSuccess)
+            {
+                Snackbar?.Add("Le supérieur hiérarchique a été mis à jour avec succès.", Severity.Success);
+            }
+            else
+            {
+                // The operation failed. Display the error message from the service.
+                Snackbar?.Add($"Erreur : {result.ErrorMessage}", Severity.Error);
+            }
             var request = new DemandeCongeRequestDto
             {
+                UtilisateurId = utilisateurId.Value,
                 DateDebut = _demandeModel.DateDebut!.Value,
                 DateFin = _demandeModel.DateFin!.Value,
                 Motif = _demandeModel.Motif
+
             };
 
+            
             if (_isEditMode && _currentDemande != null)
             {
                 await DemandeService.UpdateAsync(_currentDemande.Id, request);
@@ -383,7 +425,7 @@
 
             if (!_disposed)
             {
-                NavigationManager?.NavigateTo("/mes-demandes");
+                NavigationManager?.NavigateTo("/demandes");
             }
         }
         catch (Exception ex) when (!_disposed)
@@ -428,7 +470,6 @@
 
         if (_currentDemande != null)
         {
-            _demandeModel.TypeConge = _currentDemande.TypeConge ?? "";
             _demandeModel.DateDebut = _currentDemande.DateDebut;
             _demandeModel.DateFin = _currentDemande.DateFin;
             _demandeModel.Motif = _currentDemande.Motif ?? "";
@@ -447,8 +488,8 @@
 
     public class DemandeModel
     {
-        [Required(ErrorMessage = "Le type de congé est requis")]
-        public string TypeConge { get; set; } = "";
+        // [Required(ErrorMessage = "Le type de congé est requis")]
+        // public string TypeConge { get; set; } = "";
 
         [Required(ErrorMessage = "La date de début est requise")]
         public DateTime? DateDebut { get; set; }
@@ -469,7 +510,7 @@
     public class SoldeConges
     {
         public int CongesPayes { get; set; }
-        public int RTT { get; set; }
+        // public int RTT { get; set; }
         public int UtilisesCeMois { get; set; }
     }
 }

@@ -17,7 +17,7 @@ public class UtilisateurController : ControllerBase
         _service = service;
     }
 
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -25,7 +25,36 @@ public class UtilisateurController : ControllerBase
         return Ok(utilisateurs);
     }
 
-    [Authorize(Roles = "Admin")]
+    
+    [HttpGet ("valideurs")]
+    public async Task<IActionResult> GetAllUsersNotAdminAsync()
+    {
+        var utilisateurs = await _service.GetAllUsersNotAdminAsync();
+        return utilisateurs is not null ? Ok(utilisateurs) : NotFound();
+    }
+
+    [HttpPatch("superieur/{utilisateurId}")]
+    public async Task<IActionResult> SetSuperieur(int utilisateurId, [FromBody] int? superieurId)
+    {
+        var success = await _service.SetSuperieurAsync(utilisateurId, superieurId);
+        return success ? NoContent() : NotFound();
+    }
+
+    //[HttpGet("by-name/{nom}")]
+    //public async Task<IActionResult> GetUtilisateurIdByName(string nom)
+    //{
+    //    var utilisateurId = await _service.GetUtilisateurIdByNameAsync(nom);
+    //    return utilisateurId.HasValue ? Ok(utilisateurId.Value) : NotFound();
+    //}
+
+    [HttpGet("by-name/{nom}")]
+    public async Task<IActionResult> GetUtilisateursByName(string nom)
+    {
+        var utilisateurs = await _service.GetUtilisateursByNameAsync(nom);
+        return utilisateurs.Any() ? Ok(utilisateurs) : NotFound();
+    }
+
+    //[Authorize(Roles = "Admin")]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -39,7 +68,7 @@ public class UtilisateurController : ControllerBase
     //    var utilisateur = await _service.GetByEmailAndPasswordAsync(loginRequest.Email, loginRequest.MotDePasse);
     //    return utilisateur is not null ? Ok(utilisateur) : Unauthorized();
     //}
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> Create(UtilisateurAuth utilisateurAuth)
     {
@@ -47,7 +76,7 @@ public class UtilisateurController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id }, utilisateurAuth);
     }
 
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, UtilisateurDto utilisateurDto)
     {
@@ -56,7 +85,7 @@ public class UtilisateurController : ControllerBase
         return success ? NoContent() : NotFound();
     }
 
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -64,7 +93,7 @@ public class UtilisateurController : ControllerBase
         return success ? NoContent() : NotFound();
     }
 
-    [Authorize]
+    //[Authorize]
     // Récupérer les subordonnés
     [HttpGet("{id}/subordonnes")]
     public async Task<IActionResult> GetSubordonnes(int id)

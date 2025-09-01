@@ -561,6 +561,53 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "GestionConge.Components.Controllers.UtilisateurController",
+    "Method": "GetUtilisateursByName",
+    "RelativePath": "api/Utilisateur/by-name/{nom}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nom",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.UtilisateurController",
+    "Method": "SetSuperieur",
+    "RelativePath": "api/Utilisateur/superieur/{utilisateurId}",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "utilisateurId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "superieurId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.UtilisateurController",
+    "Method": "GetAllUsersNotAdminAsync",
+    "RelativePath": "api/Utilisateur/valideurs",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "GestionConge.Components.Controllers.ValidationController",
     "Method": "GetAll",
     "RelativePath": "api/Validation",

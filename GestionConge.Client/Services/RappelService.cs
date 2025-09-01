@@ -18,7 +18,7 @@ public class RappelService
     {
         try
         {
-            var response = await _httpClient.GetAsync("api/Rappel");
+            var response = await _httpClient.GetAsync("https://localhost:7064/api/Rappel");
 
             if (response.IsSuccessStatusCode)
             {
@@ -39,7 +39,7 @@ public class RappelService
     {
         try
         {
-            var response = await _httpClient.GetAsync($"api/Rappel/{id}");
+            var response = await _httpClient.GetAsync($"https://localhost:7064/api/Rappel/{id}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -65,7 +65,7 @@ public class RappelService
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("api/Rappel", rappel);
+            var response = await _httpClient.PostAsJsonAsync("https://localhost:7064/api/Rappel", rappel);
 
             if (response.IsSuccessStatusCode)
             {
@@ -91,7 +91,7 @@ public class RappelService
     {
         try
         {
-            var response = await _httpClient.PutAsJsonAsync($"api/Rappel/{rappel.Id}", rappel);
+            var response = await _httpClient.PutAsJsonAsync($"https://localhost:7064/api/Rappel/{rappel.Id}", rappel);
 
             if (response.IsSuccessStatusCode)
             {
@@ -116,7 +116,7 @@ public class RappelService
     {
         try
         {
-            var response = await _httpClient.DeleteAsync($"api/Rappel/{id}");
+            var response = await _httpClient.DeleteAsync($"https://localhost:7064/api/Rappel/{id}");
 
             if (response.IsSuccessStatusCode)
             {
