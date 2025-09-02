@@ -14,6 +14,8 @@
 @inject DemandeCongeService DemandeService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
 
 <PageTitle>Validations en attente - GCO</PageTitle>
 
@@ -147,7 +149,7 @@
                         </TemplateColumn>
                         <PropertyColumn Property="x => x.NomValideur" Title="Employé" />
                         @* <PropertyColumn Property="x => x.DateDebut" Title="Début" Format="dd/MM/yyyy" />
-                        <PropertyColumn Property="x => x.DateFin" Title="Fin" Format="dd/MM/yyyy" /> *@
+                         <PropertyColumn Property="x => x.DateFin" Title="Fin" Format="dd/MM/yyyy" /> *@
                         @* <PropertyColumn Property="x => x.NombreJours" Title="Jours" /> *@
                         @* <PropertyColumn Property="x => x.DateSoumission" Title="Soumise le" Format="dd/MM/yyyy" /> *@
                         <TemplateColumn Title="Actions" Sortable="false">
@@ -237,6 +239,33 @@
     </MudCardContent>
 </MudCard>
 
+<!-- Dialog de validation -->
+<MudDialog @bind-IsVisible="_showApproveDialog" Options="new DialogOptions() { MaxWidth = MaxWidth.Small }">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Check" Class="mr-3" />
+            Approuver la demande
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText GutterBottom="true">
+            Êtes-vous sûr de vouloir approuver la demande de <strong>@_selectedValidation?.NomValideur</strong> ?
+        </MudText>
+        <MudTextField @bind-Value="_commentaireApprobation"
+                      Label="Commentaire (facultatif)"
+                      Variant="Variant.Outlined"
+                      Lines="3"
+                      HelperText="Ajoutez un commentaire si nécessaire" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@(() => _showApproveDialog = false)">Annuler</MudButton>
+        <MudButton Color="Color.Success"
+                   OnClick="ConfirmApprobation">
+            Approuver
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
 <!-- Dialog de rejet -->
 <MudDialog @bind-IsVisible="_showRejectDialog" Options="new DialogOptions() { MaxWidth = MaxWidth.Small }">
     <TitleContent>
@@ -279,9 +308,11 @@
     private string _filtreType = "";
     private string _filtreEmploye = "";
 
-    // Dialog de rejet
+    // Dialogs
+    private bool _showApproveDialog = false;
     private bool _showRejectDialog = false;
     private Validation? _selectedValidation;
+    private string _commentaireApprobation = "";
     private string _commentaireRejet = "";
 
     protected override async Task OnInitializedAsync()
@@ -389,27 +420,31 @@
 
     private void VoirDetails(int validationId) => NavigationManager.NavigateTo($"/validations/details/{validationId}");
 
-    [Inject] private IDialogService DialogService { get; set; }
-
-    private async Task ApprouverDemande(Validation validation)
+    private void ApprouverDemande(Validation validation)
     {
-        var confirmed = await DialogService.ShowMessageBox(
-            "Confirmer l'approbation",
-            $"Approuver la demande de {validation.NomValideur} ?",
-            "Oui", "Non");
+        _selectedValidation = validation;
+        _commentaireApprobation = ""; // Reset comment field
+        _showApproveDialog = true;
+    }
 
-        if (confirmed == true)
+    private async Task ConfirmApprobation()
+    {
+        if (_selectedValidation == null) return;
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var validateurId = authState.User.GetUserId();
+
+        if (validateurId.HasValue)
         {
-            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-            var validateurId = authState.User.GetUserId();
+            var result = await ValidationService.ApprouverDemandeAsync(
+                _selectedValidation.Id,
+                validateurId.Value,
+                _commentaireApprobation);
 
-            if (validateurId.HasValue)
+            if (result.HandleWithNotification(Snackbar))
             {
-                var result = await ValidationService.ApprouverDemandeAsync(validation.Id, validateurId.Value);
-                if (result.HandleWithNotification(Snackbar))
-                {
-                    await RefreshData();
-                }
+                _showApproveDialog = false;
+                await RefreshData();
             }
         }
     }

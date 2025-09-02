@@ -105,7 +105,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-
         try
         {
             _theme = new()
@@ -208,6 +207,7 @@
         Navigation.NavigateTo("/notifications");
     }
 
+    // Correction ici : Implémente IDisposable pour se désabonner de l'événement.
     public void Dispose()
     {
         AuthStateProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
