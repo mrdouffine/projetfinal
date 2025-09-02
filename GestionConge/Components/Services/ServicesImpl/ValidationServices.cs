@@ -96,6 +96,8 @@ public class ValidationServices : IValidationService
         return true;
     }
 
+    public Task<IEnumerable<ValidationDto>> GetValidationsByValidateurAsync(int valideurId)
+        => _validationRepo.GetValidationsByValidateurAsync(valideurId);
     // Méthodes utilitaires privées
     private async Task UpdateDemandeStatutAsync(DemandeCongeDto demande, string statut)
     {

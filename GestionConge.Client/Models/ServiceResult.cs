@@ -75,16 +75,15 @@
     public class Validation
     {
         public int Id { get; set; }
-        public int DemandeId { get; set; }
-        public int ValidateurId { get; set; }
         public string Statut { get; set; } = string.Empty; // "En attente", "Approuve", "Rejete"
         public string? Commentaire { get; set; }
         public DateTime DateValidation { get; set; }
+        public int DemandeCongeId { get; set; }
 
-        // Propriétés de navigation
-        public string? NomValidateur { get; set; }
-        public string? PrenomValidateur { get; set; }
-        public DemandeCongeDto? Demande { get; set; }
+        public int ValideurId { get; set; }
+        public string NomValideur { get; set; }
+        public string EmailValideur { get; set; }
+        public int OrdreValidation { get; set; } = 1;
     }
 
     public class UtilisateurAuth

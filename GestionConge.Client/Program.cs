@@ -1,40 +1,50 @@
 using Blazored.LocalStorage;
 using GestionConge.Client.Services;
+using GestionConge.Client.Handlers;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using MudBlazor.Services;
 
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
+// Remove the default authentication service to use your custom one
+// builder.Services.AddApiAuthorization();
+
 // MudBlazor
-builder.Services.AddMudServices();
+builder.Services.AddMudServices(config =>
+{
+    config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
+    config.SnackbarConfiguration.VisibleStateDuration = 5000;
+    config.SnackbarConfiguration.HideTransitionDuration = 500;
+    config.SnackbarConfiguration.ShowTransitionDuration = 500;
+    //équivalent de BackgroundOpacity dans Mudblazor avec NET 9
+    config.SnackbarConfiguration.BackgroundBlurred = true;
+    config.SnackbarConfiguration.ShowCloseIcon = true;
+    config.SnackbarConfiguration.MaxDisplayedSnackbars = 3;
+});
 
 // Blazored LocalStorage
 builder.Services.AddBlazoredLocalStorage();
-builder.Services.AddScoped<UtilisateurService>();
 
-
-// Authentication
+// Register your custom authentication services
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<CustomAuthStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
     provider.GetRequiredService<CustomAuthStateProvider>());
 builder.Services.AddScoped<AuthService>();
 
-// HttpClient configuré pour votre API
+// Register the custom delegating handler
+builder.Services.AddScoped<CustomAuthorizationHandler>();
 
-//builder.Services.AddScoped(sp => new HttpClient
-//{
-//    BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"] ?? builder.HostEnvironment.BaseAddress)
-//});
+// Register your HTTP client and configure it to use your custom handler
 builder.Services.AddHttpClient("MonApi", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7064/"); // L'URL de votre API
-}).AddHttpMessageHandler<AuthorizationMessageHandler>();
-
-builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("MonApi"));
+    client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
+})
+.AddHttpMessageHandler<CustomAuthorizationHandler>();
 
 // Services API
+builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("MonApi"));
 builder.Services.AddScoped<ApiService>();
 builder.Services.AddScoped<ApiClient>();
 
@@ -44,8 +54,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PlanningCongeService>();
 builder.Services.AddScoped<RappelService>();
 builder.Services.AddScoped<ValidationService>();
-
-
+builder.Services.AddScoped<UtilisateurService>();
 
 // Service utilitaire pour les notifications
 builder.Services.AddScoped<INotificationService, NotificationService>();

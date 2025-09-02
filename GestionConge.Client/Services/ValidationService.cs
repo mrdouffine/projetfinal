@@ -1,4 +1,5 @@
 ﻿using GestionConge.Client.Models;
+using System.Net.Http.Json;
 
 namespace GestionConge.Client.Services
 {
@@ -111,8 +112,8 @@ namespace GestionConge.Client.Services
             }
         }
 
-        //GetValidationsAujourdhuiAsync
-        public async Task<ServiceResult<IEnumerable<Validation>>> GetValidationsAujourdhuiAsync()
+        //GetValidationsAujourdhuiAsync
+        public async Task<ServiceResult<IEnumerable<Validation>>> GetValidationsAujourdhuiAsync()
         {
             try
             {
@@ -217,9 +218,9 @@ namespace GestionConge.Client.Services
                 if (allValidationsResult.IsSuccess && allValidationsResult.Data != null)
                 {
                     var validationsEnAttente = allValidationsResult.Data
-                        .Where(v => v.Statut == "En attente")
-                        .OrderBy(v => v.DateValidation)
-                        .ToList();
+                      .Where(v => v.Statut == "En attente")
+                      .OrderBy(v => v.DateValidation)
+                      .ToList();
 
                     return ServiceResult<IEnumerable<Validation>>.Success(validationsEnAttente);
                 }
@@ -233,7 +234,6 @@ namespace GestionConge.Client.Services
             }
         }
 
-        //GetPendingValidationsCountAsync
         public async Task<ServiceResult<int>> GetPendingValidationsCountAsync()
         {
             try
@@ -253,23 +253,25 @@ namespace GestionConge.Client.Services
             }
         }
 
-        public async Task<ServiceResult<IEnumerable<Validation>>> GetValidationsByValidateurAsync(int? validateurId)
+        /// <summary>
+        /// Retrieves a list of validations for a specific user ID from the API.
+        /// This method is now correctly implemented to handle a list of validations.
+        /// </summary>
+        public async Task<ServiceResult<IEnumerable<Validation>>> GetValidationsByValidateurAsync(int? validateurId)
         {
             try
             {
-                var allValidationsResult = await GetAllAsync();
+                // Correctly form the URL to pass the validateurId as a query parameter
+                var response = await _httpClient.GetAsync($"https://localhost:7064/api/Validation/validations-by-validateur?id={validateurId}");
 
-                if (allValidationsResult.IsSuccess && allValidationsResult.Data != null)
+                if (response.IsSuccessStatusCode)
                 {
-                    var validationsValidateur = allValidationsResult.Data
-                        .Where(v => v.ValidateurId == validateurId)
-                        .OrderByDescending(v => v.DateValidation)
-                        .ToList();
-
-                    return ServiceResult<IEnumerable<Validation>>.Success(validationsValidateur);
+                    // Expecting a list of validations from the API
+                    var validations = await response.Content.ReadFromJsonAsync<IEnumerable<Validation>>();
+                    return ServiceResult<IEnumerable<Validation>>.Success(validations ?? new List<Validation>());
                 }
 
-                return ServiceResult<IEnumerable<Validation>>.Failure(allValidationsResult.ErrorMessage);
+                return ServiceResult<IEnumerable<Validation>>.Failure($"Erreur lors de la récupération: {response.StatusCode}");
             }
             catch (Exception ex)
             {
@@ -277,7 +279,5 @@ namespace GestionConge.Client.Services
                 return ServiceResult<IEnumerable<Validation>>.Failure("Erreur lors du traitement");
             }
         }
-
-
     }
 }

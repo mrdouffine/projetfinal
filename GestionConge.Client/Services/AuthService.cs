@@ -170,4 +170,7 @@ public class AuthService
 
         OnChange?.Invoke();
     }
+
+    //GetJwtTokenAsync => GetAccessTokenAsync();
+    public Task<string> GetJwtTokenAsync() => GetAccessTokenAsync();
 }

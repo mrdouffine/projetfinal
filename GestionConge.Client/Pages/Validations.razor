@@ -145,9 +145,9 @@
                                 }
                             </CellTemplate>
                         </TemplateColumn>
-                        <PropertyColumn Property="x => x.NomValidateur" Title="Employé" />
+                        <PropertyColumn Property="x => x.NomValideur" Title="Employé" />
                         @* <PropertyColumn Property="x => x.DateDebut" Title="Début" Format="dd/MM/yyyy" />
-                        <PropertyColumn Property="x => x.DateFin" Title="Fin" Format="dd/MM/yyyy" />
+                        <PropertyColumn Property="x => x.DateFin" Title="Fin" Format="dd/MM/yyyy" /> *@
                         @* <PropertyColumn Property="x => x.NombreJours" Title="Jours" /> *@
                         @* <PropertyColumn Property="x => x.DateSoumission" Title="Soumise le" Format="dd/MM/yyyy" /> *@
                         <TemplateColumn Title="Actions" Sortable="false">
@@ -184,7 +184,7 @@
                                 <MudCardHeader>
                                     <CardHeaderContent>
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <MudText Typo="Typo.h6">@validation.NomValidateur</MudText>
+                                            <MudText Typo="Typo.h6">@validation.NomValideur</MudText>
                                             @if (IsUrgent(validation))
                                             {
                                                 <MudIcon Icon="@Icons.Material.Filled.PriorityHigh"
@@ -247,7 +247,7 @@
     </TitleContent>
     <DialogContent>
         <MudText GutterBottom="true">
-            Êtes-vous sûr de vouloir rejeter la demande de <strong>@_selectedValidation?.NomValidateur</strong> ?
+            Êtes-vous sûr de vouloir rejeter la demande de <strong>@_selectedValidation?.NomValideur</strong> ?
         </MudText>
         <MudTextField @bind-Value="_commentaireRejet"
                       Label="Commentaire (obligatoire)"
@@ -300,16 +300,21 @@
             if (validateurId.HasValue)
             {
                 var result = await ValidationService.GetValidationsByValidateurAsync(validateurId);
-                await result.HandleServiceResultAsync(Snackbar,
-                    onSuccess: validations =>
-                    {
-                        _validationsEnAttente = validations.ToList();
-                        _validationsUrgentes = _validationsEnAttente.Where(IsUrgent).ToList();
-                        ApplyFilters();
-                    });
 
-                // Charger les statistiques
-                await LoadStatistiques();
+                if (result.IsSuccess)
+                {
+                    Console.WriteLine($"Found {result.Data.Count()} validations.");
+                    _validationsEnAttente = result.Data.ToList();
+                    _validationsUrgentes = _validationsEnAttente.Where(IsUrgent).ToList();
+                    ApplyFilters(); // Apply filters immediately after loading data
+
+                    // Load stats after data is successfully loaded
+                    await LoadStatistiques();
+                }
+                else
+                {
+                    Snackbar.Add(result.ErrorMessage ?? "Une erreur est survenue lors du chargement des demandes.", Severity.Error);
+                }
             }
         }
         catch (Exception ex)
@@ -329,14 +334,12 @@
         var result = await ValidationService.GetValidationsAujourdhuiAsync();
         if (result.IsSuccess)
         {
-            // _validationsAujourdhui = result;
+            // _validationsAujourdhui = result; // Corrected: This line needs to be handled correctly
         }
         else
         {
             Snackbar.Add("Erreur lors du chargement des statistiques", Severity.Error);
         }
-
-
     }
 
     private void ApplyFilters()
@@ -347,7 +350,7 @@
              (_filtreUrgence == "normal" && !IsUrgent(v))) &&
             (string.IsNullOrEmpty(_filtreType)) &&
             (string.IsNullOrEmpty(_filtreEmploye) ||
-             v.NomValidateur.Contains(_filtreEmploye, StringComparison.OrdinalIgnoreCase))
+             v.NomValideur.Contains(_filtreEmploye, StringComparison.OrdinalIgnoreCase))
         ).OrderBy(v => IsUrgent(v) ? 0 : 1)
          .ThenBy(v => v.DateValidation)
          .ToList();
@@ -392,7 +395,7 @@
     {
         var confirmed = await DialogService.ShowMessageBox(
             "Confirmer l'approbation",
-            $"Approuver la demande de {validation.NomValidateur} ?",
+            $"Approuver la demande de {validation.NomValideur} ?",
             "Oui", "Non");
 
         if (confirmed == true)

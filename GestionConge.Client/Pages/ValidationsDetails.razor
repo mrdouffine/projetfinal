@@ -1,0 +1,109 @@
+﻿@page "/validations/details/{ValidationId:int}"
+
+@using GestionConge.Client.Models
+@using GestionConge.Client.Services
+@inject ValidationService ValidationService
+@inject NavigationManager NavigationManager
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-4">Détails de la validation</h3>
+
+            @if (isLoading)
+            {
+                <div class="alert alert-info text-center">
+                    <em>Chargement des détails...</em>
+                </div>
+            }
+            else if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger">
+                    Erreur: @errorMessage
+                </div>
+            }
+            else if (validation == null)
+            {
+                <div class="alert alert-warning">
+                    Validation non trouvée.
+                </div>
+            }
+            else
+            {
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Validation #@validation.Id</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <strong>Nom du validateur:</strong> @validation.NomValideur
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <strong>Statut:</strong> <span class="badge @GetStatusBadge(validation.Statut)">@validation.Statut</span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <strong>ID de la demande de congé:</strong> @validation.DemandeCongeId
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <strong>Date de validation:</strong> @validation.DateValidation.ToString("dd/MM/yyyy HH:mm")
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <strong>Commentaire:</strong>
+                                <p>@(string.IsNullOrEmpty(validation.Commentaire) ? "Aucun commentaire" : validation.Commentaire)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-secondary" @onclick="GoBack">
+                            Retourner à la liste
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int ValidationId { get; set; }
+
+    private Validation validation;
+    private bool isLoading = true;
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+
+        var result = await ValidationService.GetByIdAsync(ValidationId);
+
+        if (result.IsSuccess)
+        {
+            validation = result.Data;
+        }
+        else
+        {
+            errorMessage = result.ErrorMessage;
+        }
+
+        isLoading = false;
+    }
+
+    private string GetStatusBadge(string status)
+    {
+        return status switch
+        {
+            "En attente" => "bg-warning text-dark",
+            "Approuve" => "bg-success",
+            "Rejete" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/validations");
+    }
+}

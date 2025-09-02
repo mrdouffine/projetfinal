@@ -11,6 +11,9 @@ public interface IValidationRepository
     Task<bool> UpdateAsync(Validation validation);
     Task<ValidationDto?> GetByValideurAndDemandeAsync(int valideurId, int demandeId);
 
+    //GetValidationsByValidateurAsync
+    Task<IEnumerable<ValidationDto>> GetValidationsByValidateurAsync(int valideurId);
+
     //GetValidationsAujourdhuiAsync()
 
     Task<IEnumerable<ValidationDto>> GetValidationsAujourdhuiAsync(int valideurId);

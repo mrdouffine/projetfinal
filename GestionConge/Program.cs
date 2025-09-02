@@ -31,6 +31,9 @@ builder.Services.AddScoped<IDbConnection>(sp =>
     return conn;
 });
 
+builder.Services.AddApiAuthorization();
+builder.Services.AddAuthorization();
+
 //// Register the DapperContext for database access
 //builder.Services.AddSingleton<DapperContext>();
 
@@ -83,7 +86,6 @@ builder.Services.AddScoped<CustomAuthStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthStateProvider>());
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UtilisateurService>();
-builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ApiService>();
 builder.Services.AddScoped<ApiClient>();
 builder.Services.AddScoped<DemandeCongeService>();

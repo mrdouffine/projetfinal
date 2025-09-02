@@ -75,5 +75,14 @@ public class ValidationController : ControllerBase
         return Ok(validations);
     }
 
+    //GetValidationsByValidateurAsync
+    //[Authorize]
+    [HttpGet("validations-by-validateur")]
+    public async Task<IActionResult> GetValidationsByValidateur(int id)
+    {
+        var validations = await _service.GetValidationsByValidateurAsync(id);
+        return Ok(validations);
+    }
+
 
 }

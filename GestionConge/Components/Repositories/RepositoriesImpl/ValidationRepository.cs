@@ -54,6 +54,20 @@ public class ValidationRepository : IValidationRepository
         return await _db.QueryFirstOrDefaultAsync<ValidationDto>(sql, new { ValideurId = valideurId, DemandeId = demandeId });
     }
 
+    public async Task<IEnumerable<ValidationDto>> GetValidationsByValidateurAsync(int valideurId)
+    {
+        var sql = @"
+        SELECT v.id, v.demandecongeid, v.statut, v.commentaire, v.datevalidation,
+               u.id as ValideurId, u.nom as NomValideur, u.email as EmailValideur
+        FROM validations v
+        JOIN utilisateurs u ON v.valideurid = u.id
+        WHERE v.valideurid = @ValideurId
+        ORDER BY v.datevalidation DESC;
+        ";
+        return await _db.QueryAsync<ValidationDto>(sql, new { ValideurId = valideurId });
+    }
+
+
     public async Task<int> CreateAsync(Validation validation)
     {
         var sql = @"
