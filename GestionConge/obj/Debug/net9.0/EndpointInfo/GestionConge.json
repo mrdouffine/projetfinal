@@ -1150,6 +1150,18 @@
           }
         }
       }
+    },
+    "/api/Validation/dot-ids": {
+      "get": {
+        "tags": [
+          "Validation"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   },
   "components": {

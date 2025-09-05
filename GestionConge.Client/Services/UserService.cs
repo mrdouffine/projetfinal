@@ -1,8 +1,5 @@
 ﻿using GestionConge.Client.Models;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+
 
 namespace GestionConge.Client.Services
 {

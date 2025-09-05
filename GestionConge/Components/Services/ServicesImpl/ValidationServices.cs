@@ -117,6 +117,11 @@ public class ValidationServices : IValidationService
         await _demandeRepo.UpdateAsync(demandeToUpdate);
     }
 
+    public async Task<IEnumerable<int>> GetDotIdsAsync()
+    {
+        return await _validationRepo.GetDotIdsAsync();
+    }
+
     //GetValidationsAujourdhuiAsync()
 
     public async Task<IEnumerable<ValidationDto>> GetValidationsAujourdhuiAsync(int valideurId)

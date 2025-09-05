@@ -104,6 +104,11 @@ public class ValidationRepository : IValidationRepository
 
         return await _db.ExecuteAsync(sql, validation) > 0;
     }
+    public async Task<IEnumerable<int>> GetDotIdsAsync()
+    {
+        var sql = "SELECT id FROM validations WHERE role = 'DOT';";
+        return await _db.QueryAsync<int>(sql);
+    }
 
     public async Task<bool> DeleteAsync(int id)
     {

@@ -704,6 +704,16 @@
   },
   {
     "ContainingType": "GestionConge.Components.Controllers.ValidationController",
+    "Method": "GetDotIds",
+    "RelativePath": "api/Validation/dot-ids",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.ValidationController",
     "Method": "TraiterValidation",
     "RelativePath": "api/Validation/traiter",
     "HttpMethod": "POST",

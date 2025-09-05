@@ -9,7 +9,6 @@
 @using GestionConge.Client.Extensions
 @using GestionConge.Client.Helpers
 @inject NavigationManager NavigationManager
-@* @layout SecureLayout *@
 @inject ValidationService ValidationService
 @inject DemandeCongeService DemandeService
 @inject AuthenticationStateProvider AuthStateProvider
@@ -59,7 +58,7 @@
     </MudItem>
     <MudItem xs="6" sm="3">
         <MudPaper Class="pa-4 text-center">
-            <MudText Typo="Typo.h6" Color="Color.Info">@GetTempsReponseModyen()</MudText>
+            <MudText Typo="Typo.h6" Color="Color.Info">@GetTempsReponseMoyen()</MudText>
             <MudText Typo="Typo.body2">Temps de réponse moyen</MudText>
         </MudPaper>
     </MudItem>
@@ -84,6 +83,15 @@
                     <MudSelectItem Value="@("Congés payés")">Congés payés</MudSelectItem>
                     <MudSelectItem Value="@("RTT")">RTT</MudSelectItem>
                     <MudSelectItem Value="@("Congé maladie")">Congé maladie</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            <!-- Nouveau filtre pour le rôle -->
+            <MudItem xs="12" sm="6" md="3">
+                <MudSelect T="string" @bind-Value="_filtreRole" Label="Niveau de validation"
+                           Variant="Variant.Outlined" @onchange="ApplyFilters">
+                    <MudSelectItem Value="@("")">Tous les niveaux</MudSelectItem>
+                    <MudSelectItem Value="@("normal")">Validation initiale</MudSelectItem>
+                    <MudSelectItem Value="@("dot")">Validation DOT</MudSelectItem>
                 </MudSelect>
             </MudItem>
             <MudItem xs="12" sm="6" md="3">
@@ -148,10 +156,19 @@
                             </CellTemplate>
                         </TemplateColumn>
                         <PropertyColumn Property="x => x.NomValideur" Title="Employé" />
-                        @* <PropertyColumn Property="x => x.DateDebut" Title="Début" Format="dd/MM/yyyy" />
-                         <PropertyColumn Property="x => x.DateFin" Title="Fin" Format="dd/MM/yyyy" /> *@
-                        @* <PropertyColumn Property="x => x.NombreJours" Title="Jours" /> *@
-                        @* <PropertyColumn Property="x => x.DateSoumission" Title="Soumise le" Format="dd/MM/yyyy" /> *@
+                        <PropertyColumn Property="x => x.DateValidation" Title="Soumise le" Format="dd/MM/yyyy" />
+                        <TemplateColumn Title="Niveau" Sortable="true" Filterable="true">
+                            <CellTemplate>
+                                @if (IsDotValidation(context.Item))
+                                {
+                                    <MudChip Color="Color.Primary" Size="Size.Small">DOT</MudChip>
+                                }
+                                else
+                                {
+                                    <MudChip Color="Color.Secondary" Size="Size.Small">Initial</MudChip>
+                                }
+                            </CellTemplate>
+                        </TemplateColumn>
                         <TemplateColumn Title="Actions" Sortable="false">
                             <CellTemplate>
                                 <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small">
@@ -187,12 +204,22 @@
                                     <CardHeaderContent>
                                         <div class="d-flex justify-content-between align-items-center">
                                             <MudText Typo="Typo.h6">@validation.NomValideur</MudText>
-                                            @if (IsUrgent(validation))
-                                            {
-                                                <MudIcon Icon="@Icons.Material.Filled.PriorityHigh"
-                                                         Color="Color.Error"
-                                                         Title="Demande urgente" />
-                                            }
+                                            <div class="d-flex gap-2">
+                                                @if (IsUrgent(validation))
+                                                {
+                                                    <MudIcon Icon="@Icons.Material.Filled.PriorityHigh"
+                                                             Color="Color.Error"
+                                                             Title="Demande urgente" />
+                                                }
+                                                @if (IsDotValidation(validation))
+                                                {
+                                                    <MudChip T="string" Color="Color.Primary" Size="Size.Small">DOT</MudChip>
+                                                }
+                                                else
+                                                {
+                                                    <MudChip T="string" Color="Color.Secondary" Size="Size.Small">Initial</MudChip>
+                                                }
+                                            </div>
                                         </div>
                                         <MudText Typo="Typo.caption" Color="Color.Secondary">
                                             Soumise le @validation.DateValidation.ToString("dd/MM/yyyy")
@@ -200,16 +227,6 @@
                                     </CardHeaderContent>
                                 </MudCardHeader>
                                 <MudCardContent>
-                                    @* <MudText Typo="Typo.subtitle1" GutterBottom="true">
-                                        @demande.TypeConge
-                                    </MudText> *@
-                                    @* <MudText Typo="Typo.body2" GutterBottom="true">
-                                        Du @validation.DateDebut.ToString("dd/MM")
-                                        au @validation.DateFin.ToString("dd/MM/yyyy")
-                                    </MudText> *@
-                                    @* <MudText Typo="Typo.body2" Color="Color.Secondary">
-                                        @demande.NombreJours jour@(demande.NombreJours > 1 ? "s" : "")
-                                    </MudText> *@
                                     @if (!string.IsNullOrEmpty(validation.Commentaire))
                                     {
                                         <MudText Typo="Typo.caption" Class="mt-2">
@@ -239,61 +256,66 @@
     </MudCardContent>
 </MudCard>
 
-<!-- Dialog de validation -->
-<MudDialog @bind-IsVisible="_showApproveDialog" Options="new DialogOptions() { MaxWidth = MaxWidth.Small }">
-    <TitleContent>
-        <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.Check" Class="mr-3" />
-            Approuver la demande
-        </MudText>
-    </TitleContent>
-    <DialogContent>
-        <MudText GutterBottom="true">
-            Êtes-vous sûr de vouloir approuver la demande de <strong>@_selectedValidation?.NomValideur</strong> ?
-        </MudText>
-        <MudTextField @bind-Value="_commentaireApprobation"
-                      Label="Commentaire (facultatif)"
-                      Variant="Variant.Outlined"
-                      Lines="3"
-                      HelperText="Ajoutez un commentaire si nécessaire" />
-    </DialogContent>
-    <DialogActions>
-        <MudButton OnClick="@(() => _showApproveDialog = false)">Annuler</MudButton>
-        <MudButton Color="Color.Success"
-                   OnClick="ConfirmApprobation">
-            Approuver
-        </MudButton>
-    </DialogActions>
-</MudDialog>
+<!-- Dialog de validation - VERSION CORRIGÉE -->
+@if (_showApproveDialog)
+{
+    <MudDialog>
+        <TitleContent>
+            <MudText Typo="Typo.h6">
+                <MudIcon Icon="@Icons.Material.Filled.Check" Class="mr-3" />
+                Approuver la demande
+            </MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudText GutterBottom="true">
+                Êtes-vous sûr de vouloir approuver la demande de <strong>@_selectedValidation?.NomValideur</strong> ?
+            </MudText>
+            <MudTextField @bind-Value="_commentaireApprobation"
+                          Label="Commentaire (facultatif)"
+                          Variant="Variant.Outlined"
+                          Lines="3"
+                          HelperText="Ajoutez un commentaire si nécessaire" />
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="@(() => _showApproveDialog = false)">Annuler</MudButton>
+            <MudButton Color="Color.Success" OnClick="ConfirmApprobation">
+                Approuver
+            </MudButton>
+        </DialogActions>
+    </MudDialog>
+}
 
-<!-- Dialog de rejet -->
-<MudDialog @bind-IsVisible="_showRejectDialog" Options="new DialogOptions() { MaxWidth = MaxWidth.Small }">
-    <TitleContent>
-        <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.Close" Class="mr-3" />
-            Rejeter la demande
-        </MudText>
-    </TitleContent>
-    <DialogContent>
-        <MudText GutterBottom="true">
-            Êtes-vous sûr de vouloir rejeter la demande de <strong>@_selectedValidation?.NomValideur</strong> ?
-        </MudText>
-        <MudTextField @bind-Value="_commentaireRejet"
-                      Label="Commentaire (obligatoire)"
-                      Variant="Variant.Outlined"
-                      Lines="3"
-                      Required="true"
-                      HelperText="Expliquez la raison du rejet" />
-    </DialogContent>
-    <DialogActions>
-        <MudButton OnClick="@(() => _showRejectDialog = false)">Annuler</MudButton>
-        <MudButton Color="Color.Error"
-                   OnClick="ConfirmRejet"
-                   Disabled="string.IsNullOrWhiteSpace(_commentaireRejet)">
-            Rejeter
-        </MudButton>
-    </DialogActions>
-</MudDialog>
+<!-- Dialog de rejet - VERSION CORRIGÉE -->
+@if (_showRejectDialog)
+{
+    <MudDialog>
+        <TitleContent>
+            <MudText Typo="Typo.h6">
+                <MudIcon Icon="@Icons.Material.Filled.Close" Class="mr-3" />
+                Rejeter la demande
+            </MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudText GutterBottom="true">
+                Êtes-vous sûr de vouloir rejeter la demande de <strong>@_selectedValidation?.NomValideur</strong> ?
+            </MudText>
+            <MudTextField @bind-Value="_commentaireRejet"
+                          Label="Commentaire (obligatoire)"
+                          Variant="Variant.Outlined"
+                          Lines="3"
+                          Required="true"
+                          HelperText="Expliquez la raison du rejet" />
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="@(() => _showRejectDialog = false)">Annuler</MudButton>
+            <MudButton Color="Color.Error"
+                       OnClick="ConfirmRejet"
+                       Disabled="string.IsNullOrWhiteSpace(_commentaireRejet)">
+                Rejeter
+            </MudButton>
+        </DialogActions>
+    </MudDialog>
+}
 
 @code {
     private bool _loading = true;
@@ -306,6 +328,7 @@
     // Filtres
     private string _filtreUrgence = "";
     private string _filtreType = "";
+    private string _filtreRole = ""; // Nouveau filtre pour le rôle
     private string _filtreEmploye = "";
 
     // Dialogs
@@ -314,6 +337,28 @@
     private Validation? _selectedValidation;
     private string _commentaireApprobation = "";
     private string _commentaireRejet = "";
+
+
+    //methode pour récupérer l'id utilisateur DOT depuis le service d'authentification
+    // private async Task<List<int>> GetDotUserIdAsync()
+    // {
+    //     var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+    //     var user = authState.User.GetUserId;
+
+
+    //     var  DOT_USER_ID = await ValidationService.GetDotIdsAsync();
+    //     return DOT_USER_ID;
+
+    // }
+    // stocker les id utilisateur DOT dans une constante pour la comparaison DOT_USER_ID
+
+    private List<int> result = new();
+
+
+
+
+
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -330,7 +375,7 @@
 
             if (validateurId.HasValue)
             {
-                var result = await ValidationService.GetValidationsByValidateurAsync(validateurId);
+                var result = await ValidationService.GetValidationsByValidateurAsync(validateurId.Value);
 
                 if (result.IsSuccess)
                 {
@@ -361,11 +406,10 @@
 
     private async Task LoadStatistiques()
     {
-        // Charger le nombre de validations d'aujourd'hui
         var result = await ValidationService.GetValidationsAujourdhuiAsync();
         if (result.IsSuccess)
         {
-            // _validationsAujourdhui = result; // Corrected: This line needs to be handled correctly
+            _validationsAujourdhui = result.Data.Count(); // Assuming result.Data is an integer
         }
         else
         {
@@ -377,11 +421,14 @@
     {
         _filteredValidations = _validationsEnAttente.Where(v =>
             (_filtreUrgence == "" ||
-             (_filtreUrgence == "urgent" && IsUrgent(v)) ||
-             (_filtreUrgence == "normal" && !IsUrgent(v))) &&
+            (_filtreUrgence == "urgent" && IsUrgent(v)) ||
+            (_filtreUrgence == "normal" && !IsUrgent(v))) &&
+            (_filtreRole == "" ||
+            (_filtreRole == "DOT" && IsDotValidation(v)) ||
+            (_filtreRole == "normal" && !IsDotValidation(v))) &&
             (string.IsNullOrEmpty(_filtreType)) &&
             (string.IsNullOrEmpty(_filtreEmploye) ||
-             v.NomValideur.Contains(_filtreEmploye, StringComparison.OrdinalIgnoreCase))
+            v.NomValideur.Contains(_filtreEmploye, StringComparison.OrdinalIgnoreCase))
         ).OrderBy(v => IsUrgent(v) ? 0 : 1)
          .ThenBy(v => v.DateValidation)
          .ToList();
@@ -393,6 +440,7 @@
     {
         _filtreUrgence = "";
         _filtreType = "";
+        _filtreRole = ""; // Réinitialiser le nouveau filtre
         _filtreEmploye = "";
         ApplyFilters();
     }
@@ -405,14 +453,19 @@
     private bool IsUrgent(Validation validation)
     {
         // Une demande est urgente si :
-        // - Elle commence dans moins de 3 jours
         // - Elle a été soumise il y a plus de 5 jours
-        // var joursAvantDebut = (validation.DateDebut - DateTime.Today).Days;
-        // var joursDepuisSoumission = (DateTime.Today - validation.DateSoumission.Date).Days;
-        return (validation.DateValidation - DateTime.Today).TotalDays <= 3;
+        return (DateTime.Today - validation.DateValidation.Date).Days > 5;
     }
 
-    private string GetTempsReponseModyen()
+    // Nouvelle méthode pour vérifier si la validation est destinée au DOT
+    private bool IsDotValidation(Validation validation)
+    {
+        //recupérer les id utilisateur DOT depuis la méthode GetDotUserIdAsync
+        
+        return false;
+    }
+
+    private string GetTempsReponseMoyen()
     {
         // Simuler un temps de réponse moyen
         return "2.3j";
@@ -422,62 +475,158 @@
 
     private void ApprouverDemande(Validation validation)
     {
+        Console.WriteLine($"ApprouverDemande appelée pour validation ID: {validation.Id}");
+        Console.WriteLine($"DemandeCongeId: {validation.DemandeCongeId}");
+        Console.WriteLine($"NomValideur: {validation.NomValideur}");
+
         _selectedValidation = validation;
-        _commentaireApprobation = ""; // Reset comment field
+        _commentaireApprobation = "";
         _showApproveDialog = true;
-    }
 
-    private async Task ConfirmApprobation()
-    {
-        if (_selectedValidation == null) return;
-
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var validateurId = authState.User.GetUserId();
-
-        if (validateurId.HasValue)
-        {
-            var result = await ValidationService.ApprouverDemandeAsync(
-                _selectedValidation.Id,
-                validateurId.Value,
-                _commentaireApprobation);
-
-            if (result.HandleWithNotification(Snackbar))
-            {
-                _showApproveDialog = false;
-                await RefreshData();
-            }
-        }
+        Console.WriteLine($"Dialog ouvert: {_showApproveDialog}");
+        StateHasChanged(); // Force UI update
     }
 
     private void RejeterDemande(Validation validation)
     {
+        Console.WriteLine($"RejeterDemande appelée pour validation ID: {validation.Id}");
+        Console.WriteLine($"DemandeCongeId: {validation.DemandeCongeId}");
+        Console.WriteLine($"NomValideur: {validation.NomValideur}");
+
         _selectedValidation = validation;
         _commentaireRejet = "";
         _showRejectDialog = true;
+
+        Console.WriteLine($"Dialog ouvert: {_showRejectDialog}");
+        StateHasChanged(); // Force UI update
+    }
+
+    private async Task ConfirmApprobation()
+    {
+        Console.WriteLine("ConfirmApprobation démarrée");
+
+        if (_selectedValidation == null)
+        {
+            Console.WriteLine("Erreur: _selectedValidation est null");
+            return;
+        }
+
+        Console.WriteLine($"Validation sélectionnée: ID={_selectedValidation.Id}, DemandeCongeId={_selectedValidation.DemandeCongeId}");
+
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var validateurId = authState.User.GetUserId();
+
+            Console.WriteLine($"ValidateurId récupéré: {validateurId}");
+
+            if (validateurId.HasValue)
+            {
+                Console.WriteLine($"Appel API ApprouverDemandeAsync avec DemandeCongeId: {_selectedValidation.DemandeCongeId}");
+
+                var result = await ValidationService.ApprouverDemandeAsync(
+                    _selectedValidation.DemandeCongeId,
+                    validateurId.Value,
+                    _commentaireApprobation);
+
+                Console.WriteLine($"Résultat API: IsSuccess={result.IsSuccess}");
+
+                if (!result.IsSuccess)
+                {
+                    Console.WriteLine($"Erreur API: {result.ErrorMessage}");
+                }
+
+                if (result.IsSuccess)
+                {
+                    Console.WriteLine("Approbation réussie - affichage du message de succès");
+                    Snackbar.Add("Demande approuvée avec succès", Severity.Success);
+                    _showApproveDialog = false;
+                    Console.WriteLine("Début du refresh des données");
+                    await RefreshData();
+                    Console.WriteLine("Refresh des données terminé");
+                }
+                else
+                {
+                    Snackbar.Add(result.ErrorMessage ?? "Erreur lors de l'approbation", Severity.Error);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Erreur: validateurId est null");
+                Snackbar.Add("Erreur d'authentification", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Exception dans ConfirmApprobation: {ex.Message}");
+            Console.Error.WriteLine($"StackTrace: {ex.StackTrace}");
+            Snackbar.Add("Erreur lors de l'approbation de la demande", Severity.Error);
+        }
     }
 
     private async Task ConfirmRejet()
     {
+        Console.WriteLine("ConfirmRejet démarrée");
+
         if (_selectedValidation == null || string.IsNullOrWhiteSpace(_commentaireRejet))
-            return;
-
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var validateurId = authState.User.GetUserId();
-
-        if (validateurId.HasValue)
         {
-            var result = await ValidationService.RejeterDemandeAsync(
-                _selectedValidation.Id,
-                validateurId.Value,
-                _commentaireRejet);
+            Console.WriteLine($"Erreur: _selectedValidation null={_selectedValidation == null}, commentaire vide={string.IsNullOrWhiteSpace(_commentaireRejet)}");
+            return;
+        }
 
-            if (result.HandleWithNotification(Snackbar))
+        Console.WriteLine($"Validation sélectionnée: ID={_selectedValidation.Id}, DemandeCongeId={_selectedValidation.DemandeCongeId}");
+
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var validateurId = authState.User.GetUserId();
+
+            Console.WriteLine($"ValidateurId récupéré: {validateurId}");
+
+            if (validateurId.HasValue)
             {
-                _showRejectDialog = false;
-                await RefreshData();
+                Console.WriteLine($"Appel API RejeterDemandeAsync avec DemandeCongeId: {_selectedValidation.DemandeCongeId}");
+
+                var result = await ValidationService.RejeterDemandeAsync(
+                    _selectedValidation.DemandeCongeId,
+                    validateurId.Value,
+                    _commentaireRejet);
+
+                Console.WriteLine($"Résultat API: IsSuccess={result.IsSuccess}");
+
+                if (!result.IsSuccess)
+                {
+                    Console.WriteLine($"Erreur API: {result.ErrorMessage}");
+                }
+
+                if (result.IsSuccess)
+                {
+                    Console.WriteLine("Rejet réussi - affichage du message de succès");
+                    Snackbar.Add("Demande rejetée avec succès", Severity.Success);
+                    _showRejectDialog = false;
+                    Console.WriteLine("Début du refresh des données");
+                    await RefreshData();
+                    Console.WriteLine("Refresh des données terminé");
+                }
+                else
+                {
+                    Snackbar.Add(result.ErrorMessage ?? "Erreur lors du rejet", Severity.Error);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Erreur: validateurId est null");
+                Snackbar.Add("Erreur d'authentification", Severity.Error);
             }
         }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Exception dans ConfirmRejet: {ex.Message}");
+            Console.Error.WriteLine($"StackTrace: {ex.StackTrace}");
+            Snackbar.Add("Erreur lors du rejet de la demande", Severity.Error);
+        }
     }
+
 
     private async Task RefreshData()
     {

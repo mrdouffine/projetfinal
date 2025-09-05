@@ -84,5 +84,12 @@ public class ValidationController : ControllerBase
         return Ok(validations);
     }
 
-
+    //GetDotIdsAsync
+    //[Authorize(Roles ="Admin")]
+    [HttpGet("dot-ids")]
+    public async Task<IActionResult> GetDotIds()
+    {
+        var dotIds = await _service.GetDotIdsAsync();
+        return Ok(dotIds);
+    }
 }

@@ -9,6 +9,7 @@
 @inject ISnackbar Snackbar
 @inject AuthenticationStateProvider AuthStateProvider
 @inject UtilisateurService UtilisateurService
+@implements IDisposable
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />

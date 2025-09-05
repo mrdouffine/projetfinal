@@ -17,5 +17,8 @@ public interface IValidationRepository
     //GetValidationsAujourdhuiAsync()
 
     Task<IEnumerable<ValidationDto>> GetValidationsAujourdhuiAsync(int valideurId);
+
+    //récupérer les id des dot
+    Task<IEnumerable<int>> GetDotIdsAsync();
     Task<bool> DeleteAsync(int id);
 }
