@@ -3,12 +3,9 @@ using GestionConge.Client.Services;
 using GestionConge.Client.Handlers;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
-
+using MudBlazor;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
-
-// Remove the default authentication service to use your custom one
-// builder.Services.AddApiAuthorization();
 
 // MudBlazor
 builder.Services.AddMudServices(config =>
@@ -43,8 +40,9 @@ builder.Services.AddHttpClient("MonApi", client =>
 })
 .AddHttpMessageHandler<CustomAuthorizationHandler>();
 
-// Services API
-builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("MonApi"));
+// Services API - The problematic line has been removed. The HttpClient "MonApi"
+// will now be correctly resolved by the DI container when ApiService or ApiClient
+// request it in their constructors.
 builder.Services.AddScoped<ApiService>();
 builder.Services.AddScoped<ApiClient>();
 
