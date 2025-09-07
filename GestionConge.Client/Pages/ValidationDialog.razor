@@ -1,0 +1,110 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using GestionConge.Client.Models
+@using GestionConge.Client.Services
+@using GestionConge.Client.Extensions
+@inject ISnackbar Snackbar
+@inject ValidationService ValidationService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@(IsApproval? Icons.Material.Filled.Check : Icons.Material.Filled.Close)" Class="mr-3" />
+            @(IsApproval ? "Approuver la demande" : "Rejeter la demande")
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText GutterBottom="true">
+            Êtes-vous sûr de vouloir @(IsApproval ? "approuver" : "rejeter") la demande de <strong>@Validation.NomValideur</strong> ?
+        </MudText>
+        @if (IsApproval)
+        {
+            <MudTextField @bind-Value="_commentaire"
+                          Label="Commentaire (facultatif)"
+                          Variant="Variant.Outlined"
+                          Lines="3"
+                          HelperText="Ajoutez un commentaire si nécessaire" />
+        }
+        else
+        {
+            <MudTextField @bind-Value="_commentaire"
+                          Label="Commentaire (obligatoire)"
+                          Variant="Variant.Outlined"
+                          Lines="3"
+                          Required="true"
+                          HelperText="Expliquez la raison du rejet" />
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Annuler</MudButton>
+        <MudButton Color="@(IsApproval? Color.Success: Color.Error)"
+                   OnClick="Submit"
+                   Disabled="@(!IsApproval && string.IsNullOrWhiteSpace(_commentaire))">
+            @(IsApproval ? "Approuver" : "Rejeter")
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public Validation Validation { get; set; } = default!;
+    [Parameter] public bool IsApproval { get; set; }
+
+    private string _commentaire = "";
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task Submit()
+    {
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var validateurId = authState.User.GetUserId();
+
+            if (!validateurId.HasValue)
+            {
+                Snackbar.Add("Erreur d'authentification.", Severity.Error);
+                MudDialog.Cancel();
+                return;
+            }
+
+            if (IsApproval)
+            {
+                var result = await ValidationService.ApprouverDemandeAsync(
+                    Validation.DemandeCongeId, validateurId.Value, _commentaire);
+
+                if (result.IsSuccess)
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                }
+                else
+                {
+                    Snackbar.Add(result.ErrorMessage ?? "Erreur lors de l'approbation.", Severity.Error);
+                    MudDialog.Close(DialogResult.Cancel());
+                }
+            }
+            else
+            {
+                var result = await ValidationService.RejeterDemandeAsync(
+                    Validation.DemandeCongeId, validateurId.Value, _commentaire);
+
+                if (result.IsSuccess)
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                }
+                else
+                {
+                    Snackbar.Add(result.ErrorMessage ?? "Erreur lors du rejet.", Severity.Error);
+                    MudDialog.Close(DialogResult.Cancel());
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Exception dans le dialogue: {ex.Message}");
+            Snackbar.Add("Une erreur inattendue est survenue.", Severity.Error);
+            MudDialog.Cancel();
+        }
+    }
+}
