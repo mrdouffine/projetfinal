@@ -61,7 +61,20 @@ public class ValidationRepository : IValidationRepository
                u.id as ValideurId, u.nom as NomValideur, u.email as EmailValideur
         FROM validations v
         JOIN utilisateurs u ON v.valideurid = u.id
-        WHERE v.valideurid = @ValideurId
+        WHERE v.valideurid = @ValideurId and v.statut = 'En attente'
+        ORDER BY v.datevalidation DESC;
+        ";
+        return await _db.QueryAsync<ValidationDto>(sql, new { ValideurId = valideurId });
+    }
+
+    public async Task<IEnumerable<ValidationDto>> GetValidationsByDOTAsync(int valideurId)
+    {
+        var sql = @"
+        SELECT v.id, v.demandecongeid, v.statut, v.commentaire, v.datevalidation,
+               u.id as ValideurId, u.nom as NomValideur, u.email as EmailValideur
+        FROM validations v
+        JOIN utilisateurs u ON v.valideurid = u.id
+        WHERE v.valideurid = @ValideurId and v.statut = 'En attente' and v.ordre_validation = '2'
         ORDER BY v.datevalidation DESC;
         ";
         return await _db.QueryAsync<ValidationDto>(sql, new { ValideurId = valideurId });

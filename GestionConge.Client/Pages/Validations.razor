@@ -259,11 +259,69 @@
     </MudCardContent>
 </MudCard>
 
+
+@if (_isDot)
+{
+    <MudText Typo="Typo.h5" Class="mt-8 mb-4">
+        <MudIcon Icon="@Icons.Material.Filled.Security" Class="mr-2" />
+        Validations finales (DOT)
+    </MudText>
+
+    <MudCard>
+        <MudCardContent>
+            @if (_loadingDotValidations)
+            {
+                <div class="text-center pa-4">
+                    <MudProgressCircular Indeterminate="true" />
+                    <MudText Class="mt-2">Chargement des demandes DOT...</MudText>
+                </div>
+            }
+            else if (!_dotValidations.Any())
+            {
+                <div class="text-center pa-8">
+                    <MudIcon Icon="@Icons.Material.Filled.DoneAll" Size="Size.Large" Color="Color.Success" Class="mb-4" />
+                    <MudText Typo="Typo.h6" Color="Color.Secondary">Aucune validation DOT en attente</MudText>
+                </div>
+            }
+            else
+            {
+                <MudDataGrid T="Validation" Items="_dotValidations"
+                             Sortable="true" Filterable="false"
+                             RowsPerPage="10">
+                    <Columns>
+                        <PropertyColumn Property="x => x.NomValideur" Title="Demandeur" />
+                        <PropertyColumn Property="x => x.DateValidation" Title="Soumise au DOT le" Format="dd/MM/yyyy" />
+                        <PropertyColumn Property="x => x.OrdreValidation" Title="Niveau" />
+                        <TemplateColumn Title="Actions" Sortable="false">
+                            <CellTemplate>
+                                <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small">
+                                    <MudButton Color="Color.Info" OnClick="@(() => VoirDetails(context.Item.DemandeCongeId))" StartIcon="@Icons.Material.Filled.Visibility">
+                                        Détails
+                                    </MudButton>
+                                    <MudButton Color="Color.Success" OnClick="@(() => ApprouverDemande(context.Item))" StartIcon="@Icons.Material.Filled.Check">
+                                        Approuver
+                                    </MudButton>
+                                    <MudButton Color="Color.Error" OnClick="@(() => RejeterDemande(context.Item))" StartIcon="@Icons.Material.Filled.Close">
+                                        Rejeter
+                                    </MudButton>
+                                </MudButtonGroup>
+                            </CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                </MudDataGrid>
+            }
+        </MudCardContent>
+    </MudCard>
+}
+
 @code {
     private bool _loading = true;
+    private bool _loadingDotValidations = true;
+    private bool _isDot = false;
     private List<Validation> _validationsEnAttente = new();
     private List<Validation> _filteredValidations = new();
     private List<Validation> _validationsUrgentes = new();
+    private List<Validation> _dotValidations = new();
     private int _validationsAujourdhui = 0;
     private string _viewMode = "table";
 
@@ -278,7 +336,15 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var userRole = authState.User.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
+        _isDot = userRole == "DOT";
+
         await LoadValidationEnAttente();
+
+        
+            await LoadDotValidations();
+        
     }
 
     private async Task LoadValidationEnAttente()
@@ -320,6 +386,33 @@
         }
     }
 
+    private async Task LoadDotValidations()
+    {
+        _loadingDotValidations = true;
+        try
+        {
+            var result = await ValidationService.GetValidationsByDotAsync();
+            if (result.IsSuccess)
+            {
+                _dotValidations = result.Data.ToList();
+            }
+            else
+            {
+                Snackbar.Add(result.ErrorMessage ?? "Une erreur est survenue lors du chargement des demandes DOT.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Erreur lors du chargement des demandes DOT : {ex.Message}");
+            Snackbar.Add("Erreur lors du chargement des demandes DOT", Severity.Error);
+        }
+        finally
+        {
+            _loadingDotValidations = false;
+        }
+    }
+
+
     private async Task LoadStatistiques()
     {
         var result = await ValidationService.GetValidationsAujourdhuiAsync();
@@ -340,7 +433,7 @@
             (_filtreUrgence == "urgent" && IsUrgent(v)) ||
             (_filtreUrgence == "normal" && !IsUrgent(v))) &&
             (_filtreRole == "" ||
-            (_filtreRole == "DOT" && IsDotValidation(v)) ||
+            (_filtreRole == "dot" && IsDotValidation(v)) ||
             (_filtreRole == "normal" && !IsDotValidation(v))) &&
             (string.IsNullOrEmpty(_filtreType)) &&
             (string.IsNullOrEmpty(_filtreEmploye) ||
@@ -373,8 +466,7 @@
 
     private bool IsDotValidation(Validation validation)
     {
-        // La logique pour la validation DOT devrait être implémentée ici
-        return false;
+        return validation.OrdreValidation == 2;
     }
 
     private string GetTempsReponseMoyen()
@@ -418,5 +510,9 @@
     private async Task RefreshData()
     {
         await LoadValidationEnAttente();
+        if (_isDot)
+        {
+            await LoadDotValidations();
+        }
     }
 }

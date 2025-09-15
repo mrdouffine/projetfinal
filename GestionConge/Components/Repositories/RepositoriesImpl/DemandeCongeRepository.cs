@@ -106,7 +106,7 @@ public class DemandeCongeRepository : IDemandeCongeRepository
         FROM demandes_conge d
         JOIN utilisateurs u ON d.utilisateurid = u.id
         JOIN validations v ON v.demandecongeid = d.id
-        WHERE v.statut = 'En attente'
+        WHERE v.statut = 'En attente' and v.ordre_validation = 1
         ORDER BY d.date_soumission DESC;
         ";
         return await _db.QueryAsync<DemandeCongeDto>(sql);

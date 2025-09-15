@@ -301,6 +301,31 @@ public class ValidationService
         }
     }
 
+    // GetValidationByDOTasync
+    public async Task<ServiceResult<List<Validation>>> GetValidationsByDotAsync()
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync("https://localhost:7064/api/Validation/validations-by-dot");
+            if (response.IsSuccessStatusCode)
+            {
+                var validations = await response.Content.ReadFromJsonAsync<List<Validation>>();
+                return ServiceResult<List<Validation>>.Success(validations!);
+            }
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return ServiceResult<List<Validation>>.Failure("Aucune validation DOT n'a été trouvée.");
+            }
+            return ServiceResult<List<Validation>>.Failure($"Erreur lors de la récupération: {response.StatusCode}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erreur lors de la récupération des validations DOT");
+            return ServiceResult<List<Validation>>.Failure("Erreur de connexion au serveur");
+        }
+    }
+
+
     //récupérer les id des DOT
     public async Task<List<int>> GetDotIdsAsync()
     {

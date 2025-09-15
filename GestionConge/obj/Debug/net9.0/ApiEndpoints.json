@@ -730,6 +730,22 @@
   },
   {
     "ContainingType": "GestionConge.Components.Controllers.ValidationController",
+    "Method": "GetValidationsByDOT",
+    "RelativePath": "api/Validation/validations-by-dot",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionConge.Components.Controllers.ValidationController",
     "Method": "GetValidationsByValidateur",
     "RelativePath": "api/Validation/validations-by-validateur",
     "HttpMethod": "GET",

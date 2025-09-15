@@ -92,4 +92,13 @@ public class ValidationController : ControllerBase
         var dotIds = await _service.GetDotIdsAsync();
         return Ok(dotIds);
     }
+
+    //GetValidationsByDOTAsync
+    //[Authorize (Roles ="DOT") ]
+    [HttpGet("validations-by-dot")]
+    public async Task<IActionResult> GetValidationsByDOT(int id)
+    {
+        var validations = await _service.GetValidationsByDOTAsync(id);
+        return Ok(validations);
+    }
 }

@@ -16,6 +16,7 @@ public interface IValidationService
     Task<IEnumerable<ValidationDto>> GetValidationsAujourdhuiAsync(int valideurId);
 
     Task<IEnumerable<ValidationDto>> GetValidationsByValidateurAsync(int valideurId);
+    Task<IEnumerable<ValidationDto>> GetValidationsByDOTAsync(int valideurId);
     Task<IEnumerable<int>> GetDotIdsAsync();
 
     Task<bool> DeleteAsync(int id);

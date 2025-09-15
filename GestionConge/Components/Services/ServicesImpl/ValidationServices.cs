@@ -31,6 +31,8 @@ public class ValidationServices : IValidationService
     public Task<bool> UpdateAsync(Validation validation) => _validationRepo.UpdateAsync(validation);
     public Task<bool> DeleteAsync(int id) => _validationRepo.DeleteAsync(id);
 
+
+
     public async Task<bool> TraiterValidationAsync(ValidationRequestDto dto)
     {
         // 1. Récupérer la validation existante
@@ -98,6 +100,9 @@ public class ValidationServices : IValidationService
 
     public Task<IEnumerable<ValidationDto>> GetValidationsByValidateurAsync(int valideurId)
         => _validationRepo.GetValidationsByValidateurAsync(valideurId);
+
+    public Task<IEnumerable<ValidationDto>> GetValidationsByDOTAsync(int valideurId)
+        => _validationRepo.GetValidationsByDOTAsync(valideurId);
     // Méthodes utilitaires privées
     private async Task UpdateDemandeStatutAsync(DemandeCongeDto demande, string statut)
     {
